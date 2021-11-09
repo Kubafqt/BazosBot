@@ -208,7 +208,11 @@ namespace BazosBot
          blacklistItems = blacklistItemsString.Split(';');
       }
 
-      public static void LoadDefaultUrls()
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <returns></returns>
+      public static string[] LoadDefaultUrls()
       {
          SqlConnection connection = new SqlConnection(connString);
          string cmdText = $"SELECT DISTINCT URL_PAGE FROM BazosFilter UNION SELECT DISTINCT URL_PAGE FROM BazosBlackList";
@@ -221,6 +225,7 @@ namespace BazosBot
             ListUrl.Add((string)reader["URL_PAGE"]);       
          }
          connection.Close();
+         return ListUrl.ToArray(;
       }
       #endregion
    }

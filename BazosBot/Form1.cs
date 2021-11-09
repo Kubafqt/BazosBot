@@ -22,7 +22,12 @@ namespace BazosBot
          offerLbox.HorizontalScrollbar = true;
          activePanel = "main";
          AddPanelsToCombobox();
-         
+         LoadDefaultFilters();
+      }
+
+      private void LoadDefaultFilters()
+      {
+         cmbSelectUrl.Items.AddRange(DB_Access.LoadDefaultUrls());
       }
 
       /// <summary>
