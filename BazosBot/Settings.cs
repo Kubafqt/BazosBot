@@ -17,8 +17,8 @@ namespace BazosBot
 
       public static Dictionary<string, string> DictPanelNameValue = new Dictionary<string, string>()
       {
-         { "settingsPanel" , "settings" },
-         { "panelMain" , "main panel" },
+         { "settings", "settingsPanel" },
+         { "main panel", "panelMain" },
       };
 
    }

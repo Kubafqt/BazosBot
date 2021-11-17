@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace BazosBot
@@ -11,7 +11,7 @@ namespace BazosBot
    class DB_Access
    {
       static List<BazosOffers> ActOffersList = new List<BazosOffers>();
-      static readonly string connString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Application.StartupPath}\\GameDatabase.mdf;Integrated Security = True; Connect Timeout = 30";
+      static readonly string connString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Application.StartupPath}Database.mdf;Integrated Security = True; Connect Timeout = 30";
       /// <summary>
       /// 
       /// </summary>
@@ -63,20 +63,20 @@ namespace BazosBot
       /// <param name="connection"></param>
       private static void CheckDeletedOffers(SqlConnection connection)
       {
-         string selectCmdText = "SELECT * FROM BazosOffers";
-         SqlCommand selectCommand = new SqlCommand(selectCmdText, connection);
-         connection.Open();
-         SqlDataReader reader = selectCommand.ExecuteReader();
-         while (reader.Read())
-         {
-            string categoryNameURL = (string)reader["CategoryNameUrlID"];
-            string url = (string)reader["url"];
-            if (categoryNameURL == BazosOffers.actualCategoryNameURL && BazosOffers.ListBazosOffers.Where(p => p.url == url).ToString() != string.Empty) //Offer url in db is not contained in actual offers list
-            {
-               UpdateDeletedOffers(url, connection);
-            }
-         }
-         connection.Close();
+         //string selectCmdText = "SELECT * FROM BazosOffers";
+         //SqlCommand selectCommand = new SqlCommand(selectCmdText, connection);
+         //connection.Open();
+         //SqlDataReader reader = selectCommand.ExecuteReader();
+         //while (reader.Read())
+         //{
+         //   string categoryNameURL = (string)reader["CategoryNameUrlID"];
+         //   string url = (string)reader["url"];
+         //   if (categoryNameURL == BazosOffers.actualCategoryNameURL && BazosOffers.ListBazosOffers.Where(p => p.url == url).ToString() != string.Empty) //Offer url in db is not contained in actual offers list
+         //   {
+         //      UpdateDeletedOffers(url, connection);
+         //   }
+         //}
+         //connection.Close();
       }
 
       /// <summary>
@@ -106,16 +106,16 @@ namespace BazosBot
       /// <param name="MaxCena"></param>
       public static void AddToFilter(string NameOfSet, string Name, string UrlPage, int MaxCena)
       {
-         SqlConnection connection = new SqlConnection(connString);
-         string cmdText = !NameOfSetExist(NameOfSet) ? $"INSERT INTO BazosFilterSet (NAME_OF_SET, URL_PAGE, NAME, MAX_CENA) VALUES (@NameOfSet, @Name, @UrlPage, @MaxCena;" : $"UPDATE BazosFilterSet SET URL_PAGE = @UrlPage, NAME = @Name, MAX_CENA = @MaxCena WHERE NAME_OF_SET = @NameOfSet;";
-         SqlCommand cmd = new SqlCommand(cmdText, connection);
-         cmd.Parameters.AddWithValue("@NameOfSet", NameOfSet);
-         cmd.Parameters.AddWithValue("@Name", Name);
-         cmd.Parameters.AddWithValue("@UrlPage", UrlPage);
-         cmd.Parameters.AddWithValue("@MaxCena", MaxCena);
-         connection.Open();
-         cmd.ExecuteNonQuery();
-         connection.Close();
+         //SqlConnection connection = new SqlConnection(connString);
+         //string cmdText = !NameOfSetExist(NameOfSet) ? $"INSERT INTO BazosFilterSet (NAME_OF_SET, URL_PAGE, NAME, MAX_CENA) VALUES (@NameOfSet, @Name, @UrlPage, @MaxCena;" : $"UPDATE BazosFilterSet SET URL_PAGE = @UrlPage, NAME = @Name, MAX_CENA = @MaxCena WHERE NAME_OF_SET = @NameOfSet;";
+         //SqlCommand cmd = new SqlCommand(cmdText, connection);
+         //cmd.Parameters.AddWithValue("@NameOfSet", NameOfSet);
+         //cmd.Parameters.AddWithValue("@Name", Name);
+         //cmd.Parameters.AddWithValue("@UrlPage", UrlPage);
+         //cmd.Parameters.AddWithValue("@MaxCena", MaxCena);
+         //connection.Open();
+         //cmd.ExecuteNonQuery();
+         //connection.Close();
       }
 
       /// <summary>
@@ -148,23 +148,23 @@ namespace BazosBot
       /// <param name="listboxItems"></param>
       public static void CreateFilterSet(string filterSetName, List<string> listboxFilterItems, List<string> listboxBlacklistItems)
       {
-         SqlConnection connection = new SqlConnection(connString);
-         string itemSet = string.Empty;
-         string blacklistItems = string.Empty;
-         foreach (var item in listboxFilterItems)
-         {
-            itemSet += $"{item};";
-         }
-         foreach (var item in listboxBlacklistItems)
-         {
-            blacklistItems += $"{item};";
-         }
-         string cmdText = !FilterSetExist(filterSetName) ? $"INSERT INTO BazosFilterSet VALUES (@filterSetName, {itemSet}, {blacklistItems};" : $"UPDATE BazosFilterSet SET SetItems = {itemSet}, BlacklistItems = {blacklistItems} WHERE SetName = {filterSetName};";
-         SqlCommand cmd = new SqlCommand(cmdText, connection);
-         cmd.Parameters.AddWithValue("@filterSetName", filterSetName);
-         connection.Open();
-         cmd.ExecuteNonQuery();
-         connection.Close();
+         //SqlConnection connection = new SqlConnection(connString);
+         //string itemSet = string.Empty;
+         //string blacklistItems = string.Empty;
+         //foreach (var item in listboxFilterItems)
+         //{
+         //   itemSet += $"{item};";
+         //}
+         //foreach (var item in listboxBlacklistItems)
+         //{
+         //   blacklistItems += $"{item};";
+         //}
+         //string cmdText = !FilterSetExist(filterSetName) ? $"INSERT INTO BazosFilterSet VALUES (@filterSetName, {itemSet}, {blacklistItems};" : $"UPDATE BazosFilterSet SET SetItems = {itemSet}, BlacklistItems = {blacklistItems} WHERE SetName = {filterSetName};";
+         //SqlCommand cmd = new SqlCommand(cmdText, connection);
+         //cmd.Parameters.AddWithValue("@filterSetName", filterSetName);
+         //connection.Open();
+         //cmd.ExecuteNonQuery();
+         //connection.Close();
       }
 
       /// <summary>
@@ -189,24 +189,44 @@ namespace BazosBot
          return false;
       }
 
-      public static void LoadFilterSetToBoxes(string nameOfSet, out string[] setItems, out string[] blacklistItems)
-      {
-         SqlConnection connection = new SqlConnection(connString);
-         string cmdText = $"SELECT * FROM BazosFilterSet WHERE setName = {nameOfSet}";
-         SqlCommand cmd = new SqlCommand(cmdText, connection);
-         connection.Open();
-         SqlDataReader reader = cmd.ExecuteReader();
-         string setItemsString = string.Empty;
-         string blacklistItemsString = string.Empty;
-         while (reader.Read()) //load level info
-         {
-            setItemsString = (string)reader["SetItems"];
-            blacklistItemsString = (string)reader["BlacklistItems"];
-         }
-         connection.Close();
-         setItems = setItemsString.Split(';');
-         blacklistItems = blacklistItemsString.Split(';');
-      }
+      //public static void LoadFilterSetToBoxes(string nameOfSet, out string[] setItems, out string[] blacklistItems)
+      //{
+      //   //SqlConnection connection = new SqlConnection(connString);
+      //   //string cmdText = $"SELECT * FROM BazosFilterSet WHERE setName = {nameOfSet}";
+      //   //SqlCommand cmd = new SqlCommand(cmdText, connection);
+      //   //connection.Open();
+      //   //SqlDataReader reader = cmd.ExecuteReader();
+      //   //string setItemsString = string.Empty;
+      //   //string blacklistItemsString = string.Empty;
+      //   //while (reader.Read()) //load level info
+      //   //{
+      //   //   setItemsString = (string)reader["SetItems"];
+      //   //   blacklistItemsString = (string)reader["BlacklistItems"];
+      //   //}
+      //   //connection.Close();
+      //   //setItems = setItemsString.Split(';');
+      //   //blacklistItems = blacklistItemsString.Split(';');
+      //}
+
+      //public static void LoadFilterSetToBoxes(string urlPage, out string[] setItems, out string[] blacklistItems, out string setName)
+      //{
+      //   SqlConnection connection = new SqlConnection(connString);
+      //   string cmdText = $"SELECT * FROM BazosFilterSet WHERE URL_PAGE = {urlPage}";
+      //   SqlCommand cmd = new SqlCommand(cmdText, connection);
+      //   connection.Open();
+      //   SqlDataReader reader = cmd.ExecuteReader();
+      //   string setItemsString = string.Empty;
+      //   string blacklistItemsString = string.Empty;
+      //   while (reader.Read()) //load level info
+      //   {
+      //      setItemsString = (string)reader["SetItems"];
+      //      blacklistItemsString = (string)reader["BlacklistItems"];
+      //      setName = (string)reader["SetName"];
+      //   }
+      //   connection.Close();
+      //   setItems = setItemsString.Split(';');
+      //   blacklistItems = blacklistItemsString.Split(';');
+      //}
 
       /// <summary>
       /// 
@@ -214,18 +234,19 @@ namespace BazosBot
       /// <returns></returns>
       public static string[] LoadDefaultUrls()
       {
-         SqlConnection connection = new SqlConnection(connString);
-         string cmdText = $"SELECT DISTINCT URL_PAGE FROM BazosFilter UNION SELECT DISTINCT URL_PAGE FROM BazosBlackList";
-         SqlCommand cmd = new SqlCommand(cmdText, connection);
-         List<string> ListUrl = new List<string>();
-         connection.Open();
-         SqlDataReader reader = cmd.ExecuteReader();
-         while (reader.Read()) //load level info
-         {
-            ListUrl.Add((string)reader["URL_PAGE"]);       
-         }
-         connection.Close();
-         return ListUrl.ToArray(;
+         //SqlConnection connection = new SqlConnection(connString);
+         //string cmdText = $"SELECT DISTINCT URL_PAGE FROM BazosFilter UNION SELECT DISTINCT URL_PAGE FROM BazosBlackList";
+         //SqlCommand cmd = new SqlCommand(cmdText, connection);
+         //List<string> ListUrl = new List<string>();
+         //connection.Open();
+         //SqlDataReader reader = cmd.ExecuteReader();
+         //while (reader.Read()) //load level info
+         //{
+         //   ListUrl.Add((string)reader["URL_PAGE"]);       
+         //}
+         //connection.Close();
+         //return ListUrl.ToArray
+         return new string[0];
       }
       #endregion
    }

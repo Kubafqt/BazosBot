@@ -50,10 +50,10 @@ namespace BazosBot
       /// <summary>
       /// Main method to get all offers.
       /// </summary>
-      public static void GetOffersFromPage(string html, string defUrl)
+      public static void GetOffersFromPage(string html, string defUrl, int containerLineNumber)
       {
          List<string> htmlSplit = html.Split("\n").ToList();
-         htmlSplit.RemoveRange(0, 200);
+         htmlSplit.RemoveRange(0, containerLineNumber);
          defUrl = defUrl.Substring(0, defUrl.LastIndexOf(".") + 3); //.cz, .sk
          int lineNumber = 0;
          foreach (string line in htmlSplit)
@@ -62,7 +62,7 @@ namespace BazosBot
             {      
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
                DictNameValue["nadpis"] = GetNadpis(line);
-               DictNameValue["datum"] = GetDate(line);
+               DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
             }
             if (line.Contains("class=popis")) //popis
             {
@@ -110,7 +110,7 @@ namespace BazosBot
                else
                {
                   popis += "\n" + htmlSplit[i].Split("<")[0];
-                  break;
+                  return popis;
                }                     
             }
          }
@@ -120,7 +120,7 @@ namespace BazosBot
       private static string GetNadpis(string line)
       {
          int startIndex = line.IndexOf("\">") + 2;
-         int endIndex = line.IndexOf("</a>");
+         int endIndex = line.Contains("</a>") ? line.IndexOf("</a>") : line.Length; //GetUrlClosingLine(index, htmlSplit);
          return line.Substring(startIndex, endIndex - startIndex);
       }
 
@@ -130,11 +130,34 @@ namespace BazosBot
          return defUrl + line.Substring(urlStartIndex, line.Length - urlStartIndex).Split('"')[1];
       }
 
-      private static string GetDate(string line)
+      private static string GetDate(string line, int index, List<string> htmlSplit)
       {
-         int dateStartIndex = line.LastIndexOf("[") + 1;
-         int dateEndIndex = line.LastIndexOf("]</span>");
-         return line.Substring(dateStartIndex, line.Length - dateStartIndex - (line.Length - dateEndIndex)).Replace(" ", string.Empty);
+         if (line.Contains("</a>"))
+         {
+            int dateStartIndex = line.LastIndexOf("[") + 1;
+            int dateEndIndex = line.LastIndexOf("]</span>");
+            return line.Substring(dateStartIndex, line.Length - dateStartIndex - (line.Length - dateEndIndex)).Replace(" ", string.Empty);
+          }
+         else
+         {
+            line = GetUrlClosingLine(index, htmlSplit);
+            int dateStartIndex = line.LastIndexOf("[") + 1;
+            int dateEndIndex = line.LastIndexOf("]</span>");
+            return line.Substring(dateStartIndex, line.Length - dateStartIndex - (line.Length - dateEndIndex)).Replace(" ", string.Empty);
+         }
+      }
+
+      private static string GetUrlClosingLine(int index, List<string> htmlSplit)
+      {
+         for (int i = index; i < index + 10; i++)
+         {
+            string line = htmlSplit[i];
+            if (line.Contains("</a>"))
+            {
+               return line;
+            }
+         }
+         return string.Empty;
       }
 
       private static string GetCena(string line)

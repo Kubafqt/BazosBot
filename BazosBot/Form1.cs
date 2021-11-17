@@ -37,9 +37,9 @@ namespace BazosBot
       {
          foreach (Control control in Controls.OfType<Panel>())
          {
+            cmbSelectPanel.Items.Add(Settings.DictPanelNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value 
             if (control.Tag == "mainPanels")
-            {
-               cmbSelectPanel.Items.Add(Settings.DictPanelNameValue[control.Name]);
+            {           
                control.Size = Settings.defaultPanelSize;
                control.Location = Settings.defaultPanelLocation;
             }
@@ -57,7 +57,9 @@ namespace BazosBot
       /// </summary>
       private void btnGetBazos_Click(object sender, EventArgs e)
       {
+         ResetList();
          Download.DownloadAllFromCategory(tbSearchUrl.Text);
+         //await download;
          BazosOffers.actualCategoryNameURL = tbSearchUrl.Text;
          int itemCount = 0;
          foreach (BazosOffers nabidka in BazosOffers.ListBazosOffers.ToList())
@@ -65,6 +67,12 @@ namespace BazosBot
             itemCount++;
             resultLbox.Items.Add($"{itemCount}) {nabidka.nadpis} for {nabidka.cena} - {nabidka.lokace} / {nabidka.psc} - {nabidka.datum} - {nabidka.viewed} x - {nabidka.url}"); //url show on click
          }
+      }
+
+      private void ResetList()
+      {
+         BazosOffers.ListBazosOffers.Clear();
+         resultLbox.Items.Clear();
       }
 
       private void resultLbox_SelectedIndexChanged(object sender, EventArgs e)
@@ -118,7 +126,7 @@ namespace BazosBot
 
       private void btnSelectPanel_Click(object sender, EventArgs e)
       {
-         ChangePanel(cmbSelectPanel.SelectedItem.ToString());
+         ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
       }
 
       /// <summary>
@@ -150,12 +158,13 @@ namespace BazosBot
 
       private void cmbSelectPanel_SelectedIndexChanged(object sender, EventArgs e)
       {
-         var controlName = Settings.DictPanelNameValue.FirstOrDefault(x => x.Value == cmbSelectPanel.SelectedItem.ToString()).Key;
-         Controls[controlName].Show();
+         string key = cmbSelectPanel.SelectedItem.ToString();
+         string controlName = Settings.DictPanelNameValue[key];
          foreach (Control control in Controls.OfType<Panel>())
          {
             control.Hide();
          }
+         Controls[controlName].Show();
          //foreach (Control control in Controls) //optimalize !
          //{
          //   if (control.Name == controlName)
@@ -223,13 +232,15 @@ namespace BazosBot
          string cmbText = cmbSelectFilter.SelectedItem.ToString();
          if (cmbText != string.Empty && ((lboxFilterSet.Items.Count == 0 && lboxBlacklistSet.Items.Count == 0) || MessageBox.Show("Přemazat rozdělaný filter set?", "Delete", MessageBoxButtons.YesNo) == DialogResult.Yes))
          {
+#pragma warning disable CS0168 // Variable is declared but never used
             string[] setItems;
+#pragma warning restore CS0168 // Variable is declared but never used
             string[] blacklistItems;
-            DB_Access.LoadFilterSetToBoxes(cmbText, out setItems, out blacklistItems);
+            //DB_Access.LoadFilterSetToBoxes(cmbText, out setItems, out blacklistItems);
             lboxFilterSet.Items.Clear();
             lboxBlacklistSet.Items.Clear();
-            lboxFilterSet.Items.AddRange(setItems);
-            lboxBlacklistSet.Items.AddRange(blacklistItems);
+            //lboxFilterSet.Items.AddRange(setItems);
+            //lboxBlacklistSet.Items.AddRange(blacklistItems);
             tbFilterSetName.Text = cmbText;
          }
       }
