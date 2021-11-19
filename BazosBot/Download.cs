@@ -21,8 +21,8 @@ namespace BazosBot
       {
          //await Task.Run(() =>
          //{
-         try
-         {
+         //try
+         //{
             int fullCount = 0;
             int actualNumber = 0;
             url = url[url.Length - 1] == '/' ? url : url + "/";
@@ -42,11 +42,11 @@ namespace BazosBot
             }
             while (actualNumber <= fullCount);
             //});
-         }
-         catch (Exception e)
-         {
-            MessageBox.Show($"Nastala chyba webbrowseru: {e.GetType()} {e.StackTrace}");
-         }
+         //}
+         //catch (Exception e)
+         //{
+         //   MessageBox.Show($"Nastala chyba webbrowseru: {e.GetType()} {e.StackTrace}");
+         //}
       }
 
       /// <summary>
