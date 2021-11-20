@@ -198,13 +198,23 @@ namespace BazosBot
       /// <param name="Name"></param>
       /// <param name="UrlPage"></param>
       /// <param name="MaxCena"></param>
-      public static void AddToFilter(string NameOfSet, string Name, string UrlPage, int MaxCena)
+      public static void AddToFilter(string NameOfFilter, string Name, string UrlPage, int MaxCena)
       {
-         Filters filter = new Filters(NameOfSet, UrlPage, Name, MaxCena);
+         int index = Filters.ListFilters.IndexOf(Filters.ListFilters.FirstOrDefault(p => p.NameOfFilter == NameOfFilter));
+         if (index >= 0)
+         {
+            Filters.ListFilters[index].Name = Name;
+            Filters.ListFilters[index].PageUrl = UrlPage;
+            Filters.ListFilters[index].MaxCena = MaxCena;
+         }
+         else
+         {
+            Filters filter = new Filters(NameOfFilter, UrlPage, Name, MaxCena);
+         }
          SqlConnection connection = new SqlConnection(connString);
-         string cmdText = !NameOfSetExist(NameOfSet) ? $"INSERT INTO BazosFilter (NAME_OF_FILTER, NAME, URL_PAGE, MAX_CENA) VALUES (@NameOfSet, @Name, @UrlPage, @MaxCena);" : $"UPDATE BazosFilter SET URL_PAGE = @UrlPage, NAME = @Name, MAX_CENA = @MaxCena WHERE NAME_OF_FILTER = @NameOfSet;";
+         string cmdText = !NameOfSetExist(NameOfFilter) ? $"INSERT INTO BazosFilter (NAME_OF_FILTER, NAME, URL_PAGE, MAX_CENA) VALUES (@NameOfSet, @Name, @UrlPage, @MaxCena);" : $"UPDATE BazosFilter SET URL_PAGE = @UrlPage, NAME = @Name, MAX_CENA = @MaxCena WHERE NAME_OF_FILTER = @NameOfSet;";
          SqlCommand cmd = new SqlCommand(cmdText, connection);
-         cmd.Parameters.AddWithValue("@NameOfSet", NameOfSet);
+         cmd.Parameters.AddWithValue("@NameOfSet", NameOfFilter);
          cmd.Parameters.AddWithValue("@Name", Name);
          cmd.Parameters.AddWithValue("@UrlPage", UrlPage);
          cmd.Parameters.AddWithValue("@MaxCena", MaxCena);      
@@ -254,7 +264,7 @@ namespace BazosBot
          {
             blacklistItems = listboxBlacklistItems.IndexOf(item) == 0 ? item : $"{blacklistItems};{item}";
          }
-         string cmdText = !FilterSetExist(filterSetName) ? $"INSERT INTO BazosFilterSet VALUES (@filterSetName, '{itemSet}', '{blacklistItems}', '{urlPage}');" : $"UPDATE BazosFilterSet SET SetItems = '{itemSet}', BlacklistItems = '{blacklistItems}', URL_PAGE = '{urlPage}' WHERE SetName = @filterSetName;";
+         string cmdText = !FilterSetExist(filterSetName) ? $"INSERT INTO BazosFilterSet VALUES (@filterSetName, '{itemSet}', '{blacklistItems}', '{urlPage}');" : $"UPDATE BazosFilterSet SET SetFilters = '{itemSet}', SetBlacklists = '{blacklistItems}', URL_PAGE = '{urlPage}' WHERE SetName = @filterSetName;";
          SqlCommand cmd = new SqlCommand(cmdText, connection);
          cmd.Parameters.AddWithValue("@filterSetName", filterSetName);
          connection.Open();

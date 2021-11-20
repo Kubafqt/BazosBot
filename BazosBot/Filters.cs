@@ -30,11 +30,29 @@ namespace BazosBot
          ListFilters.Add(this);
       }
 
+      public static void RemoveFilter(string filterName)
+      {
+         Filters filter = ListFilters.FirstOrDefault(f => f.NameOfFilter == filterName);
+         ListFilters.Remove(filter);
+         SqlConnection connection = new SqlConnection(connString);
+         string deleteCmdText = $"DELETE FROM BazosFilter WHERE NAME_OF_FILTER = '{filterName}';";
+         SqlCommand cmd = new SqlCommand(deleteCmdText, connection);
+         connection.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         string url = string.Empty;
+         while (reader.Read()) //load level info
+         {
+            Filters f = new Filters((string)reader["NAME_OF_FILTER"], (string)reader["URL_PAGE"], (string)reader["NAME"], (int)reader["MAX_CENA"]);
+         }
+         connection.Close();
+      }
+
       /// <summary>
       /// 
       /// </summary>
       public static void InitFilterObjects()
       {
+         ListFilters.Clear();
          SqlConnection connection = new SqlConnection(connString);
          string selectCmdText = $"SELECT * FROM BazosFilter;";
          SqlCommand cmd = new SqlCommand(selectCmdText, connection);
@@ -53,6 +71,7 @@ namespace BazosBot
       /// </summary>
       public static void InitDictionary_PageURL_FilterName()
       {
+         Dict_URL_PAGE_FilterName.Clear();
          SqlConnection connection = new SqlConnection(connString);
          string selectCmdText = $"SELECT DISTINCT URL_PAGE, NAME_OF_FILTER FROM BazosFilter;";
          SqlCommand cmd = new SqlCommand(selectCmdText, connection);

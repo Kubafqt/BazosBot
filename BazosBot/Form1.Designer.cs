@@ -42,6 +42,7 @@ namespace BazosBot
          this.textBox2 = new System.Windows.Forms.TextBox();
          this.cmbSelectFilter = new System.Windows.Forms.ComboBox();
          this.filterPanel = new System.Windows.Forms.Panel();
+         this.btnClearFilterTextboxes = new System.Windows.Forms.Button();
          this.cBoxFullName = new System.Windows.Forms.CheckBox();
          this.btnAddToFilter = new System.Windows.Forms.Button();
          this.lbName = new System.Windows.Forms.Label();
@@ -49,9 +50,9 @@ namespace BazosBot
          this.lbUrlPage = new System.Windows.Forms.Label();
          this.lbFilterName = new System.Windows.Forms.Label();
          this.tbFilterMaxCena = new System.Windows.Forms.TextBox();
-         this.tbFilterName = new System.Windows.Forms.TextBox();
+         this.tbFilterNadpis = new System.Windows.Forms.TextBox();
          this.tbFilterPageUrl = new System.Windows.Forms.TextBox();
-         this.tbFilterSetName = new System.Windows.Forms.TextBox();
+         this.tbFilterName = new System.Windows.Forms.TextBox();
          this.blacklistPanel = new System.Windows.Forms.Panel();
          this.label7 = new System.Windows.Forms.Label();
          this.label8 = new System.Windows.Forms.Label();
@@ -71,7 +72,7 @@ namespace BazosBot
          this.cmbAddBlacklist = new System.Windows.Forms.ComboBox();
          this.lboxBlacklistSet = new System.Windows.Forms.ListBox();
          this.btnCreateFilterSet = new System.Windows.Forms.Button();
-         this.tbSetName = new System.Windows.Forms.TextBox();
+         this.tbFiltersetName = new System.Windows.Forms.TextBox();
          this.lboxFilters = new System.Windows.Forms.ListBox();
          this.btnAddFilter = new System.Windows.Forms.Button();
          this.cmbAddFilter = new System.Windows.Forms.ComboBox();
@@ -143,9 +144,9 @@ namespace BazosBot
          this.panelMain.Controls.Add(this.resultLbox);
          this.panelMain.Controls.Add(this.label1);
          this.panelMain.Controls.Add(this.btnGetBazos);
-         this.panelMain.Location = new System.Drawing.Point(412, 5);
+         this.panelMain.Location = new System.Drawing.Point(245, 12);
          this.panelMain.Name = "panelMain";
-         this.panelMain.Size = new System.Drawing.Size(84, 23);
+         this.panelMain.Size = new System.Drawing.Size(46, 33);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
          // 
@@ -207,6 +208,7 @@ namespace BazosBot
          // 
          // filterPanel
          // 
+         this.filterPanel.Controls.Add(this.btnClearFilterTextboxes);
          this.filterPanel.Controls.Add(this.cBoxFullName);
          this.filterPanel.Controls.Add(this.btnAddToFilter);
          this.filterPanel.Controls.Add(this.lbName);
@@ -214,14 +216,24 @@ namespace BazosBot
          this.filterPanel.Controls.Add(this.lbUrlPage);
          this.filterPanel.Controls.Add(this.lbFilterName);
          this.filterPanel.Controls.Add(this.tbFilterMaxCena);
-         this.filterPanel.Controls.Add(this.tbFilterName);
+         this.filterPanel.Controls.Add(this.tbFilterNadpis);
          this.filterPanel.Controls.Add(this.tbFilterPageUrl);
-         this.filterPanel.Controls.Add(this.tbFilterSetName);
+         this.filterPanel.Controls.Add(this.tbFilterName);
          this.filterPanel.Location = new System.Drawing.Point(528, 67);
          this.filterPanel.Name = "filterPanel";
          this.filterPanel.Size = new System.Drawing.Size(362, 316);
          this.filterPanel.TabIndex = 10;
          this.filterPanel.Tag = "filterPanel";
+         // 
+         // btnClearFilterTextboxes
+         // 
+         this.btnClearFilterTextboxes.Location = new System.Drawing.Point(178, 163);
+         this.btnClearFilterTextboxes.Name = "btnClearFilterTextboxes";
+         this.btnClearFilterTextboxes.Size = new System.Drawing.Size(75, 23);
+         this.btnClearFilterTextboxes.TabIndex = 13;
+         this.btnClearFilterTextboxes.Text = "Clear";
+         this.btnClearFilterTextboxes.UseVisualStyleBackColor = true;
+         this.btnClearFilterTextboxes.Click += new System.EventHandler(this.btnClearFilterTextboxes_Click);
          // 
          // cBoxFullName
          // 
@@ -285,15 +297,15 @@ namespace BazosBot
          this.tbFilterMaxCena.Name = "tbFilterMaxCena";
          this.tbFilterMaxCena.Size = new System.Drawing.Size(187, 23);
          this.tbFilterMaxCena.TabIndex = 5;
-         this.tbFilterMaxCena.Tag = "FilterSet";
+         this.tbFilterMaxCena.Tag = "Filter";
          // 
-         // tbFilterName
+         // tbFilterNadpis
          // 
-         this.tbFilterName.Location = new System.Drawing.Point(85, 101);
-         this.tbFilterName.Name = "tbFilterName";
-         this.tbFilterName.Size = new System.Drawing.Size(187, 23);
-         this.tbFilterName.TabIndex = 4;
-         this.tbFilterName.Tag = "FilterSet";
+         this.tbFilterNadpis.Location = new System.Drawing.Point(85, 101);
+         this.tbFilterNadpis.Name = "tbFilterNadpis";
+         this.tbFilterNadpis.Size = new System.Drawing.Size(187, 23);
+         this.tbFilterNadpis.TabIndex = 4;
+         this.tbFilterNadpis.Tag = "Filter";
          // 
          // tbFilterPageUrl
          // 
@@ -301,15 +313,15 @@ namespace BazosBot
          this.tbFilterPageUrl.Name = "tbFilterPageUrl";
          this.tbFilterPageUrl.Size = new System.Drawing.Size(187, 23);
          this.tbFilterPageUrl.TabIndex = 3;
-         this.tbFilterPageUrl.Tag = "FilterSet";
+         this.tbFilterPageUrl.Tag = "Filter";
          // 
-         // tbFilterSetName
+         // tbFilterName
          // 
-         this.tbFilterSetName.Location = new System.Drawing.Point(85, 41);
-         this.tbFilterSetName.Name = "tbFilterSetName";
-         this.tbFilterSetName.Size = new System.Drawing.Size(187, 23);
-         this.tbFilterSetName.TabIndex = 2;
-         this.tbFilterSetName.Tag = "FilterSet";
+         this.tbFilterName.Location = new System.Drawing.Point(85, 41);
+         this.tbFilterName.Name = "tbFilterName";
+         this.tbFilterName.Size = new System.Drawing.Size(187, 23);
+         this.tbFilterName.TabIndex = 2;
+         this.tbFilterName.Tag = "Filter";
          // 
          // blacklistPanel
          // 
@@ -419,7 +431,7 @@ namespace BazosBot
          this.filterSetPanel.Controls.Add(this.cmbAddBlacklist);
          this.filterSetPanel.Controls.Add(this.lboxBlacklistSet);
          this.filterSetPanel.Controls.Add(this.btnCreateFilterSet);
-         this.filterSetPanel.Controls.Add(this.tbSetName);
+         this.filterSetPanel.Controls.Add(this.tbFiltersetName);
          this.filterSetPanel.Controls.Add(this.lboxFilters);
          this.filterSetPanel.Controls.Add(this.btnAddFilter);
          this.filterSetPanel.Controls.Add(this.cmbAddFilter);
@@ -497,12 +509,12 @@ namespace BazosBot
          this.btnCreateFilterSet.UseVisualStyleBackColor = true;
          this.btnCreateFilterSet.Click += new System.EventHandler(this.btnCreateFilterSet_Click);
          // 
-         // tbSetName
+         // tbFiltersetName
          // 
-         this.tbSetName.Location = new System.Drawing.Point(22, 166);
-         this.tbSetName.Name = "tbSetName";
-         this.tbSetName.Size = new System.Drawing.Size(139, 23);
-         this.tbSetName.TabIndex = 16;
+         this.tbFiltersetName.Location = new System.Drawing.Point(22, 166);
+         this.tbFiltersetName.Name = "tbFiltersetName";
+         this.tbFiltersetName.Size = new System.Drawing.Size(139, 23);
+         this.tbFiltersetName.TabIndex = 16;
          // 
          // lboxFilters
          // 
@@ -513,6 +525,7 @@ namespace BazosBot
          this.lboxFilters.Size = new System.Drawing.Size(243, 409);
          this.lboxFilters.TabIndex = 15;
          this.lboxFilters.SelectedIndexChanged += new System.EventHandler(this.lboxFilterSet_SelectedIndexChanged);
+         this.lboxFilters.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lboxFilters_KeyDown);
          // 
          // btnAddFilter
          // 
@@ -532,6 +545,8 @@ namespace BazosBot
          this.cmbAddFilter.Name = "cmbAddFilter";
          this.cmbAddFilter.Size = new System.Drawing.Size(139, 23);
          this.cmbAddFilter.TabIndex = 13;
+         this.cmbAddFilter.SelectedIndexChanged += new System.EventHandler(this.cmbAddFilter_SelectedIndexChanged);
+         this.cmbAddFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbAddFilter_KeyDown);
          // 
          // settingsPanel
          // 
@@ -540,7 +555,7 @@ namespace BazosBot
          this.settingsPanel.Controls.Add(this.cmbSelectFilter);
          this.settingsPanel.Location = new System.Drawing.Point(21, 45);
          this.settingsPanel.Name = "settingsPanel";
-         this.settingsPanel.Size = new System.Drawing.Size(962, 537);
+         this.settingsPanel.Size = new System.Drawing.Size(955, 511);
          this.settingsPanel.TabIndex = 8;
          this.settingsPanel.Tag = "mainPanels";
          this.settingsPanel.Visible = false;
@@ -633,9 +648,9 @@ namespace BazosBot
       private System.Windows.Forms.Label lbUrlPage;
       private System.Windows.Forms.Label lbFilterName;
       private System.Windows.Forms.TextBox tbFilterMaxCena;
-      private System.Windows.Forms.TextBox tbFilterName;
+      private System.Windows.Forms.TextBox tbFilterNadpis;
       private System.Windows.Forms.TextBox tbFilterPageUrl;
-      private System.Windows.Forms.TextBox tbFilterSetName;
+      private System.Windows.Forms.TextBox tbFilterName;
       private System.Windows.Forms.Panel blacklistPanel;
       private System.Windows.Forms.Label label7;
       private System.Windows.Forms.Label label8;
@@ -654,7 +669,7 @@ namespace BazosBot
       private System.Windows.Forms.ComboBox cmbAddBlacklist;
       private System.Windows.Forms.ListBox lboxBlacklistSet;
       private System.Windows.Forms.Button btnCreateFilterSet;
-      private System.Windows.Forms.TextBox tbSetName;
+      private System.Windows.Forms.TextBox tbFiltersetName;
       private System.Windows.Forms.ListBox lboxFilters;
       private System.Windows.Forms.Button btnAddFilter;
       private System.Windows.Forms.ComboBox cmbAddFilter;
@@ -666,6 +681,7 @@ namespace BazosBot
       private System.Windows.Forms.CheckBox cBoxFullName;
       private System.Windows.Forms.ComboBox cmbFilterSet;
       private System.Windows.Forms.ListBox lboxSetDetails;
+      private System.Windows.Forms.Button btnClearFilterTextboxes;
    }
 }
 
