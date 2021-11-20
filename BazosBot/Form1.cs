@@ -18,19 +18,40 @@ namespace BazosBot
       public Form1()
       {
          InitializeComponent();
+         PrepareUserInterface();
+         lboxFilters.MouseUp += new System.Windows.Forms.MouseEventHandler(this.List_RightClick);
+      }
+
+      private void List_RightClick(object sender, MouseEventArgs e)
+      {
+
+         if (e.Button == MouseButtons.Right)
+         {
+            int index = lboxFilters.IndexFromPoint(e.Location);
+            if (index != ListBox.NoMatches)
+            {
+              // lboxFilters.Ite[index];
+            }
+         }
+
+      }
+
+
+
+      #region PrepareUserInteface
+      private void PrepareUserInterface()
+      {
+         activePanel = "main";
          resultLbox.HorizontalScrollbar = true;
          offerLbox.HorizontalScrollbar = true;
-         activePanel = "main";
-         LoadDefaultFilters();
+         PrepareComboboxes();
+         AddUrlPageFilterName();       
+      }
+
+      private void PrepareComboboxes()
+      {
          string[] cmbSelectOffersTypeString = new string[] { "all offers", "new offers", "updated", "deleted" };
          cmbSelectOffersType.Items.AddRange(cmbSelectOffersTypeString);
-         //List<string> List_URL_PAGE = new List<string>();
-         //DB_Access.InitializeFilters(out List_URL_PAGE);
-         //cmbSelectUrl.Items.AddRange(List_URL_PAGE.ToArray());
-         cmbSelectFilter.Items.Add("Filter Set");
-         cmbSelectFilter.Items.Add("Filter Panel");
-         cmbSelectFilter.Items.Add("Blacklist Panel");
-         AddUrlPageFilterName();
          if (cmbSelectUrl.Items.Count > 0)
          {
             cmbSelectUrl.SelectedIndex = 0;
@@ -42,14 +63,24 @@ namespace BazosBot
                (cmb as ComboBox).SelectedIndex = 0;
             }
          }
-         AddPanelsToCombobox();
-      }
+         foreach (Control control in Controls.OfType<Panel>())
+         {
+            cmbSelectFilter.Items.Add(Settings.DictFilterPanelsNames.FirstOrDefault(c => c.Value == control.Name).Key);
+            cmbSelectPanel.Items.Add(Settings.DictMainPanelsNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value
+            control.Size = Settings.defaultPanelSize;
+            control.Location = Settings.defaultPanelLocation;
+         }
+         cmbSelectPanel.SelectedItem = "main panel";
+     }
 
+      /// <summary>
+      /// 
+      /// </summary>
       private void AddUrlPageFilterName()
       {
-         FilterSet.InitFilterObjects();
-         FilterSet.InitDictionary_PageURL_FilterName();
-         foreach (string key in FilterSet.Dict_URL_PAGE_FilterName.Keys)
+         Filters.InitFilterObjects();
+         Filters.InitDictionary_PageURL_FilterName();
+         foreach (string key in Filters.Dict_URL_PAGE_FilterName.Keys)
          {
             if (!cmbSelectUrl.Items.Contains(key))
             {
@@ -62,28 +93,8 @@ namespace BazosBot
       {
          //cmbSelectUrl.Items.AddRange(DB_Access.LoadDefaultUrls());
       }
-
-      /// <summary>
-      /// 
-      /// </summary>
-      private void AddPanelsToCombobox()
-      {
-         foreach (Control control in Controls.OfType<Panel>())
-         {
-            cmbSelectPanel.Items.Add(Settings.DictPanelNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value 
-            if (control.Tag == "mainPanels")
-            {           
-               control.Size = Settings.defaultPanelSize;
-               control.Location = Settings.defaultPanelLocation;
-            }
-            if (control.Tag == "filterPanel")
-            {
-               control.Location = Settings.defaultPanelLocation;
-               control.Size = Settings.defaultPanelSize;
-            }
-         }
-         cmbSelectPanel.SelectedItem = "main panel";
-      }
+ 
+      #endregion
 
       /// <summary>
       /// 
@@ -215,32 +226,24 @@ namespace BazosBot
       private void cmbSelectPanel_SelectedIndexChanged(object sender, EventArgs e)
       {
          string key = cmbSelectPanel.SelectedItem.ToString();
-         string controlName = Settings.DictPanelNameValue[key];
+         string controlName = Settings.DictMainPanelsNameValue[key];
          foreach (Control control in Controls.OfType<Panel>())
          {
             control.Hide();
          }
          Controls[controlName].Show();
-         //foreach (Control control in Controls) //optimalize !
-         //{
-         //   if (control.Name == controlName)
-         //   {
-         //      control.Show();
-         //      break;
-         //   }
-         //}
       }
 
       private void cmbSelectFilter_SelectedIndexChanged(object sender, EventArgs e)
       {
          foreach (Control panel in Controls.OfType<Panel>())//.Where(p => p.Name == FilterSet.DictFilterPanelNames[cmbSelectFilter.Text]))
          {
-            if (panel.Tag == "filterPanel" && panel.Name == FilterSet.DictFilterPanelNames[cmbSelectFilter.Text])
+            if (panel.Tag == "filterPanel" && panel.Name == Settings.DictFilterPanelsNames[cmbSelectFilter.Text])
             {
                panel.Show();
             }
          }
-         foreach (Control panel in Controls.OfType<Panel>().Where(p => p.Name != FilterSet.DictFilterPanelNames[cmbSelectFilter.Text]))
+         foreach (Control panel in Controls.OfType<Panel>().Where(p => p.Name != Settings.DictFilterPanelsNames[cmbSelectFilter.Text]))
          {
             if (panel.Tag == "filterPanel")
             {
@@ -280,7 +283,7 @@ namespace BazosBot
       {
          List<string> ListListboxFilter = new List<string>();
          List<string> ListListboxBlacklist = new List<string>();
-         foreach (string item in lboxFilterSet.Items)
+         foreach (string item in lboxFilters.Items)
          {
             ListListboxFilter.Add(item);
          }
@@ -288,15 +291,15 @@ namespace BazosBot
          {
             ListListboxBlacklist.Add(item);
          }
-         DB_Access.CreateFilterSet(tbFilterSetName.Text, ListListboxFilter, ListListboxBlacklist, cmbSelectUrl.Text);
+         DB_Access.CreateFilterSet(tbSetName.Text, ListListboxFilter, ListListboxBlacklist, cmbSelectUrl.Text);
+         tbSetName.Clear();
       }
          
-
       private void btnAddFilter_Click(object sender, EventArgs e)
       {
          if (cmbAddFilter.SelectedItem.ToString() != string.Empty)
          {
-            lboxFilterSet.Items.Add(cmbAddFilter.SelectedItem.ToString());
+            lboxFilters.Items.Add(cmbAddFilter.SelectedItem.ToString());
             cmbAddFilter.SelectedIndex = 0;
          }
       }
@@ -313,14 +316,14 @@ namespace BazosBot
       private void cmbSelectFilterSet_SelectedIndexChanged(object sender, EventArgs e)
       {
          string cmbText = cmbSelectFilter.SelectedItem.ToString();
-         if (cmbText != string.Empty && ((lboxFilterSet.Items.Count == 0 && lboxBlacklistSet.Items.Count == 0) || MessageBox.Show("Přemazat rozdělaný filter set?", "Delete", MessageBoxButtons.YesNo) == DialogResult.Yes))
+         if (cmbText != string.Empty && ((lboxFilters.Items.Count == 0 && lboxBlacklistSet.Items.Count == 0) || MessageBox.Show("Přemazat rozdělaný filter set?", "Delete", MessageBoxButtons.YesNo) == DialogResult.Yes))
          {
 #pragma warning disable CS0168 // Variable is declared but never used
             string[] setItems;
 #pragma warning restore CS0168 // Variable is declared but never used
             string[] blacklistItems;
             //DB_Access.LoadFilterSetToBoxes(cmbText, out setItems, out blacklistItems);
-            lboxFilterSet.Items.Clear();
+            lboxFilters.Items.Clear();
             lboxBlacklistSet.Items.Clear();
             //lboxFilterSet.Items.AddRange(setItems);
             //lboxBlacklistSet.Items.AddRange(blacklistItems);
@@ -332,7 +335,7 @@ namespace BazosBot
       {
          string selectedUrl = cmbSelectUrl.Text;
          cmbAddFilter.Items.Clear();
-         cmbAddFilter.Items.AddRange(FilterSet.Dict_URL_PAGE_FilterName[selectedUrl].Split(';'));
+         cmbAddFilter.Items.AddRange(Filters.Dict_URL_PAGE_FilterName[selectedUrl].Split(';'));
          //cmbAddFilter.Items.AddRange(DB_Access.AddFilters(selectedUrl));
          //cmbAddBlacklist.Items.AddRange(DB_Access.AddBLacklists(selectedUrl));
       }
@@ -383,7 +386,7 @@ namespace BazosBot
       private void lboxFilterSet_SelectedIndexChanged(object sender, EventArgs e)
       {
          lboxSetDetails.Items.Clear();
-         FilterSet aktualFilter = FilterSet.ListFilterSet.FirstOrDefault(p => p.NameOfFilter == lboxFilterSet.SelectedItem.ToString());
+         Filters aktualFilter = Filters.ListFilters.FirstOrDefault(p => p.NameOfFilter == lboxFilters.SelectedItem.ToString());
          lboxSetDetails.Items.Add("page url: " + aktualFilter.PageUrl);
          lboxSetDetails.Items.Add("name of filter: " + aktualFilter.NameOfFilter);
          lboxSetDetails.Items.Add("search name: " + aktualFilter.Name);

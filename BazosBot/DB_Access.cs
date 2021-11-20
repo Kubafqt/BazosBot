@@ -200,7 +200,7 @@ namespace BazosBot
       /// <param name="MaxCena"></param>
       public static void AddToFilter(string NameOfSet, string Name, string UrlPage, int MaxCena)
       {
-         FilterSet filter = new FilterSet(NameOfSet, UrlPage, Name, MaxCena);
+         Filters filter = new Filters(NameOfSet, UrlPage, Name, MaxCena);
          SqlConnection connection = new SqlConnection(connString);
          string cmdText = !NameOfSetExist(NameOfSet) ? $"INSERT INTO BazosFilter (NAME_OF_FILTER, NAME, URL_PAGE, MAX_CENA) VALUES (@NameOfSet, @Name, @UrlPage, @MaxCena);" : $"UPDATE BazosFilter SET URL_PAGE = @UrlPage, NAME = @Name, MAX_CENA = @MaxCena WHERE NAME_OF_FILTER = @NameOfSet;";
          SqlCommand cmd = new SqlCommand(cmdText, connection);
@@ -246,11 +246,11 @@ namespace BazosBot
          SqlConnection connection = new SqlConnection(connString);
          string itemSet = string.Empty;
          string blacklistItems = string.Empty;
-         foreach (var item in listboxFilterItems)
+         foreach (var item in listboxFilterItems) //itemSet string
          {
             itemSet = listboxFilterItems.IndexOf(item) == 0 ? item : $"{itemSet};{item}";
          }
-         foreach (var item in listboxBlacklistItems)
+         foreach (var item in listboxBlacklistItems) //blaclistItems string
          {
             blacklistItems = listboxBlacklistItems.IndexOf(item) == 0 ? item : $"{blacklistItems};{item}";
          }

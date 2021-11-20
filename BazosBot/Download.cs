@@ -29,10 +29,6 @@ namespace BazosBot
             WebClient wc = new WebClient();
             do
             {
-               //if (url.Contains("320"))
-               //{
-               //   MessageBox.Show("before error");
-               //}
                string html = wc.DownloadString(url); //download html source from new url
                string[] lineSplit = html.Split("\n");
                int containerLineNumber = 0;  

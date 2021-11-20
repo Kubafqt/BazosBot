@@ -72,7 +72,7 @@ namespace BazosBot
          this.lboxBlacklistSet = new System.Windows.Forms.ListBox();
          this.btnCreateFilterSet = new System.Windows.Forms.Button();
          this.tbSetName = new System.Windows.Forms.TextBox();
-         this.lboxFilterSet = new System.Windows.Forms.ListBox();
+         this.lboxFilters = new System.Windows.Forms.ListBox();
          this.btnAddFilter = new System.Windows.Forms.Button();
          this.cmbAddFilter = new System.Windows.Forms.ComboBox();
          this.settingsPanel = new System.Windows.Forms.Panel();
@@ -420,7 +420,7 @@ namespace BazosBot
          this.filterSetPanel.Controls.Add(this.lboxBlacklistSet);
          this.filterSetPanel.Controls.Add(this.btnCreateFilterSet);
          this.filterSetPanel.Controls.Add(this.tbSetName);
-         this.filterSetPanel.Controls.Add(this.lboxFilterSet);
+         this.filterSetPanel.Controls.Add(this.lboxFilters);
          this.filterSetPanel.Controls.Add(this.btnAddFilter);
          this.filterSetPanel.Controls.Add(this.cmbAddFilter);
          this.filterSetPanel.Location = new System.Drawing.Point(10, 47);
@@ -504,15 +504,15 @@ namespace BazosBot
          this.tbSetName.Size = new System.Drawing.Size(139, 23);
          this.tbSetName.TabIndex = 16;
          // 
-         // lboxFilterSet
+         // lboxFilters
          // 
-         this.lboxFilterSet.FormattingEnabled = true;
-         this.lboxFilterSet.ItemHeight = 15;
-         this.lboxFilterSet.Location = new System.Drawing.Point(256, 20);
-         this.lboxFilterSet.Name = "lboxFilterSet";
-         this.lboxFilterSet.Size = new System.Drawing.Size(243, 409);
-         this.lboxFilterSet.TabIndex = 15;
-         this.lboxFilterSet.SelectedIndexChanged += new System.EventHandler(this.lboxFilterSet_SelectedIndexChanged);
+         this.lboxFilters.FormattingEnabled = true;
+         this.lboxFilters.ItemHeight = 15;
+         this.lboxFilters.Location = new System.Drawing.Point(256, 20);
+         this.lboxFilters.Name = "lboxFilters";
+         this.lboxFilters.Size = new System.Drawing.Size(243, 409);
+         this.lboxFilters.TabIndex = 15;
+         this.lboxFilters.SelectedIndexChanged += new System.EventHandler(this.lboxFilterSet_SelectedIndexChanged);
          // 
          // btnAddFilter
          // 
@@ -655,7 +655,7 @@ namespace BazosBot
       private System.Windows.Forms.ListBox lboxBlacklistSet;
       private System.Windows.Forms.Button btnCreateFilterSet;
       private System.Windows.Forms.TextBox tbSetName;
-      private System.Windows.Forms.ListBox lboxFilterSet;
+      private System.Windows.Forms.ListBox lboxFilters;
       private System.Windows.Forms.Button btnAddFilter;
       private System.Windows.Forms.ComboBox cmbAddFilter;
       private System.Windows.Forms.Panel settingsPanel;
