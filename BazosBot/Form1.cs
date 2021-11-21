@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+//.net maui
 
 namespace BazosBot
 {
@@ -111,36 +112,16 @@ namespace BazosBot
       /// </summary>
       private void btnGetBazos_Click(object sender, EventArgs e)
       {
-         ResetList();
-         int itemCount = 1;
-         BazosOffers.actualCategoryNameURL = tbSearchUrl.Text;
-         Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked);
-         //await download;
-         //List<BazosOffers> lastOffers = DB_Access.ListActualOffersInDB();
-         //foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList())
+         ResetList(); //reset list of offers and result lisbox
+         BazosOffers.actualCategoryNameURL = tbSearchUrl.Text; //actual category url id
+         Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
+         AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
+         //if (!cboxDownOnlyLast.Checked)
          //{
-         //   resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
-         //   itemCount++;
-         //   //if (!lastOffers.Contains(item)) //and checkbox checked
-         //   //{
-         //   //   itemCount++;
-         //   //   resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}"); //url show on click
-         //   //}
-         //   //}
+         //   DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL); //database
          //}
-         foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList())
-         {
-            AddItemsToResultLbox(itemCount, item);
-            //resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
-            itemCount++;
-            //if (!lastOffers.Contains(item)) //and checkbox checked
-            //{
-            //   itemCount++;
-            //   resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}"); //url show on click
-            //}
-            //}
-         }
-         DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
+         //labels:
+         lbAllOffers.Text = $"all offers: {BazosOffers.ListBazosOffers.Count}";
          lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
          lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
          lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
@@ -153,16 +134,11 @@ namespace BazosBot
 
       private void AddItemsToResultLbox(List<BazosOffers> itemList, int itemCount = 1)
       {
-         foreach (BazosOffers item in itemList)
+         foreach (BazosOffers item in itemList.ToList())
          {
             resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
             itemCount++;
          }     
-      }
-
-      private void AddItemsResultLbox()
-      {
-
       }
 
       private void ResetList()
@@ -174,7 +150,7 @@ namespace BazosBot
       private void resultLbox_SelectedIndexChanged(object sender, EventArgs e)
       {
          offerLbox.Items.Clear();
-         BazosOffers item = BazosOffers.ListBazosOffers.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], "for", ";").Split(";")[0].Trim());
+         BazosOffers item = BazosOffers.ListBazosOffers.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
          foreach (var prop in item.GetType().GetProperties())
          {
            offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
@@ -552,15 +528,21 @@ namespace BazosBot
 
       private void btnApplyQuickFilter_Click(object sender, EventArgs e)
       {
+         GetQuickFiltersFromTextbox(tbQuickFilter.Text);
+         ApplyQuickFilterChanges();
+      }
+
+      private void GetQuickFiltersFromTextbox(string tbQuickFilterText)
+      {
          QuickFilter.QuickFilterList.Clear();
-         string[] filterSplit = new string[] { tbQuickFilter.Text };
-         if (tbQuickFilter.Text.Contains(";"))
+         string[] filterSplit = new string[] { tbQuickFilterText };
+         if (tbQuickFilterText.Contains(";"))
          {
-            filterSplit = tbQuickFilter.Text.Split(";");
+            filterSplit = tbQuickFilterText.Split(";");
          }
          foreach (string item in filterSplit)
          {
-            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0];
+            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0]; //split from max price
             string nadpis = ndpsSplit.Length == 0 ? Regex.Match(item, @"[0-9]+|[A-Z]+", RegexOptions.IgnoreCase).ToString() : Regex.Match(ndpsSplit[0], @"[0-9]+|[A-Z]+").ToString(); //nadpis
             string popis = string.Empty;
             int maxCena = 0;
@@ -581,7 +563,6 @@ namespace BazosBot
                QuickFilter qf = new QuickFilter(nadpis, popis, maxCena, fullNadpisName);
             }
          }
-         ApplyQuickFilterChanges();
       }
 
       /// <summary>
@@ -597,11 +578,12 @@ namespace BazosBot
             //bool itemPlus = false;
             foreach (BazosOffers item in BazosOffers.ListBazosOffers)
             {
+               int cena = 0;
                if (qfList.Any(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase))) //nadpis is matched in quickfilter
                {
                   QuickFilter quickfilter = qfList.FirstOrDefault(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
-
-                  if (!quickfilter.fullNadpisName || Regex.IsMatch(item.nadpis, @"\s" + quickfilter.nadpis+ @"\s") && quickfilter.maxCena == 0 || int.Parse(item.cena) <= quickfilter.maxCena) //test if item is matched to max cena
+                  int.TryParse(item.cena, out cena);
+                  if (!quickfilter.fullNadpisName || item.nadpis.Split(' ').Contains(quickfilter.nadpis) /*Regex.IsMatch(item.nadpis, @"\s" + quickfilter.nadpis + @"(\s)*(?!.)")*/ && quickfilter.maxCena == 0 || (cena > 0 && cena <= quickfilter.maxCena) || cena == 0) //test if item is matched to max cena
                   {
                      AddItemsToResultLbox(itemCount, item);
                      itemCount++; //itemPlus = true;

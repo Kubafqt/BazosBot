@@ -33,13 +33,16 @@ namespace BazosBot
             string[] lineSplit = html.Split("\n");
             int containerLineNumber = 0;
             fullCount = GetFullCount(lineSplit, ref containerLineNumber);
-            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, getOnlyNewOffers))
+            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, getOnlyNewOffers)) //download only new offers
             {
-               break;
+               DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
+               BazosOffers.ListBazosOffers.AddRange(DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryNameURL));
+               return;
             }
             PrepareNextPage(ref actualNumber, ref url);
          }
          while (actualNumber <= fullCount);
+         DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
          //});
          //}
          //catch (Exception e)

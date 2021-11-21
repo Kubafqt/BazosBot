@@ -68,7 +68,7 @@ namespace BazosBot
                DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
                if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryNameURL))
                {
-                  return true;
+                  return true; //only new offers
                }
             }
             if (line.Contains("class=popis")) //popis

@@ -86,6 +86,7 @@ namespace BazosBot
          this.lbDeletedCount = new System.Windows.Forms.Label();
          this.lbNewOffers = new System.Windows.Forms.Label();
          this.cmbFilterSet = new System.Windows.Forms.ComboBox();
+         this.lbAllOffers = new System.Windows.Forms.Label();
          this.panelMain.SuspendLayout();
          this.filterPanel.SuspendLayout();
          this.blacklistPanel.SuspendLayout();
@@ -184,7 +185,7 @@ namespace BazosBot
          // 
          this.textBox3.Location = new System.Drawing.Point(518, 30);
          this.textBox3.Name = "textBox3";
-         this.textBox3.Size = new System.Drawing.Size(324, 23);
+         this.textBox3.Size = new System.Drawing.Size(104, 23);
          this.textBox3.TabIndex = 14;
          // 
          // lbQuickFilter
@@ -616,7 +617,7 @@ namespace BazosBot
          // lbUpdatedCount
          // 
          this.lbUpdatedCount.AutoSize = true;
-         this.lbUpdatedCount.Location = new System.Drawing.Point(475, 12);
+         this.lbUpdatedCount.Location = new System.Drawing.Point(517, 12);
          this.lbUpdatedCount.Name = "lbUpdatedCount";
          this.lbUpdatedCount.Size = new System.Drawing.Size(54, 15);
          this.lbUpdatedCount.TabIndex = 9;
@@ -634,7 +635,7 @@ namespace BazosBot
          // lbNewOffers
          // 
          this.lbNewOffers.AutoSize = true;
-         this.lbNewOffers.Location = new System.Drawing.Point(330, 12);
+         this.lbNewOffers.Location = new System.Drawing.Point(412, 12);
          this.lbNewOffers.Name = "lbNewOffers";
          this.lbNewOffers.Size = new System.Drawing.Size(65, 15);
          this.lbNewOffers.TabIndex = 11;
@@ -649,11 +650,21 @@ namespace BazosBot
          this.cmbFilterSet.Size = new System.Drawing.Size(254, 23);
          this.cmbFilterSet.TabIndex = 12;
          // 
+         // lbAllOffers
+         // 
+         this.lbAllOffers.AutoSize = true;
+         this.lbAllOffers.Location = new System.Drawing.Point(322, 12);
+         this.lbAllOffers.Name = "lbAllOffers";
+         this.lbAllOffers.Size = new System.Drawing.Size(55, 15);
+         this.lbAllOffers.TabIndex = 13;
+         this.lbAllOffers.Text = "all offers:";
+         // 
          // Form1
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(1060, 655);
+         this.Controls.Add(this.lbAllOffers);
          this.Controls.Add(this.cmbFilterSet);
          this.Controls.Add(this.lbNewOffers);
          this.Controls.Add(this.lbDeletedCount);
@@ -740,6 +751,7 @@ namespace BazosBot
       private System.Windows.Forms.TextBox tbQuickFilter;
       private System.Windows.Forms.Button btnApplyQuickFilter;
       private System.Windows.Forms.CheckBox cboxDownOnlyLast;
+      private System.Windows.Forms.Label lbAllOffers;
    }
 }
 
