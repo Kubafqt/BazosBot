@@ -13,7 +13,7 @@ namespace BazosBot
    {
       public static readonly string DBconnString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}Database.mdf;Integrated Security = True; Connect Timeout = 30";
 
-      public static Size defaultPanelSize = new Size(1000, 549);
+      public static Size defaultPanelSize = new Size(1003, 593);//(1000, 549);
       public static Point defaultPanelLocation = new Point(12, 34);
       public static Dictionary<string, string> DictMainPanelsNameValue = new Dictionary<string, string>()
       {

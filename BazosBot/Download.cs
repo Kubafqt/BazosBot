@@ -12,6 +12,7 @@ namespace BazosBot
 {
    class Download
    {
+      public static bool getOnlyNewOffers = false;
       public static List<string> htmlList = new List<string>();
       /// <summary>
       /// 
@@ -52,7 +53,7 @@ namespace BazosBot
       }
 
       /// <summary>
-      /// 
+      /// Prepare next bazos page.
       /// </summary>
       /// <param name="actualNumber"></param>
       /// <param name="url"></param>

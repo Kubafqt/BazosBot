@@ -18,7 +18,7 @@ namespace BazosBot
       public static bool downloaded = false;
 
       /// <summary>
-      /// 
+      /// Get list of actual offers in DB.
       /// </summary>
       /// <returns></returns>
       public static List<BazosOffers> ListActualOffersInDB(string urlNameID)
@@ -33,11 +33,32 @@ namespace BazosBot
          {
             listOffers.Add(new BazosOffers((string)reader["Nadpis"], (string)reader["Popis"], (string)reader["Datum"], (string)reader["URL"], (string)reader["Cena"], (int)reader["Viewed"], (string)reader["Lokace"], (string)reader["PSC"], (string)reader["lastChecked"]));
          }
+         conn.Close();
          return listOffers;
       }
 
       /// <summary>
-      /// 
+      /// Get list of actual offer names in DB.
+      /// </summary>
+      /// <returns></returns>
+      public static List<string> ListActualOffersCategoryURLInDB()
+      {
+         List<string> listOfferCategoryURL = new List<string>();
+         SqlConnection conn = new SqlConnection(connString);
+         string cmdText = $"SELECT DISTINCT CategoryNameUrlID FROM BazosOffers;";
+         SqlCommand cmd = new SqlCommand(cmdText, conn);
+         conn.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+            listOfferCategoryURL.Add((string)reader["CategoryNameUrlID"]);
+         }
+         conn.Close();
+         return listOfferCategoryURL;
+      }
+
+      /// <summary>
+      /// Insert new offers to offers DB, update updated offers in DB, then delete deleted offers from DB and add it to deleted offers table.
       /// </summary>
       /// <param name="urlNameID"></param>
       public static void InsertNewOffers(string urlNameID)
@@ -45,14 +66,6 @@ namespace BazosBot
          SqlConnection connection = new SqlConnection(connString);
          List<BazosOffers> actualList = ListActualOffersInDB(urlNameID);
          updatedList = new List<BazosOffers>();
-         //string cmd = $"INSERT INTO BazosOffers (Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, URL, CategoryNameUrlID) VALUES('ndps', 'pps', 'dtm', 'cn', 'lkc', 'psc', 100, 'url', @urlNameID);";
-         //SqlCommand command = new SqlCommand(cmd, connection);
-         //command.Parameters.AddWithValue("@urlNameID", urlNameID);
-         //connection.Open();
-         //command.ExecuteNonQuery();
-         //connection.Close();
-         //try
-         //{
          int i = 0;
          foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList()) //aktual downloaded
          {
@@ -83,7 +96,7 @@ namespace BazosBot
                   int recordAffect = ExecuteNonQuery(cmdText);
                   if (recordAffect > 0 && !cmdText.Contains("Viewed") && !cmdText.Contains("LastChecked"))
                   {
-                     Dictionary<int, string> DictUpdateAfterChange = new Dictionary<int, string>()
+                     Dictionary<int, string> DictAfterUpdateChange = new Dictionary<int, string>()
                      {
                         { 0, item.nadpis },
                         { 1, item.cena },
@@ -95,7 +108,7 @@ namespace BazosBot
                      {
                         updatedList.Add(item);
                      }
-                     item.changed = item.changed == string.Empty ? $"changed:\n {DictUpdateChange[index]} - {DictUpdateAfterChange[index]}" : item.changed + $"\n{DictUpdateChange[index]} - {DictUpdateAfterChange[index]}";
+                     item.changed = item.changed == string.Empty ? $"changed:\n {DictUpdateChange[index]} - {DictAfterUpdateChange[index]}" : item.changed + $"\n{DictUpdateChange[index]} - {DictAfterUpdateChange[index]}";
                   }
                   index++;
                }
@@ -119,24 +132,37 @@ namespace BazosBot
                command.ExecuteNonQuery();
                connection.Close();
                newOffersList.Add(item);
-            }
-            //if (i > 3950)
-            //{
-            //   Console.WriteLine("test");
-            //}
-            //CheckDeletedOffers(connection);
+            }     
          }
+         CheckDeletedOffers(connection);
          downloaded = true;
-         //}
-         //catch
-         //{
-
-
-         //}
       }
 
       /// <summary>
-      /// Check if offer is to delete
+      /// Used when get only new offers.
+      /// </summary>
+      /// <param name="url"></param>
+      /// <param name="categoryUrl"></param>
+      /// <returns></returns>
+      public static bool DBContainsUrl(string url, string categoryUrl)
+      {
+         SqlConnection connection = new SqlConnection(connString);
+         string selectCmdText = $"SELECT * FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
+         SqlCommand cmd = new SqlCommand(selectCmdText, connection);
+         connection.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read()) //load level info
+         {
+            connection.Close();
+            return true;
+         }
+         connection.Close();
+         return false;
+      }
+
+      #region Deleted offers
+      /// <summary>
+      /// Check if offer is deleted from offers category.
       /// </summary>
       /// <param name="connection"></param>
       private static void CheckDeletedOffers(SqlConnection connection)
@@ -144,17 +170,21 @@ namespace BazosBot
          string selectCmdText = "SELECT * FROM BazosOffers";
          SqlCommand selectCommand = new SqlCommand(selectCmdText, connection);
          connection.Open();
+         List<BazosOffers> actualList = ListActualOffersInDB(BazosOffers.actualCategoryNameURL);
          SqlDataReader reader = selectCommand.ExecuteReader();
+         List<string> urls = new List<string>();
+         string categoryNameURL = string.Empty;
          while (reader.Read())
          {
-            string dbUrl = (string)reader["url"];
-            string categoryNameURL = (string)reader["CategoryNameUrlID"];
-            if (categoryNameURL == BazosOffers.actualCategoryNameURL && BazosOffers.ListBazosOffers.Where(p => p.url == dbUrl).ToString() != string.Empty) //Offer url in db is not contained in actual offers list
+            string urlDB = (string)reader["url"];
+            categoryNameURL = (string)reader["CategoryNameUrlID"];
+            if (categoryNameURL == BazosOffers.actualCategoryNameURL && !actualList.Any(p => p.url == urlDB)) //Offer url in DBs is not contained in actual offers list
             {
-               UpdateDeletedOffers(dbUrl, connection);
+               urls.Add(urlDB);
             }
          }
          connection.Close();
+         UpdateDeletedOffers(urls, connection, categoryNameURL);
       }
 
       /// <summary>
@@ -162,35 +192,58 @@ namespace BazosBot
       /// </summary>
       /// <param name="url"></param>
       /// <param name="connection"></param>
-      private static void UpdateDeletedOffers(string url, SqlConnection connection)
+      private static void UpdateDeletedOffers(List<string> urls, SqlConnection connection, string categoryNameURL)
       {
-         string insertCmdText = $"INSERT INTO BazosEndedOffers (Nadpis, Popis, Cena, Lokace, PSC, Viewed, LastViewed) SELECT (Nadpis, Popis, Cena, Lokace, PSC, Viewed, LastChecked) FROM BazosOffers;";
-         string deleteCmdText = $"DELETE FROM BazosOffers WHERE URL = {url}";
-         //string cmdText = "SELECT * FROM BazosOffers";
-         SqlCommand cmdInsertToEnded = new SqlCommand(insertCmdText, connection);
-         SqlCommand cmdDeleteFromOffers = new SqlCommand(deleteCmdText, connection);
-         connection.Open();
-         cmdInsertToEnded.ExecuteNonQuery();
-         cmdDeleteFromOffers.ExecuteNonQuery();
-         connection.Close();
-         AddDeletedOffersToList();
+         foreach (string url in urls)
+         {
+            string insertCmdText = $"INSERT INTO BazosDeletedOffers " +
+            $"(Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, LastViewed, CategoryNameUrlID, EndedDateTimeGetted) SELECT " +
+            $"Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, LastChecked, CategoryNameUrlID, '{DateTime.Now}' FROM BazosOffers WHERE URL='{url}';";
+            string deleteCmdText = $"DELETE FROM BazosOffers WHERE URL='{url}'";
+            //string cmdText = "SELECT * FROM BazosOffers";
+            SqlCommand cmdInsertToEnded = new SqlCommand(insertCmdText, connection);
+            SqlCommand cmdDeleteFromOffers = new SqlCommand(deleteCmdText, connection);
+            connection.Open();
+            cmdInsertToEnded.ExecuteNonQuery();
+            cmdDeleteFromOffers.ExecuteNonQuery();
+            connection.Close();
+         }
+         AddDeletedOffersToList(urls);
       }
 
-      private static void AddDeletedOffersToList()
+      /// <summary>
+      /// 
+      /// </summary>
+      private static void AddDeletedOffersToList(List<string> urls)
+      {
+         foreach (string url in urls)
+         {
+            BazosOffers item = BazosOffers.ListBazosOffers.FirstOrDefault(p => p.url == url); /* new BazosOffers((string)reader["Nadpis"], (string)reader["Popis"], (string)reader["Datum"], (string)reader["LastViewed"], (string)reader["Cena"], (int)reader["Viewed"], (string)reader["Lokace"], (string)reader["PSC"], (string)reader["EndedDateTimeGetted"]);*/
+            deletedList.Add(item);
+         }
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      private static void AddDeletedOffersToList(string categoryNameURL)
       {
          SqlConnection connection = new SqlConnection(connString);
-         string selectCmdText = $"SELECT * FROM BazosDeletedTable;";
+         string selectCmdText = $"SELECT * FROM BazosDeletedOffers WHERE CategoryNameUrlID = '{categoryNameURL}';";
          SqlCommand cmd = new SqlCommand(selectCmdText, connection);
          connection.Open();
          SqlDataReader reader = cmd.ExecuteReader();
          while (reader.Read()) //load level info
          {
-            BazosOffers item = new BazosOffers((string)reader["Nadpis"], (string)reader["Popis"], (string)reader["Datum"], (string)reader["URL"], (string)reader["Cena"], (int)reader["Viewed"], (string)reader["Lokace"], (string)reader["PSC"], (string)reader["EndedDateTimeGetted"]);
+            BazosOffers item = new BazosOffers((string)reader["Nadpis"], (string)reader["Popis"], (string)reader["Datum"], (string)reader["LastViewed"], (string)reader["Cena"], (int)reader["Viewed"], (string)reader["Lokace"], (string)reader["PSC"], (string)reader["EndedDateTimeGetted"]);
             deletedList.Add(item);
          }
          connection.Close();
       }
 
+      #endregion
+
+      #region Filter
       /// <summary>
       /// 
       /// </summary>
@@ -217,7 +270,7 @@ namespace BazosBot
          cmd.Parameters.AddWithValue("@NameOfSet", NameOfFilter);
          cmd.Parameters.AddWithValue("@Name", Name);
          cmd.Parameters.AddWithValue("@UrlPage", UrlPage);
-         cmd.Parameters.AddWithValue("@MaxCena", MaxCena);      
+         cmd.Parameters.AddWithValue("@MaxCena", MaxCena);
          connection.Open();
          cmd.ExecuteNonQuery();
          connection.Close();
@@ -244,6 +297,8 @@ namespace BazosBot
          connection.Close();
          return false;
       }
+
+      #endregion
 
       #region FilterSet
       /// <summary>
@@ -294,6 +349,10 @@ namespace BazosBot
          return false;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="List_URL_PAGE"></param>
       public static void InitializeFilters(out List<string> List_URL_PAGE)//, out List<string> NAME_OF_FILTER)
       {
          SqlConnection connection = new SqlConnection(connString);
@@ -311,6 +370,12 @@ namespace BazosBot
          connection.Close();
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="nameOfSet"></param>
+      /// <param name="setItems"></param>
+      /// <param name="blacklistItems"></param>
       public static void LoadFilterSetToBoxes(string nameOfSet, out string[] setItems, out string[] blacklistItems)
       {
          SqlConnection connection = new SqlConnection(connString);
@@ -330,6 +395,13 @@ namespace BazosBot
          blacklistItems = blacklistItemsString.Split(';');
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="urlPage"></param>
+      /// <param name="setItems"></param>
+      /// <param name="blacklistItems"></param>
+      /// <param name="setName"></param>
       public static void LoadFilterSetToBoxes(string urlPage, out string[] setItems, out string[] blacklistItems, out string setName)
       {
          SqlConnection connection = new SqlConnection(connString);
@@ -368,33 +440,13 @@ namespace BazosBot
          //   ListUrl.Add((string)reader["URL_PAGE"]);       
          //}
          //connection.Close();
-         //return ListUrl.ToArray
+         //return ListUrl.ToArray();
          return new string[0];
       }
+
       #endregion
 
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="url"></param>
-      /// <param name="categoryUrl"></param>
-      /// <returns></returns>
-      public static bool DBContainsUrl(string url, string categoryUrl)
-      {
-         SqlConnection connection = new SqlConnection(connString);
-         string selectCmdText = $"SELECT * FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
-         SqlCommand cmd = new SqlCommand(selectCmdText, connection);
-         connection.Open();
-         SqlDataReader reader = cmd.ExecuteReader();
-         while (reader.Read()) //load level info
-         {
-            connection.Close();
-            return true;
-         }
-         connection.Close();
-         return false;
-      }
-
+      #region Execute SQL commands
       /// <summary>
       /// Execute SQL command
       /// </summary>
@@ -435,6 +487,8 @@ namespace BazosBot
       //   connection.Close();
       //   return recordsAffected;
       //}
+
+      #endregion
 
    }
 }
