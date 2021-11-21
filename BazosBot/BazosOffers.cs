@@ -53,7 +53,7 @@ namespace BazosBot
       /// <summary>
       /// Main method to get all offers.
       /// </summary>
-      public static void GetOffersFromPage(string html, string defUrl, int containerLineNumber)
+      public static bool GetOffersFromPage(string html, string defUrl, int containerLineNumber, bool getOnlyNewOffers)
       {
          List<string> htmlSplit = html.Split("\n").ToList();
          htmlSplit.RemoveRange(0, containerLineNumber);
@@ -62,10 +62,14 @@ namespace BazosBot
          foreach (string line in htmlSplit)
          {
             if(line.Contains("class=nadpis")) //nadpis, url, datum
-            {      
+            {   
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
                DictNameValue["nadpis"] = GetNadpis(line);
                DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
+               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryNameURL))
+               {
+                  return true;
+               }
             }
             if (line.Contains("class=popis")) //popis
             {
@@ -89,6 +93,7 @@ namespace BazosBot
             }
             lineNumber++;
          }
+         return false;
       }
 
       #region GetParametersFromHTML

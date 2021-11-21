@@ -11,8 +11,6 @@ namespace BazosBot
 {
    class FilterSet
    {
-      static readonly string connString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}Database.mdf;Integrated Security = True; Connect Timeout = 30";
-
       public static Dictionary<string, string> Dict_URL_PAGE_FilterSetName = new Dictionary<string, string>();
       public static List<FilterSet> ListFilterSet = new List<FilterSet>();
       public string SetName { get; set; }
@@ -34,7 +32,7 @@ namespace BazosBot
       public static void InitFilterSetObjects()
       {
          ListFilterSet.Clear();
-         SqlConnection connection = new SqlConnection(connString);
+         SqlConnection connection = new SqlConnection(Settings.DBconnString);
          string selectCmdText = $"SELECT * FROM BazosFilterSet;";
          SqlCommand cmd = new SqlCommand(selectCmdText, connection);
          connection.Open();
@@ -53,7 +51,7 @@ namespace BazosBot
       public static void InitFilterSetDictionary()
       {
          Dict_URL_PAGE_FilterSetName.Clear();
-         SqlConnection connection = new SqlConnection(connString);
+         SqlConnection connection = new SqlConnection(Settings.DBconnString);
          string selectCmdText = $"SELECT URL_PAGE, SetName FROM BazosFilterSet;";
          SqlCommand cmd = new SqlCommand(selectCmdText, connection);
          connection.Open();

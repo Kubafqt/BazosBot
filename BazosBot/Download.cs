@@ -17,27 +17,30 @@ namespace BazosBot
       /// 
       /// </summary>
       /// <param name="url"></param>
-      public static /*async Task*/ void DownloadAllFromCategory(string url) //from bazos section
+      public static /*async Task*/ void DownloadAllFromCategory(string url, bool getOnlyNewOffers = false) //from bazos section
       {
          //await Task.Run(() =>
          //{
          //try
          //{
-            int fullCount = 0;
-            int actualNumber = 0;
-            url = url[url.Length - 1] == '/' ? url : url + "/";
-            WebClient wc = new WebClient();
-            do
+         int fullCount = 0;
+         int actualNumber = 0;
+         url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
+         WebClient wc = new WebClient();
+         do
+         {
+            string html = wc.DownloadString(url); //download html source from new url
+            string[] lineSplit = html.Split("\n");
+            int containerLineNumber = 0;
+            fullCount = GetFullCount(lineSplit, ref containerLineNumber);
+            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, getOnlyNewOffers))
             {
-               string html = wc.DownloadString(url); //download html source from new url
-               string[] lineSplit = html.Split("\n");
-               int containerLineNumber = 0;  
-               fullCount = GetFullCount(lineSplit, ref containerLineNumber);
-               BazosOffers.GetOffersFromPage(html, url, containerLineNumber);
-               PrepareNextPage(ref actualNumber, ref url);
+               break;
             }
-            while (actualNumber <= fullCount);
-            //});
+            PrepareNextPage(ref actualNumber, ref url);
+         }
+         while (actualNumber <= fullCount);
+         //});
          //}
          //catch (Exception e)
          //{

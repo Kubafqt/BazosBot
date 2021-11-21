@@ -100,7 +100,7 @@ namespace BazosBot
                   index++;
                }
             }
-            if (!actualList.Any(p => p.url == item.url))
+            if (!actualList.Any(p => p.url == item.url)) //exception: category goes from Another CategoryNameUrl - now url set to not unique;
             {
                string cmd = $"INSERT INTO BazosOffers " +
                   $"(Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, URL, CategoryNameUrlID, LastChecked) VALUES " +
@@ -120,10 +120,10 @@ namespace BazosBot
                connection.Close();
                newOffersList.Add(item);
             }
-            if (i > 3950)
-            {
-               Console.WriteLine("test");
-            }
+            //if (i > 3950)
+            //{
+            //   Console.WriteLine("test");
+            //}
             //CheckDeletedOffers(connection);
          }
          downloaded = true;
@@ -373,6 +373,27 @@ namespace BazosBot
       }
       #endregion
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="url"></param>
+      /// <param name="categoryUrl"></param>
+      /// <returns></returns>
+      public static bool DBContainsUrl(string url, string categoryUrl)
+      {
+         SqlConnection connection = new SqlConnection(connString);
+         string selectCmdText = $"SELECT * FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
+         SqlCommand cmd = new SqlCommand(selectCmdText, connection);
+         connection.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read()) //load level info
+         {
+            connection.Close();
+            return true;
+         }
+         connection.Close();
+         return false;
+      }
 
       /// <summary>
       /// Execute SQL command
