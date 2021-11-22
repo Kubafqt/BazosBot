@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
+//.net maui
 
 namespace BazosBot
 {
@@ -18,79 +20,136 @@ namespace BazosBot
       public Form1()
       {
          InitializeComponent();
+         PrepareUserInterface();
+      }
+
+      private void Form1_Load(object sender, EventArgs e)
+      {
+         cmbSelectOffers.Items.AddRange(DB_Access.ListActualOffersCategoryURLInDB().ToArray());
+      }
+
+      #region PrepareUserInteface
+      private void PrepareUserInterface()
+      {
+         activePanel = "main";
          resultLbox.HorizontalScrollbar = true;
          offerLbox.HorizontalScrollbar = true;
-         activePanel = "main";
-         AddPanelsToCombobox();
-         LoadDefaultFilters();
+         PrepareComboboxes();     
       }
 
-      private void LoadDefaultFilters()
+      private void PrepareComboboxes()
       {
-         cmbSelectUrl.Items.AddRange(DB_Access.LoadDefaultUrls());
-      }
+         string[] cmbSelectOffersTypeString = new string[] { "all offers", "new offers", "updated", "deleted" };
+         cmbSelectOffersType.Items.AddRange(cmbSelectOffersTypeString);
+         cmbSelectOffersType.SelectedIndex = 0;
 
-      /// <summary>
-      /// 
-      /// </summary>
-      private void AddPanelsToCombobox()
-      {
+         foreach (Control cmb in Controls.OfType<ComboBox>())
+         {
+            if ((cmb as ComboBox).Items.Count > 0)
+            {
+               (cmb as ComboBox).SelectedIndex = 0;
+            }
+         }
          foreach (Control control in Controls.OfType<Panel>())
          {
-            cmbSelectPanel.Items.Add(Settings.DictPanelNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value 
-            if (control.Tag == "mainPanels")
-            {           
-               control.Size = Settings.defaultPanelSize;
-               control.Location = Settings.defaultPanelLocation;
-            }
-            if (control.Tag == "filterPanel")
-            {
-               control.Location = Settings.defaultPanelLocation;
-               control.Size = Settings.defaultPanelSize;
-            }
+            cmbSelectPanel.Items.Add(Settings.DictMainPanelsNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value
+            control.Size = Settings.defaultPanelSize;
+            control.Location = Settings.defaultPanelLocation;
          }
          cmbSelectPanel.SelectedItem = "main panel";
+     }
+
+      private void btnSelectPanel_Click(object sender, EventArgs e)
+      {
+         //ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
+         //DB_Access.InsertNewOffers("test");
       }
 
+      #endregion
+
+      #region Main Panel
       /// <summary>
-      /// 
+      /// Main method to get items from bazos.
       /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="e"></param>
       private void btnGetBazos_Click(object sender, EventArgs e)
       {
-         ResetList();
-         Download.DownloadAllFromCategory(tbSearchUrl.Text);
-         //await download;
-         BazosOffers.actualCategoryNameURL = tbSearchUrl.Text;
-         int itemCount = 0;
-         foreach (BazosOffers nabidka in BazosOffers.ListBazosOffers.ToList())
+         ResetList(); //reset list of offers and result lisbox
+         BazosOffers.actualCategoryNameURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
+         Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
+         AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
+         //labels:
+         lbAllOffers.Text = $"all offers: {BazosOffers.ListBazosOffers.Count}";
+         lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
+         lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
+         lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
+         lastSearched = true;
+         
+      }
+
+
+      /// <summary>
+      /// resultLbox
+      /// </summary>
+      /// <param name="itemCount"></param>
+      /// <param name="item"></param>
+      private void AddItemToResultLbox(int itemCount, BazosOffers item)
+      {
+         resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
+      }
+
+      private void AddItemsToResultLbox(List<BazosOffers> itemList, int itemCount = 1)
+      {
+         foreach (BazosOffers item in itemList.ToList())
          {
+            resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
             itemCount++;
-            resultLbox.Items.Add($"{itemCount}) {nabidka.nadpis} for {nabidka.cena} - {nabidka.lokace} / {nabidka.psc} - {nabidka.datum} - {nabidka.viewed} x - {nabidka.url}"); //url show on click
          }
       }
 
-      private void ResetList()
+      private void AddOffersToResultLbox(List<BazosOffers> offersList, string name = "")
       {
-         BazosOffers.ListBazosOffers.Clear();
-         resultLbox.Items.Clear();
+         int itemCount = 1;
+         foreach (BazosOffers item in offersList)
+         {
+            resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
+            itemCount++;
+         }
       }
 
       private void resultLbox_SelectedIndexChanged(object sender, EventArgs e)
       {
          offerLbox.Items.Clear();
-         BazosOffers nabidka = BazosOffers.ListBazosOffers[resultLbox.SelectedIndex];
-         foreach (var prop in nabidka.GetType().GetProperties())
+         if (!Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase))
          {
-           offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(nabidka, null)}");
+            BazosOffers item = BazosOffers.ListBazosOffers.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
+            foreach (var prop in item.GetType().GetProperties())
+            {
+               offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
+            }
          }
-         //foreach (var p in nabidka.GetType().GetProperties().Where(p => !p.GetGetMethod().GetParameters().Any()))
-         //{
-         //   offerLbox.Items.Add(p.GetValue(nabidka, null));
-         //}
-         //offerLbox.Items.Add($"{nabidka.nadpis}\n{nabidka.cena}\n{nabidka.url}\n{nabidka.lokace}\n{nabidka.psc}\n{nabidka.datum}\n{nabidka.viewed} x");
-         //offerLbox.Items.Add(
       }
 
+      private void resultLbox_DoubleClick(object sender, EventArgs e)
+      {
+         BazosOffers item = BazosOffers.ListBazosOffers.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
+         string url = item.url;
+         Process process = new Process();
+         process.StartInfo = new ProcessStartInfo()
+         {
+            FileName = Environment.GetEnvironmentVariable("ProgramFiles") + @"\Google\Chrome\Application\chrome.exe",
+            Arguments = url
+         };
+         process.Start();
+      }
+
+
+      /// <summary>
+      /// offerLbox
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="e"></param>
       private void offerLbox_DoubleClick(object sender, EventArgs e)
       {
          if (offerLbox.SelectedItem.ToString().Contains("url:"))
@@ -106,27 +165,124 @@ namespace BazosBot
          }
       }
 
-      private void resultLbox_DoubleClick(object sender, EventArgs e)
+
+      /// <summary>
+      /// reset list
+      /// </summary>
+      private void ResetList()
       {
-         //Process.Start("chrome", BazosOffers.ListBazosOffers[resultLbox.SelectedIndex].url);
-
-         string url = BazosOffers.ListBazosOffers[resultLbox.SelectedIndex].url;
-
-         Process process = new Process();
-         process.StartInfo = new ProcessStartInfo()
-         {
-            FileName = Environment.GetEnvironmentVariable("ProgramFiles") + @"\Google\Chrome\Application\chrome.exe",
-            Arguments = url
-         };
-         process.Start();
-         //startInfo.FileName = "chrome.exe";
-         //startInfo.Arguments = url;
-         //Process.Start(startInfo);
+         BazosOffers.ListBazosOffers.Clear();
+         resultLbox.Items.Clear();
       }
 
-      private void btnSelectPanel_Click(object sender, EventArgs e)
+
+      /// <summary>
+      /// 
+      /// </summary>
+      Dictionary<string, List<BazosOffers>> DictNameOffersList = new Dictionary<string, List<BazosOffers>>()
       {
-         ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
+         { "all offers" , BazosOffers.ListBazosOffers },
+         { "new offers" , DB_Access.newOffersList },
+         { "updated" , DB_Access.updatedList },
+         { "deleted" , DB_Access.deletedList }
+      };
+
+      private void cmbSelectOffersType_SelectedIndexChanged(object sender, EventArgs e)
+      {
+         if (DB_Access.downloaded)
+         {
+            resultLbox.Items.Clear();
+            //Dictionary<string, List<BazosOffers>> innerDictionary = DictNameOffersList;
+            if (cmbSelectOffersType.Text != "updated")
+            {
+               AddOffersToResultLbox(DictNameOffersList[cmbSelectOffersType.Text], cmbSelectOffersType.Text);
+            }
+            else
+            {
+               AddOffersToResultLbox(DB_Access.updatedList, "updated");
+            }
+         }
+      }
+
+      string lastSelectedItem;
+      private void cmbSelectOffers_SelectedIndexChanged(object sender, EventArgs e)
+      {
+         if (resultLbox.Items.Count == 0 || lastSelectedItem != cmbSelectOffers.Text && resultLbox.Items.Count > 0 && MessageBox.Show("Nahrát tento seznam věcí?", "Přemazat věci v listboxu?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+         {
+            resultLbox.Items.Clear();
+            BazosOffers.ListBazosOffers = DB_Access.ListActualOffersInDB(cmbSelectOffers.Text);
+            AddOffersToResultLbox(BazosOffers.ListBazosOffers);
+            lastSelectedItem = cmbSelectOffers.Text;
+            cmbSelectQuickFilter.Items.Clear();
+            cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(cmbSelectOffers.Text).ToArray());
+            lastSearched = false;
+         }
+      }
+
+
+      /// <summary>
+      /// Quick filter
+      /// </summary>
+      private void btnApplyQuickFilter_Click(object sender, EventArgs e)
+      {
+         QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
+         ApplyQuickFilterChanges();
+      }
+
+      private void ApplyQuickFilterChanges()
+      {
+         resultLbox.Items.Clear();
+         List<QuickFilter> qfList = QuickFilter.QuickFilterList;
+         if (qfList.Count > 0)
+         {
+            int itemCount = 1;
+            //bool itemPlus = false;
+            foreach (BazosOffers item in BazosOffers.ListBazosOffers)
+            {
+               int cena = 0;
+               if (qfList.Any(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase))) //nadpis is matched in quickfilter
+               {
+                  QuickFilter quickfilter = qfList.FirstOrDefault(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
+                  int.TryParse(item.cena, out cena);
+                  if ((!quickfilter.fullNadpisName || item.nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena > 0 && cena <= quickfilter.maxCena) || cena == 0) && !QuickFilter.Blacklist.Any(nadpis => item.nadpis.Contains(nadpis, StringComparison.OrdinalIgnoreCase))) //test if item is matched to max cena
+                  {
+                     AddItemToResultLbox(itemCount, item);
+                     itemCount++; //itemPlus = true;
+                  }
+               }
+            }
+         }
+         else
+         {
+            AddItemsToResultLbox(BazosOffers.ListBazosOffers);
+         }
+      }
+
+      bool lastSearched = false;
+      private void btnCreateQuickFilter_Click(object sender, EventArgs e)
+      {
+         if (!string.IsNullOrEmpty(tbQuickFilter.Text) && !string.IsNullOrEmpty(tbSearchUrl.Text) || !string.IsNullOrEmpty(cmbSelectOffers.Text))
+         {
+            //QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
+            string categoryUrl = lastSearched ? tbSearchUrl.Text : cmbSelectOffers.Text;
+            QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, categoryUrl);
+            cmbSelectQuickFilter.Items.Add(QuickFilter.Name);
+            cmbSelectQuickFilter.SelectedItem = QuickFilter.Name;
+         }      
+      }
+
+      #endregion
+
+      #region Control methods
+      private void cmbSelectPanel_SelectedIndexChanged(object sender, EventArgs e)
+      {
+         string key = cmbSelectPanel.SelectedItem.ToString();
+         string controlName = Settings.DictMainPanelsNameValue[key];
+         foreach (Control control in Controls.OfType<Panel>())
+         {
+            control.Hide();
+         }
+         Controls[controlName].Show();
       }
 
       /// <summary>
@@ -156,98 +312,35 @@ namespace BazosBot
          }
       }
 
-      private void cmbSelectPanel_SelectedIndexChanged(object sender, EventArgs e)
+      private bool ListBoxesNotClear()
       {
-         string key = cmbSelectPanel.SelectedItem.ToString();
-         string controlName = Settings.DictPanelNameValue[key];
-         foreach (Control control in Controls.OfType<Panel>())
-         {
-            control.Hide();
-         }
-         Controls[controlName].Show();
-         //foreach (Control control in Controls) //optimalize !
+         //foreach (GroupBox g in Controls.OfType<GroupBox>())
          //{
-         //   if (control.Name == controlName)
-         //   {
-         //      control.Show();
-         //      break;
-         //   }
+         foreach (TextBox textbox in Controls.OfType<TextBox>())//.Where(p => p.Tag == "Filter"))
+         {
+            if (textbox.Text != string.Empty)
+            {
+               return true;
+            }
+         }
          //}
+         return false;
       }
 
-      private void cmbSelectFilter_SelectedIndexChanged(object sender, EventArgs e)
-      {
+      //private void List_RightClick(object sender, MouseEventArgs e)
+      //{
 
-      }
+      //   if (e.Button == MouseButtons.Right)
+      //   {
+      //      //int index = lboxFilters.IndexFromPoint(e.Location);
+      //      if (index != ListBox.NoMatches)
+      //      {
+      //         // lboxFilters.Ite[index];
+      //      }
+      //   }
+      //}
 
-      private void btnAddToFilter_Click(object sender, EventArgs e)
-      {
-         int MaxCena;
-         if (int.TryParse(tbMaxCena.Text, out MaxCena))
-         {
-            DB_Access.AddToFilter(NameOfSet: tbFilterSetName.Text, UrlPage: tbFilterPageUrl.Text, Name: tbFilterName.Text, MaxCena: MaxCena);
-         }
+      #endregion
 
-         foreach (Control textbox in Controls.OfType<TextBox>().Where(p => p.Tag == "FilterSet"))
-         {
-            (textbox as TextBox).Clear();
-         }
-      }
-
-      private void btnCreateFilterSet_Click(object sender, EventArgs e)
-      {
-         List<string> ListListboxFilter = new List<string>();
-         List<string> ListListboxBlacklist = new List<string>();
-         foreach (string item in lboxFilterSet.Items)
-         {
-            ListListboxFilter.Add(item);
-         }
-         foreach (string item in lboxBlacklistSet.Items)
-         {
-            ListListboxBlacklist.Add(item);
-         }
-         DB_Access.CreateFilterSet(tbFilterSetName.Text, ListListboxFilter, ListListboxBlacklist);
-      }
-
-      private void btnAddFilter_Click(object sender, EventArgs e)
-      {
-         if (cmbAddFilter.SelectedItem.ToString() != string.Empty)
-         {
-            lboxFilterSet.Items.Add(cmbAddFilter.SelectedItem.ToString());
-            cmbAddFilter.SelectedIndex = 0;
-         }
-      }
-
-      private void btnAddBlacklist_Click(object sender, EventArgs e)
-      {
-         if (cmbAddBlacklist.SelectedItem.ToString() != string.Empty)
-         {
-            lboxBlacklistSet.Items.Add(cmbAddBlacklist.SelectedItem.ToString());
-            cmbAddBlacklist.SelectedIndex = 0;
-         }
-      }
-
-      private void cmbSelectFilterSet_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         string cmbText = cmbSelectFilter.SelectedItem.ToString();
-         if (cmbText != string.Empty && ((lboxFilterSet.Items.Count == 0 && lboxBlacklistSet.Items.Count == 0) || MessageBox.Show("Přemazat rozdělaný filter set?", "Delete", MessageBoxButtons.YesNo) == DialogResult.Yes))
-         {
-#pragma warning disable CS0168 // Variable is declared but never used
-            string[] setItems;
-#pragma warning restore CS0168 // Variable is declared but never used
-            string[] blacklistItems;
-            //DB_Access.LoadFilterSetToBoxes(cmbText, out setItems, out blacklistItems);
-            lboxFilterSet.Items.Clear();
-            lboxBlacklistSet.Items.Clear();
-            //lboxFilterSet.Items.AddRange(setItems);
-            //lboxBlacklistSet.Items.AddRange(blacklistItems);
-            tbFilterSetName.Text = cmbText;
-         }
-      }
-
-      private void cmbSelectUrl_SelectedIndexChanged(object sender, EventArgs e)
-      {
-
-      }
    }
-} 
+}

@@ -12,45 +12,41 @@ namespace BazosBot
 {
    class Download
    {
+      public static bool getOnlyNewOffers = false;
       public static List<string> htmlList = new List<string>();
       /// <summary>
       /// 
       /// </summary>
       /// <param name="url"></param>
-      public static /*async Task*/ void DownloadAllFromCategory(string url) //from bazos section
+      public static /*async Task*/ void DownloadAllFromCategory(string url, bool getOnlyNewOffers = false) //from bazos section
       {
          //await Task.Run(() =>
          //{
-         try
+         int fullCount = 0;
+         int actualNumber = 0;
+         url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
+         WebClient wc = new WebClient();
+         do
          {
-            int fullCount = 0;
-            int actualNumber = 0;
-            url = url[url.Length - 1] == '/' ? url : url + "/";
-            WebClient wc = new WebClient();
-            do
+            string html = wc.DownloadString(url); //download html source from new url
+            string[] lineSplit = html.Split("\n");
+            int containerLineNumber = 0;
+            fullCount = GetFullCount(lineSplit, ref containerLineNumber);
+            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, getOnlyNewOffers)) //download only new offers
             {
-               //if (url.Contains("320"))
-               //{
-               //   MessageBox.Show("before error");
-               //}
-               string html = wc.DownloadString(url); //download html source from new url
-               string[] lineSplit = html.Split("\n");
-               int containerLineNumber = 0;  
-               fullCount = GetFullCount(lineSplit, ref containerLineNumber);
-               BazosOffers.GetOffersFromPage(html, url, containerLineNumber);
-               PrepareNextPage(ref actualNumber, ref url);
+               DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
+               BazosOffers.ListBazosOffers.AddRange(DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryNameURL));
+               return;
             }
-            while (actualNumber <= fullCount);
-            //});
+            PrepareNextPage(ref actualNumber, ref url);
          }
-         catch (Exception e)
-         {
-            MessageBox.Show($"Nastala chyba webbrowseru: {e.GetType()} {e.StackTrace}");
-         }
+         while (actualNumber <= fullCount);
+         DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
+         //});
       }
 
       /// <summary>
-      /// 
+      /// Prepare next bazos page.
       /// </summary>
       /// <param name="actualNumber"></param>
       /// <param name="url"></param>

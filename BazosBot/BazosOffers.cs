@@ -19,7 +19,9 @@ namespace BazosBot
       public int viewed { get; set; }
       public string lokace { get; set; }
       public string psc { get; set; }
-      public BazosOffers(string nadpis, string popis, string datum, string url, string cena, int viewed, string lokace, string psc)
+      public string lastChecked { get; set; }
+      public string changed { get; set; }
+      public BazosOffers(string nadpis, string popis, string datum, string url, string cena, int viewed, string lokace, string psc, string lastChecked)
       {
          this.nadpis = nadpis;
          this.popis = popis;
@@ -29,6 +31,7 @@ namespace BazosBot
          this.viewed = viewed;
          this.lokace = lokace;
          this.psc = psc;
+         this.lastChecked = lastChecked;
          //ListBazosOffers.Add(this);
       }
 
@@ -50,7 +53,7 @@ namespace BazosBot
       /// <summary>
       /// Main method to get all offers.
       /// </summary>
-      public static void GetOffersFromPage(string html, string defUrl, int containerLineNumber)
+      public static bool GetOffersFromPage(string html, string defUrl, int containerLineNumber, bool getOnlyNewOffers)
       {
          List<string> htmlSplit = html.Split("\n").ToList();
          htmlSplit.RemoveRange(0, containerLineNumber);
@@ -59,10 +62,14 @@ namespace BazosBot
          foreach (string line in htmlSplit)
          {
             if(line.Contains("class=nadpis")) //nadpis, url, datum
-            {      
+            {   
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
                DictNameValue["nadpis"] = GetNadpis(line);
                DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
+               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryNameURL))
+               {
+                  return true; //only new offers
+               }
             }
             if (line.Contains("class=popis")) //popis
             {
@@ -86,11 +93,18 @@ namespace BazosBot
             }
             lineNumber++;
          }
+         return false;
       }
 
       #region GetParametersFromHTML
 
-
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="htmlSplit"></param>
+      /// <param name="line"></param>
+      /// <param name="lineNumber"></param>
+      /// <returns></returns>
       private static string GetOfferPopis(List<string> htmlSplit, string line, int lineNumber)
       {
          int startIndex = line.IndexOf("=popis>") + 7;
@@ -117,6 +131,11 @@ namespace BazosBot
          return string.Empty;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="line"></param>
+      /// <returns></returns>
       private static string GetNadpis(string line)
       {
          int startIndex = line.IndexOf("\">") + 2;
@@ -124,12 +143,25 @@ namespace BazosBot
          return line.Substring(startIndex, endIndex - startIndex);
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="line"></param>
+      /// <param name="defUrl"></param>
+      /// <returns></returns>
       private static string GetOfferUrl(string line, string defUrl)
       {
          int urlStartIndex = line.IndexOf("<a href=") + 8;
          return defUrl + line.Substring(urlStartIndex, line.Length - urlStartIndex).Split('"')[1];
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="line"></param>
+      /// <param name="index"></param>
+      /// <param name="htmlSplit"></param>
+      /// <returns></returns>
       private static string GetDate(string line, int index, List<string> htmlSplit)
       {
          if (line.Contains("</a>"))
@@ -147,6 +179,12 @@ namespace BazosBot
          }
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="index"></param>
+      /// <param name="htmlSplit"></param>
+      /// <returns></returns>
       private static string GetUrlClosingLine(int index, List<string> htmlSplit)
       {
          for (int i = index; i < index + 10; i++)
@@ -160,6 +198,11 @@ namespace BazosBot
          return string.Empty;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="line"></param>
+      /// <returns></returns>
       private static string GetCena(string line)
       {
          int startIndex = line.IndexOf("<b>") + 3;
@@ -170,12 +213,18 @@ namespace BazosBot
       #endregion
 
       #region Add offer to list of objects
+      /// <summary>
+      /// 
+      /// </summary>
       private static void OfferDictionaryToObject()
       {
-         ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"]));
+         ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"], DateTime.Now.ToString()));
          ResetStaticVariables();
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
       private static void ResetStaticVariables()
       {
          foreach (string key in DictNameValue.Keys)
