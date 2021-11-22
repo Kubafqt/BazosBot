@@ -342,5 +342,12 @@ namespace BazosBot
 
       #endregion
 
+      private void cmbSelectQuickFilter_SelectedIndexChanged(object sender, EventArgs e)
+      {
+         //tbQuickFilter.Text = cmbSelectQuickFilter.SelectedText;
+         //btnApplyQuickFilter.PerformClick();
+         QuickFilter.GetQuickFiltersFromTextbox(cmbSelectQuickFilter.SelectedText);
+         ApplyQuickFilterChanges();
+      }
    }
 }
