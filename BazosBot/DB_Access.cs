@@ -168,7 +168,7 @@ namespace BazosBot
          string selectCmdText = "SELECT * FROM BazosOffers";
          SqlCommand selectCommand = new SqlCommand(selectCmdText, connection);
          connection.Open();
-         List<BazosOffers> actualList = ListActualOffersInDB(BazosOffers.actualCategoryNameURL);
+         List<BazosOffers> actualList = ListActualOffersInDB(BazosOffers.actualCategoryURL);
          SqlDataReader reader = selectCommand.ExecuteReader();
          List<string> urls = new List<string>();
          string categoryNameURL = string.Empty;
@@ -176,7 +176,7 @@ namespace BazosBot
          {
             string urlDB = (string)reader["url"];
             categoryNameURL = (string)reader["CategoryNameUrlID"];
-            if (categoryNameURL == BazosOffers.actualCategoryNameURL && !actualList.Any(p => p.url == urlDB)) //Offer url in DBs is not contained in actual offers list
+            if (categoryNameURL == BazosOffers.actualCategoryURL && !actualList.Any(p => p.url == urlDB)) //Offer url in DBs is not contained in actual offers list
             {
                urls.Add(urlDB);
             }

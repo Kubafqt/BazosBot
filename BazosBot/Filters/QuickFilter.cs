@@ -35,12 +35,11 @@ namespace BazosBot
          QuickFilterList.Clear();
          List<string> blackListNadpisList = new List<string>();
          string[] filterSplit = tbQuickFilterText.Contains(";") ? filterSplit = tbQuickFilterText.Split(";") : new string[] { tbQuickFilterText };
-         int index = 0;
          Name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
          filterSplit[0] = filterSplit[0].Replace($"{Name}:", string.Empty);
          foreach (string item in filterSplit)
          {
-            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0]; //split from max price
+            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0]; //split name from max price
             string nadpis = ndpsSplit.Length == 0 ? Regex.Match(item, @"[0-9]+|[A-Z]+", RegexOptions.IgnoreCase).ToString() : Regex.Match(ndpsSplit[0], @"[0-9]+|[A-Z]+").ToString(); //nadpis
             string popis = string.Empty;
             int maxCena = 0;
@@ -61,10 +60,6 @@ namespace BazosBot
                int cena = int.Parse(Regex.Match(item.Split("<")[1], @"\d+").ToString());
                maxCena = item.Contains("=") ? cena : cena - 1;
             }
-            //if (index == 0 && nadpis.Contains("name:"))
-            //{
-            //   Name = nadpis.Replace("name:", string.Empty);
-            //}
             if (nadpis != string.Empty && !blackListNadpisList.Contains(nadpis)) //add quick filter to list
             {
                QuickFilter qf = new QuickFilter(nadpis, popis, maxCena, fullNadpisName);

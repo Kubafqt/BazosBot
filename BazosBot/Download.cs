@@ -34,14 +34,14 @@ namespace BazosBot
             fullCount = GetFullCount(lineSplit, ref containerLineNumber);
             if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, getOnlyNewOffers)) //download only new offers
             {
-               DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
-               BazosOffers.ListBazosOffers.AddRange(DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryNameURL));
+               DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
+               BazosOffers.ListBazosOffers.AddRange(DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL));
                return;
             }
             PrepareNextPage(ref actualNumber, ref url);
          }
          while (actualNumber <= fullCount);
-         DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
+         DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
          //});
       }
 
