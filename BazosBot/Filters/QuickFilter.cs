@@ -32,15 +32,12 @@ namespace BazosBot
       /// <param name="tbQuickFilterText"></param>
       public static void GetQuickFiltersFromTextbox(string tbQuickFilterText)
       {
-         Name = "";
          QuickFilterList.Clear();
          List<string> blackListNadpisList = new List<string>();
-         string[] filterSplit = new string[] { tbQuickFilterText };
-         if (tbQuickFilterText.Contains(";"))
-         {
-            filterSplit = tbQuickFilterText.Split(";");
-         }
+         string[] filterSplit = tbQuickFilterText.Contains(";") ? filterSplit = tbQuickFilterText.Split(";") : new string[] { tbQuickFilterText };
          int index = 0;
+         Name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
+         filterSplit[0] = filterSplit[0].Replace($"{Name}:", string.Empty);
          foreach (string item in filterSplit)
          {
             string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0]; //split from max price
@@ -64,11 +61,11 @@ namespace BazosBot
                int cena = int.Parse(Regex.Match(item.Split("<")[1], @"\d+").ToString());
                maxCena = item.Contains("=") ? cena : cena - 1;
             }
-            if (index == 0 && nadpis.Contains("name:"))
-            {
-               Name = nadpis.Replace("name:", string.Empty);
-            }
-            else if (nadpis != string.Empty && !blackListNadpisList.Contains(nadpis)) //add quick filter to list
+            //if (index == 0 && nadpis.Contains("name:"))
+            //{
+            //   Name = nadpis.Replace("name:", string.Empty);
+            //}
+            if (nadpis != string.Empty && !blackListNadpisList.Contains(nadpis)) //add quick filter to list
             {
                QuickFilter qf = new QuickFilter(nadpis, popis, maxCena, fullNadpisName);
             }
@@ -83,25 +80,14 @@ namespace BazosBot
       public static void SaveQuickFilterToDB(string QuickfilterTextboxText, string CategoryURL)
       {
          SqlConnection connection = new SqlConnection(Settings.DBconnString);
-         //string nadpis = string.Empty;
-         //string maxcena = string.Empty;
-         //string blacklistNadpis = string.Empty;
-         //foreach (QuickFilter quickFilter in QuickFilterList.ToList())
-         //{
-         //   string addNadpis = quickFilter.fullNadpisName ? $"{quickFilter.nadpis}!" : quickFilter.nadpis;
-         //   nadpis = nadpis == string.Empty ? addNadpis : $"{nadpis};{addNadpis}";
-         //   maxcena = maxcena == string.Empty ? quickFilter.maxCena.ToString() : $"{maxcena};{quickFilter.maxCena}";
-         //}
-         //foreach (string bl in Blacklist)
-         //{
-         //   blacklistNadpis = blacklistNadpis == string.Empty ? bl : $"{blacklistNadpis};{bl}";
-         //}
-         //Name = string.IsNullOrEmpty(Name) ? "qf" + HighestID() : Name; 
-         //string cmd = !QuickFilterNameExist() ? $"INSERT INTO BazosQuickFilter " +
-         //      $"(FilterName, Nadpis, MAX_CENA, CategoryNameUrlID, BlackListNadpis) VALUES " +
-         //      $"({Name}, {nadpis}, {maxcena}, {CategoryURL}, {blacklistNadpis});" : $"UPDATE BazosQuickFilter SET " +
-         //      $"Nadpis = {nadpis}, MAX_CENA = {maxcena}, CategoryNameUrlID = {CategoryURL}, BlackListNadpis = {blacklistNadpis})";
-         Name = string.IsNullOrEmpty(Name) ? "qf" + HighestID() : Name;
+         if (string.IsNullOrEmpty(Name))
+         {
+                Name = "qf" + HighestID();
+         }
+         else
+         {
+            QuickfilterTextboxText = QuickfilterTextboxText.Split(":")[1].Trim();
+         }
          string cmd = !QuickFilterNameExist() ?
                $"INSERT INTO BazosQuickFilter (FilterName, FilterString, CategoryNameUrlID) VALUES ('{Name}', '{QuickfilterTextboxText}', '{CategoryURL}');" : $"UPDATE BazosQuickFilter SET FilterString = '{QuickfilterTextboxText}' WHERE FilterName = '{Name}';";
          SqlCommand command = new SqlCommand(cmd, connection);
