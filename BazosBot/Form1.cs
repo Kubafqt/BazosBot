@@ -26,6 +26,8 @@ namespace BazosBot
       private void Form1_Load(object sender, EventArgs e)
       {
          cmbSelectOffers.Items.AddRange(DB_Access.ListActualOffersCategoryURLInDB().ToArray());
+         cmbSelectQuickFilter.Items.Add("none");
+         cmbSelectQuickFilter.SelectedIndex = 0;
       }
 
       #region PrepareUserInteface
@@ -76,7 +78,7 @@ namespace BazosBot
       private void btnGetBazos_Click(object sender, EventArgs e)
       {
          ResetList(); //reset list of offers and result lisbox
-         BazosOffers.actualCategoryNameURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
+         BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
          Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
          AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
          //labels:
@@ -85,7 +87,7 @@ namespace BazosBot
          lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
          lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
          lastSearched = true;
-         
+         cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(BazosOffers.actualCategoryURL).ToArray());
       }
 
 
@@ -214,6 +216,7 @@ namespace BazosBot
             AddOffersToResultLbox(BazosOffers.ListBazosOffers);
             lastSelectedItem = cmbSelectOffers.Text;
             cmbSelectQuickFilter.Items.Clear();
+            cmbSelectQuickFilter.Items.Add("none");
             cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(cmbSelectOffers.Text).ToArray());
             lastSearched = false;
          }
@@ -227,6 +230,18 @@ namespace BazosBot
       {
          QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
          ApplyQuickFilterChanges();
+      }
+
+      private void cmbSelectQuickFilter_SelectedIndexChanged(object sender, EventArgs e)
+      {
+         //tbQuickFilter.Text = cmbSelectQuickFilter.SelectedText;
+         //btnApplyQuickFilter.PerformClick();
+         if (cmbSelectQuickFilter.SelectedItem.ToString() != "none")
+         {
+            QuickFilter.GetQuickFiltersFromTextbox(cmbSelectQuickFilter.SelectedItem.ToString());
+            tbQuickFilter.Text = cmbSelectQuickFilter.SelectedItem.ToString();
+            ApplyQuickFilterChanges();
+         }
       }
 
       private void ApplyQuickFilterChanges()
@@ -244,7 +259,7 @@ namespace BazosBot
                {
                   QuickFilter quickfilter = qfList.FirstOrDefault(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
                   int.TryParse(item.cena, out cena);
-                  if ((!quickfilter.fullNadpisName || item.nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena > 0 && cena <= quickfilter.maxCena) || cena == 0) && !QuickFilter.Blacklist.Any(nadpis => item.nadpis.Contains(nadpis, StringComparison.OrdinalIgnoreCase))) //test if item is matched to max cena
+                  if ((!quickfilter.fullNadpisName || item.nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena > 0 && cena <= quickfilter.maxCena) || cena == 0) && !QuickFilter.Blacklist.Any(nadpis => item.nadpis.Contains(nadpis, StringComparison.OrdinalIgnoreCase) && (tbLokalita.Text == string.Empty || item.lokace.Contains(tbLokalita.Text)))) //test if item is matched to max cena
                   {
                      AddItemToResultLbox(itemCount, item);
                      itemCount++; //itemPlus = true;
@@ -271,14 +286,6 @@ namespace BazosBot
             cmbSelectQuickFilter.Items.Add(tbQuickFilter.Text);
             cmbSelectQuickFilter.SelectedItem = tbQuickFilter.Text;
          }      
-      }
-
-      private void cmbSelectQuickFilter_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         //tbQuickFilter.Text = cmbSelectQuickFilter.SelectedText;
-         //btnApplyQuickFilter.PerformClick();
-         QuickFilter.GetQuickFiltersFromTextbox(cmbSelectQuickFilter.SelectedItem.ToString());
-         ApplyQuickFilterChanges();
       }
 
       #endregion

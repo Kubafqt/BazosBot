@@ -10,7 +10,7 @@ namespace BazosBot
    class BazosOffers
    {
       public static List<BazosOffers> ListBazosOffers = new List<BazosOffers>();
-      public static string actualCategoryNameURL;
+      public static string actualCategoryURL;
       public string nadpis { get; set; }
       public string popis { get; set; }
       public string datum { get; set; } //date after maybe
@@ -66,7 +66,7 @@ namespace BazosBot
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
                DictNameValue["nadpis"] = GetNadpis(line);
                DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
-               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryNameURL))
+               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryURL))
                {
                   return true; //only new offers
                }
