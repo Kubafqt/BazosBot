@@ -137,6 +137,7 @@ namespace BazosBot
          this.cmbSelectQuickFilter.Name = "cmbSelectQuickFilter";
          this.cmbSelectQuickFilter.Size = new System.Drawing.Size(225, 23);
          this.cmbSelectQuickFilter.TabIndex = 18;
+         this.cmbSelectQuickFilter.SelectedIndexChanged += new System.EventHandler(this.cmbSelectQuickFilter_SelectedIndexChanged);
          // 
          // lbLokace
          // 
