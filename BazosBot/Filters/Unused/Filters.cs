@@ -9,6 +9,7 @@ using System.IO;
 
 namespace BazosBot
 {
+   //used in clickable UI
    class Filters
    {
       public static Dictionary<string, string> Dict_URL_PAGE_FilterName = new Dictionary<string, string>();

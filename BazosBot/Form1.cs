@@ -21,8 +21,6 @@ namespace BazosBot
       {
          InitializeComponent();
          PrepareUserInterface();
-         AddUrlPageFilterName();
-         lboxFilters.MouseUp += new MouseEventHandler(List_RightClick);
       }
 
       private void Form1_Load(object sender, EventArgs e)
@@ -42,19 +40,9 @@ namespace BazosBot
       private void PrepareComboboxes()
       {
          string[] cmbSelectOffersTypeString = new string[] { "all offers", "new offers", "updated", "deleted" };
-         cmbSelectFilter.Items.Add("Filter Set");
-         cmbSelectFilter.Items.Add("Filter Panel");
-         cmbSelectFilter.Items.Add("Blacklist Panel");
          cmbSelectOffersType.Items.AddRange(cmbSelectOffersTypeString);
          cmbSelectOffersType.SelectedIndex = 0;
-         if (cmbAddFilter.Items.Count > 0)
-         {
-            cmbAddFilter.SelectedIndex = 0;
-         }
-         if (cmbSelectUrl.Items.Count > 0)
-         {
-            cmbSelectUrl.SelectedIndex = 0;
-         }
+
          foreach (Control cmb in Controls.OfType<ComboBox>())
          {
             if ((cmb as ComboBox).Items.Count > 0)
@@ -70,26 +58,6 @@ namespace BazosBot
          }
          cmbSelectPanel.SelectedItem = "main panel";
      }
-
-      private void AddUrlPageFilterName()
-      {
-         Filters.InitFilterObjects();
-         Filters.InitDictionary_PageURL_FilterName();
-         FilterSet.InitFilterSetObjects();
-         FilterSet.InitFilterSetDictionary();
-         foreach (string key in Filters.Dict_URL_PAGE_FilterName.Keys)
-         {
-            if (!cmbSelectUrl.Items.Contains(key))
-            {
-               cmbSelectUrl.Items.Add(key);
-            }
-         }
-      }
-
-      private void LoadDefaultFilters()
-      {
-         //cmbSelectUrl.Items.AddRange(DB_Access.LoadDefaultUrls());
-      }
 
       private void btnSelectPanel_Click(object sender, EventArgs e)
       {
@@ -116,6 +84,8 @@ namespace BazosBot
          lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
          lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
          lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
+         lastSearched = true;
+         
       }
 
 
@@ -243,6 +213,9 @@ namespace BazosBot
             BazosOffers.ListBazosOffers = DB_Access.ListActualOffersInDB(cmbSelectOffers.Text);
             AddOffersToResultLbox(BazosOffers.ListBazosOffers);
             lastSelectedItem = cmbSelectOffers.Text;
+            cmbSelectQuickFilter.Items.Clear();
+            cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(cmbSelectOffers.Text).ToArray());
+            lastSearched = false;
          }
       }
 
@@ -285,260 +258,18 @@ namespace BazosBot
          }
       }
 
+      bool lastSearched = false;
       private void btnCreateQuickFilter_Click(object sender, EventArgs e)
       {
-         QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
-         QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, tbSearchUrl.Text);
-      }
-
-      #endregion
-
-      #region Filter Panels
-
-      /// <summary>
-      /// buttons
-      /// </summary>
-      private void btnAddToFilter_Click(object sender, EventArgs e)
-      {
-         //search by popis later (cm)
-         int MaxCena;
-         foreach (Control textbox in Controls.OfType<TextBox>())//.Where(p => p.Tag == "FilterSet"))
+         if (!string.IsNullOrEmpty(tbQuickFilter.Text) && !string.IsNullOrEmpty(tbSearchUrl.Text) || !string.IsNullOrEmpty(cmbSelectOffers.Text))
          {
-            if (textbox.Text == string.Empty && textbox.Tag == "FilterSet")
-            {
-               return;
-            }
-         }
-
-         if (int.TryParse(tbFilterMaxCena.Text, out MaxCena)) // dohodou, ... ;
-         {
-            DB_Access.AddToFilter(NameOfFilter: tbFilterName.Text, UrlPage: tbFilterPageUrl.Text, Name: tbFilterNadpis.Text, MaxCena: MaxCena);
-            string url = tbFilterPageUrl.Text;
-            cmbSelectUrl.SelectedItem = url;
-            if (!cmbAddFilter.Items.Contains(tbFilterName.Text))
-            {
-               cmbAddFilter.Items.Add(tbFilterName.Text);
-            }
-            if (Filters.Dict_URL_PAGE_FilterName.ContainsKey(url))
-            {
-               Filters.Dict_URL_PAGE_FilterName[url] += $";{tbFilterName.Text}";
-            }
-            else
-            {
-               Filters.Dict_URL_PAGE_FilterName.Add(url, tbFilterName.Text);
-            }
-            foreach (string key in Filters.Dict_URL_PAGE_FilterName.Keys)
-            {
-               if (!cmbSelectUrl.Items.Contains(key))
-               {
-                  cmbSelectUrl.Items.Add(key);
-               }
-            }
-            //AddUrlPageFilterName();
-            ClearFilterTextboxes();
-         }
+            //QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
+            string categoryUrl = lastSearched ? tbSearchUrl.Text : cmbSelectOffers.Text;
+            QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, categoryUrl);
+            cmbSelectQuickFilter.Items.Add(QuickFilter.Name);
+            cmbSelectQuickFilter.SelectedItem = QuickFilter.Name;
+         }      
       }
-
-      private void btnClearFilterTextboxes_Click(object sender, EventArgs e)
-      {
-         if (ListBoxesNotClear() && MessageBox.Show("Vymazat rozdělaný filter set?", "Delete", MessageBoxButtons.YesNo) == DialogResult.Yes)
-         {
-            ClearFilterTextboxes();
-         }
-      }
-
-      private void btnCreateFilterSet_Click(object sender, EventArgs e)
-      {
-         List<string> ListListboxFilter = new List<string>();
-         List<string> ListListboxBlacklist = new List<string>();
-         foreach (string item in lboxFilters.Items)
-         {
-            ListListboxFilter.Add(item);
-         }
-         foreach (string item in lboxBlacklistSet.Items)
-         {
-            ListListboxBlacklist.Add(item);
-         }
-         cmbSelectFilterSet.Items.Add(tbFiltersetName.Text);
-         DB_Access.CreateFilterSet(tbFiltersetName.Text, ListListboxFilter, ListListboxBlacklist, cmbSelectUrl.Text);
-         AddUrlPageFilterName();
-         tbFiltersetName.Clear();
-         lboxFilters.Items.Clear();
-         lboxBlacklistSet.Items.Clear();
-      }
-
-      private void btnAddFilter_Click(object sender, EventArgs e)
-      {
-         if (cmbAddFilter.SelectedItem.ToString() != string.Empty && !lboxFilters.Items.Contains(cmbAddFilter.Text))
-         {
-            lboxFilters.Items.Add(cmbAddFilter.SelectedItem.ToString());
-            cmbAddFilter.SelectedIndex = 0;
-         }
-      }
-
-      private void btnAddBlacklist_Click(object sender, EventArgs e)
-      {
-         if (cmbAddBlacklist.SelectedItem.ToString() != string.Empty)
-         {
-            lboxBlacklistSet.Items.Add(cmbAddBlacklist.SelectedItem.ToString());
-            cmbAddBlacklist.SelectedIndex = 0;
-         }
-      }
-
-      private void ClearFilterTextboxes()
-      {
-         foreach (Control textbox in Controls.OfType<TextBox>())//().Where(p => p.Tag == "FilterSet"))
-         {
-            if (textbox.Tag == "Filter")
-            {
-               (textbox as TextBox).Clear();
-            }
-         }
-      }
-
-
-      /// <summary>
-      /// comboboxes
-      /// </summary>
-      private void cmbSelectFilterSet_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         string cmbText = cmbSelectFilterSet.SelectedItem.ToString();
-         if (cmbText != string.Empty && ((lboxFilters.Items.Count == 0 && lboxBlacklistSet.Items.Count == 0) || MessageBox.Show("Přemazat rozdělaný filter set?", "Delete", MessageBoxButtons.YesNo) == DialogResult.Yes))
-         {
-            List<string> setFilters = new List<string>();
-            List<string> setBlacklists = new List<string>();
-            foreach (FilterSet item in FilterSet.ListFilterSet)
-            {
-               if (item.SetName == cmbSelectFilterSet.Text)
-               {
-                  setFilters.AddRange(item.SetFilters.Split(";"));
-                  setBlacklists.AddRange(item.SetBlacklists.Split(";"));
-               }
-            }
-            tbFiltersetName.Text = cmbSelectFilterSet.Text;
-            //string[] setFilters = FilterSet.ListFilterSet.GetRange(0, FilterSet.ListFilterSet.Count).;
-            //string[] setBlacklists;
-            //DB_Access.LoadFilterSetToBoxes(cmbText, out setItems, out blacklistItems);
-            lboxFilters.Items.Clear();
-            lboxBlacklistSet.Items.Clear();
-            //lboxFilterSet.Items.AddRange(setItems);
-            //lboxBlacklistSet.Items.AddRange(blacklistItems);
-            lboxFilters.Items.AddRange(setFilters.ToArray());
-            lboxBlacklistSet.Items.AddRange(setBlacklists.ToArray());
-         }
-      }
-
-      string cmbSelectUrl_lastSelectedItem;
-      private void cmbSelectUrl_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         string selectedUrl = cmbSelectUrl.Text;
-         if (selectedUrl == cmbSelectUrl_lastSelectedItem || (lboxFilters.Items.Count == 0 && lboxBlacklistSet.Items.Count == 0) || MessageBox.Show("Přemazat rozdělaný filter set?", "Delete", MessageBoxButtons.YesNo) == DialogResult.Yes)
-         {
-            cmbAddFilter.Items.Clear();
-            cmbAddBlacklist.Items.Clear();
-            cmbSelectFilterSet.Items.Clear();
-            lboxFilters.Items.Clear();
-            lboxBlacklistSet.Items.Clear();
-            cmbAddFilter.Items.AddRange(Filters.Dict_URL_PAGE_FilterName[selectedUrl].Split(';'));
-            if (FilterSet.Dict_URL_PAGE_FilterSetName.ContainsKey(selectedUrl))
-            {
-               cmbSelectFilterSet.Items.AddRange(FilterSet.Dict_URL_PAGE_FilterSetName[selectedUrl].Split(';'));
-               //cmbAddFilter.Items.AddRange(DB_Access.AddFilters(selectedUrl));
-               //cmbAddBlacklist.Items.AddRange(DB_Access.AddBLacklists(selectedUrl));
-            }
-         }
-         cmbSelectUrl_lastSelectedItem = cmbSelectUrl.Text;
-      }
-
-      private void cmbAddFilter_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         lboxSetDetails.Items.Clear();
-         Filters aktualFilter = Filters.ListFilters.FirstOrDefault(p => p.NameOfFilter == cmbAddFilter.SelectedItem.ToString());
-         lboxSetDetails.Items.Add("page url: " + aktualFilter.PageUrl);
-         lboxSetDetails.Items.Add("name of filter: " + aktualFilter.NameOfFilter);
-         lboxSetDetails.Items.Add("search name: " + aktualFilter.Name);
-         lboxSetDetails.Items.Add("max cena: " + aktualFilter.MaxCena);
-         tbFilterName.Text = aktualFilter.NameOfFilter;
-         tbFilterNadpis.Text = aktualFilter.Name;
-         tbFilterPageUrl.Text = aktualFilter.PageUrl;
-         tbFilterMaxCena.Text = aktualFilter.MaxCena.ToString();
-      }
-
-      private void cmbAddFilter_KeyDown(object sender, KeyEventArgs e)
-      {
-         if (e.KeyCode == Keys.Delete && MessageBox.Show("Opravdu odstranit filter?", "Odstranit filter?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-         {
-            Filters.RemoveFilter(cmbAddFilter.Text);
-            cmbAddFilter.Items.Remove(cmbAddFilter.SelectedItem);
-         }
-      }
-
-      private void cmbSelectFilter_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         foreach (Control panel in Controls.OfType<Panel>())//.Where(p => p.Name == FilterSet.DictFilterPanelNames[cmbSelectFilter.Text]))
-         {
-            if (panel.Tag == "filterPanel" && panel.Name == Settings.DictFilterPanelsNames[cmbSelectFilter.Text])
-            {
-               panel.Show();
-            }
-         }
-         foreach (Control panel in Controls.OfType<Panel>().Where(p => p.Name != Settings.DictFilterPanelsNames[cmbSelectFilter.Text]))
-         {
-            if (panel.Tag == "filterPanel")
-            {
-               panel.Hide();
-            }
-         }
-      }
-
-
-      /// <summary>
-      /// listboxes
-      /// </summary>
-      private void lboxBlacklistSet_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         lboxSetDetails.Items.Clear();
-         //Filters aktualFilter = Filters.ListFilters.FirstOrDefault(p => p.NameOfFilter == lboxFilters.SelectedItem.ToString());
-         //lboxSetDetails.Items.Add("page url: " + aktualFilter.PageUrl);
-         //lboxSetDetails.Items.Add("name of filter: " + aktualFilter.NameOfFilter);
-         //lboxSetDetails.Items.Add("search name: " + aktualFilter.Name);
-         //lboxSetDetails.Items.Add("max cena: " + aktualFilter.MaxCena);
-         //tbFilterName.Text = aktualFilter.NameOfFilter;
-         //tbFilterNadpis.Text = aktualFilter.Name;
-         //tbFilterPageUrl.Text = aktualFilter.PageUrl;
-         //tbFilterMaxCena.Text = aktualFilter.MaxCena.ToString();
-      }
-
-      private void lboxFilterSet_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         lboxSetDetails.Items.Clear();
-         if (lboxFilters.Items.Count > 0 && lboxFilters.SelectedItem != null)
-         {
-            Filters aktualFilter = Filters.ListFilters.FirstOrDefault(p => p.NameOfFilter == lboxFilters.SelectedItem.ToString());
-            lboxSetDetails.Items.Add("page url: " + aktualFilter.PageUrl);
-            lboxSetDetails.Items.Add("name of filter: " + aktualFilter.NameOfFilter);
-            lboxSetDetails.Items.Add("search name: " + aktualFilter.Name);
-            lboxSetDetails.Items.Add("max cena: " + aktualFilter.MaxCena);
-            tbFilterName.Text = aktualFilter.NameOfFilter;
-            tbFilterNadpis.Text = aktualFilter.Name;
-            tbFilterPageUrl.Text = aktualFilter.PageUrl;
-            tbFilterMaxCena.Text = aktualFilter.MaxCena.ToString();
-         }
-      }
-
-      private void lboxFilters_KeyDown(object sender, KeyEventArgs e)
-      {
-         Keys key = e.KeyCode;
-         if (key == Keys.Delete)
-         {
-            lboxFilters.Items.Remove(lboxFilters.SelectedItem);
-            //if (lboxFilters.Items.Count > 0)
-            //{
-            //   lboxFilters.SelectedIndex = 0;
-            //}
-         }
-      }
-
 
       #endregion
 
@@ -596,19 +327,18 @@ namespace BazosBot
          return false;
       }
 
-      private void List_RightClick(object sender, MouseEventArgs e)
-      {
+      //private void List_RightClick(object sender, MouseEventArgs e)
+      //{
 
-         if (e.Button == MouseButtons.Right)
-         {
-            int index = lboxFilters.IndexFromPoint(e.Location);
-            if (index != ListBox.NoMatches)
-            {
-               // lboxFilters.Ite[index];
-            }
-         }
-
-      }
+      //   if (e.Button == MouseButtons.Right)
+      //   {
+      //      //int index = lboxFilters.IndexFromPoint(e.Location);
+      //      if (index != ListBox.NoMatches)
+      //      {
+      //         // lboxFilters.Ite[index];
+      //      }
+      //   }
+      //}
 
       #endregion
 

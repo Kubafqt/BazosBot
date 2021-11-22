@@ -22,8 +22,6 @@ namespace BazosBot
       {
          //await Task.Run(() =>
          //{
-         //try
-         //{
          int fullCount = 0;
          int actualNumber = 0;
          url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
@@ -45,11 +43,6 @@ namespace BazosBot
          while (actualNumber <= fullCount);
          DB_Access.InsertNewOffers(BazosOffers.actualCategoryNameURL);
          //});
-         //}
-         //catch (Exception e)
-         //{
-         //   MessageBox.Show($"Nastala chyba webbrowseru: {e.GetType()} {e.StackTrace}");
-         //}
       }
 
       /// <summary>

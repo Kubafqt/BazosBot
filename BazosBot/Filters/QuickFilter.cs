@@ -83,25 +83,29 @@ namespace BazosBot
       public static void SaveQuickFilterToDB(string QuickfilterTextboxText, string CategoryURL)
       {
          SqlConnection connection = new SqlConnection(Settings.DBconnString);
-         string nadpis = string.Empty;
-         string maxcena = string.Empty;
-         string blacklistNadpis = string.Empty;
-         foreach (QuickFilter quickFilter in QuickFilterList.ToList())
-         {
-            string addNadpis = quickFilter.fullNadpisName ? $"{quickFilter.nadpis}!" : quickFilter.nadpis;
-            nadpis = nadpis == string.Empty ? addNadpis : $"{nadpis};{addNadpis}";
-            maxcena = maxcena == string.Empty ? quickFilter.maxCena.ToString() : $"{maxcena};{quickFilter.maxCena}";
-         }
-         foreach (string bl in Blacklist)
-         {
-            blacklistNadpis = blacklistNadpis == string.Empty ? bl : $"{blacklistNadpis};{bl}";
-         }
-         Name = Name == string.Empty ? "qf" + HighestID() : Name; 
-         string cmd = !QuickFilterNameExist() ? $"INSERT INTO BazosQuickFilter " +
-               $"(FilterName, Nadpis, MAX_CENA, CategoryNameUrlID, BlackListNadpis) VALUES " +
-               $"({Name}, {nadpis}, {maxcena}, {CategoryURL}, {blacklistNadpis});" : $"UPDATE BazosQuickFilter SET Nadpis = {nadpis}, MAX_CENA = {maxcena}, CategoryNameUrlID = {CategoryURL}, BlackListNadpis = {blacklistNadpis})";
+         //string nadpis = string.Empty;
+         //string maxcena = string.Empty;
+         //string blacklistNadpis = string.Empty;
+         //foreach (QuickFilter quickFilter in QuickFilterList.ToList())
+         //{
+         //   string addNadpis = quickFilter.fullNadpisName ? $"{quickFilter.nadpis}!" : quickFilter.nadpis;
+         //   nadpis = nadpis == string.Empty ? addNadpis : $"{nadpis};{addNadpis}";
+         //   maxcena = maxcena == string.Empty ? quickFilter.maxCena.ToString() : $"{maxcena};{quickFilter.maxCena}";
+         //}
+         //foreach (string bl in Blacklist)
+         //{
+         //   blacklistNadpis = blacklistNadpis == string.Empty ? bl : $"{blacklistNadpis};{bl}";
+         //}
+         //Name = string.IsNullOrEmpty(Name) ? "qf" + HighestID() : Name; 
+         //string cmd = !QuickFilterNameExist() ? $"INSERT INTO BazosQuickFilter " +
+         //      $"(FilterName, Nadpis, MAX_CENA, CategoryNameUrlID, BlackListNadpis) VALUES " +
+         //      $"({Name}, {nadpis}, {maxcena}, {CategoryURL}, {blacklistNadpis});" : $"UPDATE BazosQuickFilter SET " +
+         //      $"Nadpis = {nadpis}, MAX_CENA = {maxcena}, CategoryNameUrlID = {CategoryURL}, BlackListNadpis = {blacklistNadpis})";
+         Name = string.IsNullOrEmpty(Name) ? "qf" + HighestID() : Name;
+         string cmd = !QuickFilterNameExist() ?
+               $"INSERT INTO BazosQuickFilter (FilterName, FilterString, CategoryNameUrlID) VALUES ('{Name}', '{QuickfilterTextboxText}', '{CategoryURL}');" : $"UPDATE BazosQuickFilter SET FilterString = '{QuickfilterTextboxText}' WHERE FilterName = '{Name}';";
          SqlCommand command = new SqlCommand(cmd, connection);
-         connection.Open(); //open SQL server connection
+         connection.Open();
          command.ExecuteNonQuery();
          connection.Close();
       }
@@ -132,18 +136,57 @@ namespace BazosBot
       /// <returns></returns>
       private static int HighestID()
       {
+         int ID = 1;
+         if (DbContainsItem())
+         {
+            SqlConnection connection = new SqlConnection(Settings.DBconnString);
+            string cmdText = "SELECT MAX(Id) FROM BazosQuickFilter";
+            SqlCommand cmd = new SqlCommand(cmdText, connection);
+            connection.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+               ID = (int)reader["Id"];
+            }
+            connection.Close();
+         }
+         return ID;
+      }
+
+      private static bool DbContainsItem()
+      {
          SqlConnection connection = new SqlConnection(Settings.DBconnString);
-         string cmdText = "select yourcolumn from yourtable where id = (select max(id) from yourtable )";//$"SELECT * FROM BazosQuickFilter WHERE FilterName = '{Name}';";
+         string cmdText = "SELECT * FROM BazosQuickFilter";
          SqlCommand cmd = new SqlCommand(cmdText, connection);
          connection.Open();
          SqlDataReader reader = cmd.ExecuteReader();
-         int ID = 1;
          while (reader.Read())
          {
-            ID = (int)reader["Id"];
+            connection.Close();
+            return true;
          }
          connection.Close();
-         return ID;
+         return false;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="actualCategoryUrl"></param>
+      public static List<string> ListActualQuickFiltersInDB(string actualCategoryUrl)
+      {
+         List<string> listQuickFilters = new List<string>();
+         SqlConnection conn = new SqlConnection(Settings.DBconnString);
+         string cmdText = $"SELECT FilterName, FilterString FROM BazosQuickFilter WHERE CategoryNameUrlID = '{actualCategoryUrl}';";
+         SqlCommand cmd = new SqlCommand(cmdText, conn);
+         conn.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+            listQuickFilters.Add($"{(string)reader["FilterName"]}: {(string)reader["FilterString"]}");
+         }
+         conn.Close();
+         return listQuickFilters;
       }
 
    }
