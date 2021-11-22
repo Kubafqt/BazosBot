@@ -53,7 +53,6 @@ namespace BazosBot
          this.lbUpdatedCount = new System.Windows.Forms.Label();
          this.lbDeletedCount = new System.Windows.Forms.Label();
          this.lbNewOffers = new System.Windows.Forms.Label();
-         this.cmbFilterSet = new System.Windows.Forms.ComboBox();
          this.lbAllOffers = new System.Windows.Forms.Label();
          this.panelMain.SuspendLayout();
          this.SuspendLayout();
@@ -290,15 +289,6 @@ namespace BazosBot
          this.lbNewOffers.TabIndex = 11;
          this.lbNewOffers.Text = "new offers:";
          // 
-         // cmbFilterSet
-         // 
-         this.cmbFilterSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cmbFilterSet.FormattingEnabled = true;
-         this.cmbFilterSet.Location = new System.Drawing.Point(701, 12);
-         this.cmbFilterSet.Name = "cmbFilterSet";
-         this.cmbFilterSet.Size = new System.Drawing.Size(290, 23);
-         this.cmbFilterSet.TabIndex = 12;
-         // 
          // lbAllOffers
          // 
          this.lbAllOffers.AutoSize = true;
@@ -314,7 +304,6 @@ namespace BazosBot
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(1049, 645);
          this.Controls.Add(this.lbAllOffers);
-         this.Controls.Add(this.cmbFilterSet);
          this.Controls.Add(this.lbNewOffers);
          this.Controls.Add(this.lbDeletedCount);
          this.Controls.Add(this.lbUpdatedCount);
@@ -352,7 +341,6 @@ namespace BazosBot
       private System.Windows.Forms.Label lbUpdatedCount;
       private System.Windows.Forms.Label lbDeletedCount;
       private System.Windows.Forms.Label lbNewOffers;
-      private System.Windows.Forms.ComboBox cmbFilterSet;
       private System.Windows.Forms.TextBox tbLokalita;
       private System.Windows.Forms.Label lbQuickFilter;
       private System.Windows.Forms.TextBox tbQuickFilter;

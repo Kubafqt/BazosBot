@@ -264,11 +264,21 @@ namespace BazosBot
          if (!string.IsNullOrEmpty(tbQuickFilter.Text) && !string.IsNullOrEmpty(tbSearchUrl.Text) || !string.IsNullOrEmpty(cmbSelectOffers.Text))
          {
             //QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
+            string[] filterSplit = tbQuickFilter.Text.Split(";");
+            QuickFilter.Name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
             string categoryUrl = lastSearched ? tbSearchUrl.Text : cmbSelectOffers.Text;
             QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, categoryUrl);
-            cmbSelectQuickFilter.Items.Add(QuickFilter.Name);
-            cmbSelectQuickFilter.SelectedItem = QuickFilter.Name;
+            cmbSelectQuickFilter.Items.Add(tbQuickFilter.Text);
+            cmbSelectQuickFilter.SelectedItem = tbQuickFilter.Text;
          }      
+      }
+
+      private void cmbSelectQuickFilter_SelectedIndexChanged(object sender, EventArgs e)
+      {
+         //tbQuickFilter.Text = cmbSelectQuickFilter.SelectedText;
+         //btnApplyQuickFilter.PerformClick();
+         QuickFilter.GetQuickFiltersFromTextbox(cmbSelectQuickFilter.SelectedItem.ToString());
+         ApplyQuickFilterChanges();
       }
 
       #endregion
@@ -342,12 +352,5 @@ namespace BazosBot
 
       #endregion
 
-      private void cmbSelectQuickFilter_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         //tbQuickFilter.Text = cmbSelectQuickFilter.SelectedText;
-         //btnApplyQuickFilter.PerformClick();
-         QuickFilter.GetQuickFiltersFromTextbox(cmbSelectQuickFilter.SelectedText);
-         ApplyQuickFilterChanges();
-      }
    }
 }
