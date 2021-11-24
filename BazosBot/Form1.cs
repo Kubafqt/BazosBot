@@ -80,8 +80,8 @@ namespace BazosBot
       private bool switchAutoBot = false; //autobot get full offers - start stopwatch after getted
 		
       /// <summary>
-      /// 
-      /// </summary>
+      /// timer switch
+      /// </summary> 
       private void switchtimer()
 		 {
 			if (!timer.Enabled)
