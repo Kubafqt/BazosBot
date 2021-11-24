@@ -161,7 +161,7 @@ namespace BazosBot
       /// <param name="url"></param>
       /// <param name="categoryUrl"></param>
       /// <returns></returns>
-      public static bool DBContainsUrl(string url, string categoryUrl)
+      public static bool DBContainsUrl(string url, string datum, string categoryUrl)
       {
          SqlConnection connection = new SqlConnection(connString);
          string selectCmdText = $"SELECT * FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
@@ -170,6 +170,7 @@ namespace BazosBot
          SqlDataReader reader = cmd.ExecuteReader();
          while (reader.Read()) //load level info
          {
+            //string u = (string)reader["URL"];
             connection.Close();
             return true;
          }
