@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 //.net maui
 
 namespace BazosBot
@@ -17,10 +18,15 @@ namespace BazosBot
    public partial class Form1 : Form
    {
       string activePanel;
+	   System.Windows.Forms.Timer timer; //showing progress timer
+      System.Windows.Forms.Timer autoTimer; //autobot timer
+      Stopwatch sw = new Stopwatch();
+
       public Form1()
       {
          InitializeComponent();
          PrepareUserInterface();
+		   InitTimers();
       }
 
       private void Form1_Load(object sender, EventArgs e)
@@ -29,6 +35,124 @@ namespace BazosBot
          cmbSelectQuickFilter.Items.Add("none");
          cmbSelectQuickFilter.SelectedIndex = 0;
       }
+
+      #region timers
+      //showing:
+      private void timer_tick(object s, EventArgs a)
+      {
+         double percent = 100 / (Download.fullCount / Download.count);
+         percent = Math.Round(percent, 1);
+         double dbPercent = DB_Access.offersCount > 0 && DB_Access.i > 0 ? 100 / (DB_Access.offersCount / DB_Access.i) : 0;
+         double elapsedTime = Math.Round(sw.Elapsed.TotalSeconds, 0);
+         dbPercent = Math.Round(dbPercent, 1);
+
+         if (Download.downloadDone && !Download.isRunning)
+         {
+            switchtimer();
+            Download.downloadDone = false;
+            AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
+            elapsedTime = sw.Elapsed.Milliseconds >= 50 ? elapsedTime + 1 : elapsedTime;
+            //labels:
+            lbAllOffers.Text = $"all offers: {BazosOffers.ListBazosOffers.Count}";
+            lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
+            lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
+            lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
+            lastSearched = true;
+            cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(BazosOffers.actualCategoryURL).ToArray());
+         }
+         lbProgress.Text = !Download.downloadDone ? $"Download progress: {Download.count} / {Download.fullCount} - {percent}%\nTime elapsed: {elapsedTime} sec" : $"Download progress: {Download.count} / {Download.fullCount} - {percent}% - done!\nUpdating data to DB: {DB_Access.i} / {DB_Access.offersCount} - {dbPercent}% \nTime elapsed: {elapsedTime} sec";
+      }
+
+      private bool switchAutoBot = false; //autobot get full offers - start stopwatch after getted
+		 private void switchtimer()
+		 {
+			if (!timer.Enabled)
+			{
+				timer.Start();
+				lbProgress.Show();
+            sw.Start();
+			}
+			else
+			{
+				timer.Stop();
+            sw.Stop();
+            sw.Reset();
+            if (switchAutoBot)
+            {
+               switchAutoBot = false;
+               AutoBot.LastAutoBot.sw.Start();
+            }
+            //lbProgress.Hide();
+			}
+		 }
+
+      //autobot timer:
+      //double elapsedSec = 0;
+      private void auto_timer_tick(object s, EventArgs a)
+      {
+         foreach (AutoBot aBot in AutoBot.AutoBotList.ToList()) //not enqueued autobot - wait to interval
+         {
+            double elapsedSec = Math.Round(aBot.sw.Elapsed.TotalSeconds, 0);
+            if (elapsedSec > aBot.interval || !aBot.sw.IsRunning)
+            {
+               AutoBot.AutoBotList.Remove(aBot);
+               AutoBot.AutoBotQueue.Enqueue(aBot);
+               aBot.sw.Reset();
+            }
+         }
+         if (AutoBot.AutoBotQueue.Count > 0)
+         {
+            if (AutoBot.LastAutoBot == null) //first autobot run
+            {
+               AutoBot.LastAutoBot = AutoBot.AutoBotQueue.Dequeue();
+               RunAutoBot();
+            }
+            else if (!AutoBot.LastAutoBot.isRunning) //after lastAutobot finished run
+            {
+               AutoBot.AutoBotList.Add(AutoBot.LastAutoBot);
+               AutoBot.LastAutoBot = AutoBot.AutoBotQueue.Dequeue();
+               RunAutoBot();
+            }
+         }
+         //if (AutoBot.LastAutoBot.isRunning)
+         //{
+         //   elapsedSec = Math.Round(AutoBot.LastAutoBot.sw.Elapsed.TotalSeconds, 0);
+         //}
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      private void RunAutoBot()
+      {
+         bool getOnlyNewOffers = AutoBot.LastAutoBot.timesUsed < AutoBot.LastAutoBot.fullInterval;
+         AutoBot.LastAutoBot.timesUsed = getOnlyNewOffers ? AutoBot.LastAutoBot.timesUsed : 0;
+         AutoBot.LastAutoBot.isRunning = true;
+         if (!getOnlyNewOffers)
+         {
+            switchAutoBot = true;
+            switchtimer();
+         }
+         else
+         {
+            AutoBot.LastAutoBot.sw.Start();
+         }
+         Thread thread = new Thread(() => Download.DownloadAllFromCategory(AutoBot.LastAutoBot.category, getOnlyNewOffers, true));
+         thread.Start();
+      }
+
+      //initialize timers:
+      private void InitTimers()
+      {
+         timer = new System.Windows.Forms.Timer();
+         timer.Tick += new EventHandler(timer_tick);
+         timer.Interval = 20;
+         autoTimer = new System.Windows.Forms.Timer();
+         autoTimer.Tick += new EventHandler(timer_tick);
+         autoTimer.Interval = 500;
+      }
+
+      #endregion
 
       #region PrepareUserInteface
       private void PrepareUserInterface()
@@ -62,7 +186,7 @@ namespace BazosBot
      }
 
       private void btnSelectPanel_Click(object sender, EventArgs e)
-      {
+      {   
          //ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
          //DB_Access.InsertNewOffers("test");
       }
@@ -73,21 +197,17 @@ namespace BazosBot
       /// <summary>
       /// Main method to get items from bazos.
       /// </summary>
-      /// <param name="sender"></param>
-      /// <param name="e"></param>
       private void btnGetBazos_Click(object sender, EventArgs e)
       {
-         ResetList(); //reset list of offers and result lisbox
-         BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
-         Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
-         AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
-         //labels:
-         lbAllOffers.Text = $"all offers: {BazosOffers.ListBazosOffers.Count}";
-         lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
-         lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
-         lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
-         lastSearched = true;
-         cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(BazosOffers.actualCategoryURL).ToArray());
+         if (!Download.isRunning)
+         {
+            ResetList(); //reset list of offers and result lisbox
+            BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
+            //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
+            Thread thread = new Thread(() => Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked));
+            thread.Start();
+            switchtimer();
+         }
       }
 
 
@@ -113,7 +233,7 @@ namespace BazosBot
       private void AddOffersToResultLbox(List<BazosOffers> offersList, string name = "")
       {
          int itemCount = 1;
-         foreach (BazosOffers item in offersList)
+         foreach (BazosOffers item in offersList.ToList())
          {
             resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
             itemCount++;
@@ -290,6 +410,11 @@ namespace BazosBot
 
       #endregion
 
+	   #region Auto-bot Panel
+	  
+	  
+	  #endregion
+
       #region Control methods
       private void cmbSelectPanel_SelectedIndexChanged(object sender, EventArgs e)
       {
@@ -356,6 +481,15 @@ namespace BazosBot
       //      }
       //   }
       //}
+
+      /// <summary>
+      /// kill everything on form is closed
+      /// </summary>
+      protected override void OnFormClosing(FormClosingEventArgs e)
+      {
+         base.OnFormClosing(e);
+         Environment.Exit(0);
+      }
 
       #endregion
 

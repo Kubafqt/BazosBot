@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Net;
 using System.Windows.Forms;
+using System.Threading;
 
 
 namespace BazosBot
@@ -14,16 +15,21 @@ namespace BazosBot
    {
       public static bool getOnlyNewOffers = false;
       public static List<string> htmlList = new List<string>();
+      public static double fullCount = 1;
+      public static double count = 1;
+      public static bool downloadDone = false;
+      public static bool isRunning = false;
       /// <summary>
       /// 
       /// </summary>
       /// <param name="url"></param>
-      public static /*async Task*/ void DownloadAllFromCategory(string url, bool getOnlyNewOffers = false) //from bazos section
+      public static /*async Task*/ /*IEnumerable<int>*/ void DownloadAllFromCategory(string url, bool getOnlyNewOffers = false, bool autobot = false) //from bazos section
       {
          //await Task.Run(() =>
          //{
-         int fullCount = 0;
          int actualNumber = 0;
+         downloadDone = false;
+         isRunning = true;
          url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
          WebClient wc = new WebClient();
          do
@@ -34,14 +40,30 @@ namespace BazosBot
             fullCount = GetFullCount(lineSplit, ref containerLineNumber);
             if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, getOnlyNewOffers)) //download only new offers
             {
+               downloadDone = true;
                DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
+               BazosOffers.ListBazosOffers.Clear(); //for showing in resultLbox
                BazosOffers.ListBazosOffers.AddRange(DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL));
+               isRunning = false;
+               if (autobot)
+               {
+                  AutoBot.LastAutoBot.isRunning = false;
+               }
                return;
+               //yield break; //means return
             }
             PrepareNextPage(ref actualNumber, ref url);
+            count = actualNumber <= fullCount ? actualNumber : fullCount;
+            //yield return actualNumber;
          }
          while (actualNumber <= fullCount);
+         downloadDone = true;
          DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
+         isRunning = false;
+         if (autobot)
+         {
+            AutoBot.LastAutoBot.isRunning = false;
+         }
          //});
       }
 
