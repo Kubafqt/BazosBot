@@ -35,11 +35,11 @@ namespace BazosBot
          this.offerLbox = new System.Windows.Forms.ListBox();
          this.tbSearchUrl = new System.Windows.Forms.TextBox();
          this.panelMain = new System.Windows.Forms.Panel();
+         this.cbDisableQuickFilterPrice = new System.Windows.Forms.CheckBox();
          this.cmbSelectQuickFilter = new System.Windows.Forms.ComboBox();
          this.lbLokace = new System.Windows.Forms.Label();
          this.btnCreateQuickFilter = new System.Windows.Forms.Button();
          this.cboxDownOnlyLast = new System.Windows.Forms.CheckBox();
-         this.btnApplyQuickFilter = new System.Windows.Forms.Button();
          this.tbLokalita = new System.Windows.Forms.TextBox();
          this.lbQuickFilter = new System.Windows.Forms.Label();
          this.tbQuickFilter = new System.Windows.Forms.TextBox();
@@ -54,6 +54,7 @@ namespace BazosBot
          this.lbDeletedCount = new System.Windows.Forms.Label();
          this.lbNewOffers = new System.Windows.Forms.Label();
          this.lbAllOffers = new System.Windows.Forms.Label();
+         this.lbProgress = new System.Windows.Forms.Label();
          this.panelMain.SuspendLayout();
          this.SuspendLayout();
          // 
@@ -106,11 +107,11 @@ namespace BazosBot
          // 
          // panelMain
          // 
+         this.panelMain.Controls.Add(this.cbDisableQuickFilterPrice);
          this.panelMain.Controls.Add(this.cmbSelectQuickFilter);
          this.panelMain.Controls.Add(this.lbLokace);
          this.panelMain.Controls.Add(this.btnCreateQuickFilter);
          this.panelMain.Controls.Add(this.cboxDownOnlyLast);
-         this.panelMain.Controls.Add(this.btnApplyQuickFilter);
          this.panelMain.Controls.Add(this.tbLokalita);
          this.panelMain.Controls.Add(this.lbQuickFilter);
          this.panelMain.Controls.Add(this.tbQuickFilter);
@@ -127,6 +128,16 @@ namespace BazosBot
          this.panelMain.Size = new System.Drawing.Size(889, 347);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
+         // 
+         // cbDisableQuickFilterPrice
+         // 
+         this.cbDisableQuickFilterPrice.AutoSize = true;
+         this.cbDisableQuickFilterPrice.Location = new System.Drawing.Point(264, 12);
+         this.cbDisableQuickFilterPrice.Name = "cbDisableQuickFilterPrice";
+         this.cbDisableQuickFilterPrice.Size = new System.Drawing.Size(164, 19);
+         this.cbDisableQuickFilterPrice.TabIndex = 19;
+         this.cbDisableQuickFilterPrice.Text = "disable price in quick filter";
+         this.cbDisableQuickFilterPrice.UseVisualStyleBackColor = true;
          // 
          // cmbSelectQuickFilter
          // 
@@ -167,16 +178,6 @@ namespace BazosBot
          this.cboxDownOnlyLast.TabIndex = 15;
          this.cboxDownOnlyLast.Text = "download only new offers";
          this.cboxDownOnlyLast.UseVisualStyleBackColor = true;
-         // 
-         // btnApplyQuickFilter
-         // 
-         this.btnApplyQuickFilter.Location = new System.Drawing.Point(416, 32);
-         this.btnApplyQuickFilter.Name = "btnApplyQuickFilter";
-         this.btnApplyQuickFilter.Size = new System.Drawing.Size(69, 23);
-         this.btnApplyQuickFilter.TabIndex = 13;
-         this.btnApplyQuickFilter.Text = "apply";
-         this.btnApplyQuickFilter.UseVisualStyleBackColor = true;
-         this.btnApplyQuickFilter.Click += new System.EventHandler(this.btnApplyQuickFilter_Click);
          // 
          // tbLokalita
          // 
@@ -265,7 +266,7 @@ namespace BazosBot
          // lbUpdatedCount
          // 
          this.lbUpdatedCount.AutoSize = true;
-         this.lbUpdatedCount.Location = new System.Drawing.Point(517, 12);
+         this.lbUpdatedCount.Location = new System.Drawing.Point(512, 12);
          this.lbUpdatedCount.Name = "lbUpdatedCount";
          this.lbUpdatedCount.Size = new System.Drawing.Size(54, 15);
          this.lbUpdatedCount.TabIndex = 9;
@@ -274,7 +275,7 @@ namespace BazosBot
          // lbDeletedCount
          // 
          this.lbDeletedCount.AutoSize = true;
-         this.lbDeletedCount.Location = new System.Drawing.Point(610, 12);
+         this.lbDeletedCount.Location = new System.Drawing.Point(627, 13);
          this.lbDeletedCount.Name = "lbDeletedCount";
          this.lbDeletedCount.Size = new System.Drawing.Size(49, 15);
          this.lbDeletedCount.TabIndex = 10;
@@ -298,11 +299,22 @@ namespace BazosBot
          this.lbAllOffers.TabIndex = 13;
          this.lbAllOffers.Text = "all offers:";
          // 
+         // lbProgress
+         // 
+         this.lbProgress.AutoSize = true;
+         this.lbProgress.Location = new System.Drawing.Point(759, 12);
+         this.lbProgress.Name = "lbProgress";
+         this.lbProgress.Size = new System.Drawing.Size(55, 15);
+         this.lbProgress.TabIndex = 14;
+         this.lbProgress.Text = "progress:";
+         this.lbProgress.Visible = false;
+         // 
          // Form1
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(1049, 645);
+         this.Controls.Add(this.lbProgress);
          this.Controls.Add(this.lbAllOffers);
          this.Controls.Add(this.lbNewOffers);
          this.Controls.Add(this.lbDeletedCount);
@@ -344,12 +356,13 @@ namespace BazosBot
       private System.Windows.Forms.TextBox tbLokalita;
       private System.Windows.Forms.Label lbQuickFilter;
       private System.Windows.Forms.TextBox tbQuickFilter;
-      private System.Windows.Forms.Button btnApplyQuickFilter;
       private System.Windows.Forms.CheckBox cboxDownOnlyLast;
       private System.Windows.Forms.Label lbAllOffers;
       private System.Windows.Forms.Button btnCreateQuickFilter;
       private System.Windows.Forms.Label lbLokace;
       private System.Windows.Forms.ComboBox cmbSelectQuickFilter;
+      private System.Windows.Forms.CheckBox cbDisableQuickFilterPrice;
+      private System.Windows.Forms.Label lbProgress;
    }
 }
 
