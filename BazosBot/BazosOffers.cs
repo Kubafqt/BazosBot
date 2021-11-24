@@ -21,6 +21,7 @@ namespace BazosBot
       public string psc { get; set; }
       public string lastChecked { get; set; }
       public string changed { get; set; }
+      public string endedDateTimeGetted { get; set; }
       public BazosOffers(string nadpis, string popis, string datum, string url, string cena, int viewed, string lokace, string psc, string lastChecked)
       {
          this.nadpis = nadpis;
@@ -32,6 +33,8 @@ namespace BazosBot
          this.lokace = lokace;
          this.psc = psc;
          this.lastChecked = lastChecked;
+         this.changed = string.Empty;
+         this.endedDateTimeGetted = string.Empty;
          //ListBazosOffers.Add(this);
       }
 

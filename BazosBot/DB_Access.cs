@@ -53,14 +53,14 @@ namespace BazosBot
                   { 4, $"{item.lokace} - {item.psc}" }
                };
                string[] updateCmdTexts = new string[]
-               {
-               $"UPDATE BazosOffers SET Nadpis = '{item.nadpis}' WHERE URL = '{item.url}' AND Nadpis != '{item.nadpis}';",
-               $"UPDATE BazosOffers SET Cena = '{item.cena}' WHERE URL = '{item.url}' AND Cena != '{item.cena}';",
-               $"UPDATE BazosOffers SET Popis = '{item.popis}' WHERE URL = '{item.url}' AND Popis != '{item.popis}';",
-               $"UPDATE BazosOffers SET Datum = '{item.datum}' WHERE URL = '{item.url}' AND Datum != '{item.datum}';",
+               {  // optimalize - create view of table or object comparison (?)
+               $"UPDATE BazosOffers SET Nadpis = '{item.nadpis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Nadpis != '{item.nadpis}';",
+               $"UPDATE BazosOffers SET Cena = '{item.cena}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Cena != '{item.cena}';",
+               $"UPDATE BazosOffers SET Popis = '{item.popis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Popis != '{item.popis}';",
+               $"UPDATE BazosOffers SET Datum = '{item.datum}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Datum != '{item.datum}';",
                $"UPDATE BazosOffers SET Lokace = '{item.lokace}', PSC = '{item.psc}' WHERE URL = '{item.url}' AND Lokace != '{item.lokace}';",
-               $"UPDATE BazosOffers SET Viewed = '{item.viewed}' WHERE URL = '{item.url}' AND Viewed != '{item.viewed}';",
-               $"UPDATE BazosOffers SET LastChecked = '{DateTime.Now}' WHERE URL = '{item.url}' AND LastChecked != '{item.lastChecked}';",
+               $"UPDATE BazosOffers SET Viewed = '{item.viewed}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Viewed != '{item.viewed}';",
+               $"UPDATE BazosOffers SET LastChecked = '{DateTime.Now}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND LastChecked != '{item.lastChecked}';",
                };
                int index = 0;
                foreach (string cmdText in updateCmdTexts)
@@ -254,6 +254,7 @@ namespace BazosBot
          foreach (string url in urls)
          {
             BazosOffers item = DBlist.FirstOrDefault(p => p.url == url);
+            item.endedDateTimeGetted = DateTime.Now.ToString();
             deletedList.Add(item);
          }
       }

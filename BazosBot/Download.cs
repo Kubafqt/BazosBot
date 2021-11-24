@@ -25,47 +25,54 @@ namespace BazosBot
       /// <param name="url"></param>
       public static /*async Task*/ /*IEnumerable<int>*/ void DownloadAllFromCategory(string url, bool onlyNewOffers = false, bool autobot = false) //from bazos section
       {
-         //await Task.Run(() =>
-         //{
-         int actualNumber = 0;
-         downloadDone = false;
-         isRunning = true;
-         getOnlyNewOffers = onlyNewOffers;
-         url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
-         WebClient wc = new WebClient();
-         do
+         try
          {
-            string html = wc.DownloadString(url); //download html source from new url
-            string[] lineSplit = html.Split("\n");
-            int containerLineNumber = 0;
-            fullCount = GetFullCount(lineSplit, ref containerLineNumber);
-            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers
+            //await Task.Run(() =>
+            //{
+            int actualNumber = 0;
+            downloadDone = false;
+            isRunning = true;
+            getOnlyNewOffers = onlyNewOffers;
+            url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
+            WebClient wc = new WebClient();
+            do
             {
-               downloadDone = true;
-               DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL, true);
-               BazosOffers.ListBazosOffers.Clear(); //for showing in resultLbox
-               BazosOffers.ListBazosOffers = onlyNewOffers ? DB_Access.newOffersList : DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL);
-               isRunning = false;
-               if (autobot)
+               string html = wc.DownloadString(url); //download html source from new url
+               string[] lineSplit = html.Split("\n");
+               int containerLineNumber = 0;
+               fullCount = GetFullCount(lineSplit, ref containerLineNumber);
+               if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers
                {
-                  AutoBot.LastAutoBot.isRunning = false;
+                  downloadDone = true;
+                  DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL, true);
+                  BazosOffers.ListBazosOffers.Clear(); //for showing in resultLbox
+                  BazosOffers.ListBazosOffers = onlyNewOffers ? DB_Access.newOffersList : DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL);
+                  isRunning = false;
+                  if (autobot)
+                  {
+                     AutoBot.LastAutoBot.isRunning = false;
+                  }
+                  return;
+                  //yield break; //means return
                }
-               return;
-               //yield break; //means return
+               PrepareNextPage(ref actualNumber, ref url);
+               count = actualNumber <= fullCount ? actualNumber : fullCount;
+               //yield return actualNumber;
             }
-            PrepareNextPage(ref actualNumber, ref url);
-            count = actualNumber <= fullCount ? actualNumber : fullCount;
-            //yield return actualNumber;
+            while (actualNumber <= fullCount);
+            downloadDone = true;
+            DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
+            isRunning = false;
+            if (autobot)
+            {
+               AutoBot.LastAutoBot.isRunning = false;
+            }
+            //});
          }
-         while (actualNumber <= fullCount);
-         downloadDone = true;
-         DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
-         isRunning = false;
-         if (autobot)
+         catch (Exception exeption)
          {
-            AutoBot.LastAutoBot.isRunning = false;
+            MessageBox.Show($"An error occured when trying to download offers from bazos - {exeption.GetType()}");
          }
-         //});
       }
 
       /// <summary>
