@@ -10,9 +10,9 @@ namespace BazosBot
 {
    class DB_Access
    {
-      public static List<BazosOffers> newOffersList = new List<BazosOffers>();
-      public static List<BazosOffers> updatedList = new List<BazosOffers>();
-      public static List<BazosOffers> deletedList = new List<BazosOffers>();
+      public static List<BazosOffers> newOffersList;
+      public static List<BazosOffers> updatedList;
+      public static List<BazosOffers> deletedList;
       static readonly string connString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}Database.mdf;Integrated Security = True; Connect Timeout = 30";
       public static bool downloaded = false;
       private static Dictionary<int, string> DictUpdateChangeNames = new Dictionary<int, string>()
@@ -30,17 +30,19 @@ namespace BazosBot
       /// Insert new offers to offers DB, update updated offers in DB, then delete deleted offers from DB and add it to deleted offers table.
       /// </summary>
       /// <param name="urlNameID"></param>
-      public static void InsertNewOffers(string urlNameID)
+      public static void InsertNewOffers(string urlNameID, bool onlyNewOffers = false)
       {
          SqlConnection connection = new SqlConnection(connString);
          List<BazosOffers> actualList = ListActualOffersInDB(urlNameID);
+         newOffersList = new List<BazosOffers>();
          updatedList = new List<BazosOffers>();
+         deletedList = new List<BazosOffers>();
          offersCount = BazosOffers.ListBazosOffers.Count;
          i = 0;
          foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList()) //aktual downloaded
          {
             i++;
-            if (actualList.Count > 0)
+            if (actualList.Count > 0 && !onlyNewOffers)
             {
                Dictionary<int, string> DictUpdateChange = new Dictionary<int, string>()
                {
@@ -80,7 +82,7 @@ namespace BazosBot
                      {
                         updatedList.Add(item);
                      }
-                     item.changed = item.changed == string.Empty ? $"changed:\n {DictUpdateChangeNames[index]}: {DictUpdateChange[index]} TO {DictAfterUpdateChange[index]}" : item.changed + $"\n {DictUpdateChangeNames[index]}: {DictUpdateChange[index]} TO {DictAfterUpdateChange[index]}";
+                     item.changed = item.changed == string.Empty ? $"changed:\n {DictUpdateChangeNames[index]}: {DictUpdateChange[index]} -> {DictAfterUpdateChange[index]}" : item.changed + $"\n {DictUpdateChangeNames[index]}: {DictUpdateChange[index]} -> {DictAfterUpdateChange[index]}";
                   }
                   index++;
                }
@@ -106,7 +108,10 @@ namespace BazosBot
                newOffersList.Add(item);
             }     
          }
-         CheckDeletedOffers(connection);
+         if (!onlyNewOffers)
+         {
+            CheckDeletedOffers(connection);
+         }
          downloaded = true;
       }
 
@@ -205,7 +210,6 @@ namespace BazosBot
          //List<BazosOffers> actualList = BazosOffers.ListBazosOffers;
          SqlDataReader reader = selectCommand.ExecuteReader();
          List<string> urls = new List<string>();
-         string categoryNameURL = string.Empty;
          while (reader.Read())
          {
             string urlDB = (string)reader["url"];
@@ -215,7 +219,7 @@ namespace BazosBot
             }
          }
          connection.Close();
-         UpdateDeletedOffers(urls, connection, categoryNameURL);
+         UpdateDeletedOffers(urls, connection, BazosOffers.actualCategoryURL);
       }
 
       /// <summary>

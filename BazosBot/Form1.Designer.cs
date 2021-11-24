@@ -35,6 +35,7 @@ namespace BazosBot
          this.offerLbox = new System.Windows.Forms.ListBox();
          this.tbSearchUrl = new System.Windows.Forms.TextBox();
          this.panelMain = new System.Windows.Forms.Panel();
+         this.btnApplyQuickFilter = new System.Windows.Forms.Button();
          this.cbDisableQuickFilterPrice = new System.Windows.Forms.CheckBox();
          this.cmbSelectQuickFilter = new System.Windows.Forms.ComboBox();
          this.lbLokace = new System.Windows.Forms.Label();
@@ -107,6 +108,7 @@ namespace BazosBot
          // 
          // panelMain
          // 
+         this.panelMain.Controls.Add(this.btnApplyQuickFilter);
          this.panelMain.Controls.Add(this.cbDisableQuickFilterPrice);
          this.panelMain.Controls.Add(this.cmbSelectQuickFilter);
          this.panelMain.Controls.Add(this.lbLokace);
@@ -128,6 +130,16 @@ namespace BazosBot
          this.panelMain.Size = new System.Drawing.Size(889, 347);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
+         // 
+         // btnApplyQuickFilter
+         // 
+         this.btnApplyQuickFilter.Location = new System.Drawing.Point(416, 32);
+         this.btnApplyQuickFilter.Name = "btnApplyQuickFilter";
+         this.btnApplyQuickFilter.Size = new System.Drawing.Size(69, 23);
+         this.btnApplyQuickFilter.TabIndex = 20;
+         this.btnApplyQuickFilter.Text = "apply";
+         this.btnApplyQuickFilter.UseVisualStyleBackColor = true;
+         this.btnApplyQuickFilter.Click += new System.EventHandler(this.btnApplyQuickFilter_Click);
          // 
          // cbDisableQuickFilterPrice
          // 
@@ -266,7 +278,7 @@ namespace BazosBot
          // lbUpdatedCount
          // 
          this.lbUpdatedCount.AutoSize = true;
-         this.lbUpdatedCount.Location = new System.Drawing.Point(512, 12);
+         this.lbUpdatedCount.Location = new System.Drawing.Point(487, 12);
          this.lbUpdatedCount.Name = "lbUpdatedCount";
          this.lbUpdatedCount.Size = new System.Drawing.Size(54, 15);
          this.lbUpdatedCount.TabIndex = 9;
@@ -275,7 +287,7 @@ namespace BazosBot
          // lbDeletedCount
          // 
          this.lbDeletedCount.AutoSize = true;
-         this.lbDeletedCount.Location = new System.Drawing.Point(627, 13);
+         this.lbDeletedCount.Location = new System.Drawing.Point(617, 13);
          this.lbDeletedCount.Name = "lbDeletedCount";
          this.lbDeletedCount.Size = new System.Drawing.Size(49, 15);
          this.lbDeletedCount.TabIndex = 10;
@@ -284,7 +296,7 @@ namespace BazosBot
          // lbNewOffers
          // 
          this.lbNewOffers.AutoSize = true;
-         this.lbNewOffers.Location = new System.Drawing.Point(398, 12);
+         this.lbNewOffers.Location = new System.Drawing.Point(355, 12);
          this.lbNewOffers.Name = "lbNewOffers";
          this.lbNewOffers.Size = new System.Drawing.Size(65, 15);
          this.lbNewOffers.TabIndex = 11;
@@ -293,7 +305,7 @@ namespace BazosBot
          // lbAllOffers
          // 
          this.lbAllOffers.AutoSize = true;
-         this.lbAllOffers.Location = new System.Drawing.Point(275, 12);
+         this.lbAllOffers.Location = new System.Drawing.Point(243, 12);
          this.lbAllOffers.Name = "lbAllOffers";
          this.lbAllOffers.Size = new System.Drawing.Size(55, 15);
          this.lbAllOffers.TabIndex = 13;
@@ -302,7 +314,7 @@ namespace BazosBot
          // lbProgress
          // 
          this.lbProgress.AutoSize = true;
-         this.lbProgress.Location = new System.Drawing.Point(759, 12);
+         this.lbProgress.Location = new System.Drawing.Point(768, 13);
          this.lbProgress.Name = "lbProgress";
          this.lbProgress.Size = new System.Drawing.Size(55, 15);
          this.lbProgress.TabIndex = 14;
@@ -363,6 +375,7 @@ namespace BazosBot
       private System.Windows.Forms.ComboBox cmbSelectQuickFilter;
       private System.Windows.Forms.CheckBox cbDisableQuickFilterPrice;
       private System.Windows.Forms.Label lbProgress;
+      private System.Windows.Forms.Button btnApplyQuickFilter;
    }
 }
 
