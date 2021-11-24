@@ -179,16 +179,23 @@ namespace BazosBot
       /// </summary>
       private void btnGetBazos_Click(object sender, EventArgs e)
       {
-         if (!Download.isRunning)
+         try
          {
-            cmbSelectOffersType.SelectedIndex = 0;
-            ResetList(); //reset list of offers and result lisbox
-            BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
-            //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
-            Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
-            thread.Start();
-            ChangeCmbSelectQuickFilter(BazosOffers.actualCategoryURL);
-            switchtimer();
+            if (!Download.isRunning)
+            {
+               cmbSelectOffersType.SelectedIndex = 0;
+               ResetList(); //reset list of offers and result lisbox
+               BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
+               Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
+               //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
+               thread.Start();
+               ChangeCmbSelectQuickFilter(BazosOffers.actualCategoryURL);
+               switchtimer();
+            }
+         }
+         catch (Exception exeption)
+         {
+            MessageBox.Show($"An error occured when trying to get data from bazos - {exeption.GetType()}");
          }
       }
 
@@ -224,7 +231,10 @@ namespace BazosBot
          BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
          foreach (var prop in item.GetType().GetProperties())
          {
-            offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
+            if (!string.IsNullOrEmpty(prop.GetValue(item, null).ToString()))
+            {
+               offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
+            }
          }
       }
 
