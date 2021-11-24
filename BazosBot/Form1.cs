@@ -40,31 +40,49 @@ namespace BazosBot
       //showing:
       private void timer_tick(object s, EventArgs a)
       {
-         double percent = 100 / (Download.fullCount / Download.count);
-         percent = Math.Round(percent, 1);
-         double dbPercent = DB_Access.offersCount > 0 && DB_Access.i > 0 ? 100 / (DB_Access.offersCount / DB_Access.i) : 0;
-         double elapsedTime = Math.Round(sw.Elapsed.TotalSeconds, 0);
-         dbPercent = Math.Round(dbPercent, 1);
-
-         if (Download.downloadDone && !Download.isRunning)
+         if (!Download.getOnlyNewOffers)
          {
-            switchtimer();
-            Download.downloadDone = false;
-            AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
-            elapsedTime = sw.Elapsed.Milliseconds >= 50 ? elapsedTime + 1 : elapsedTime;
-            //labels:
-            lbAllOffers.Text = $"all offers: {BazosOffers.ListBazosOffers.Count}";
-            lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
-            lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
-            lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
-            lastSearched = true;
-            cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(BazosOffers.actualCategoryURL).ToArray());
+            double percent = 100 / (Download.fullCount / Download.count);
+            percent = Math.Round(percent, 1);
+            double dbPercent = DB_Access.offersCount > 0 && DB_Access.i > 0 ? 100 / (DB_Access.offersCount / DB_Access.i) : 0;
+            double elapsedTime = Math.Round(sw.Elapsed.TotalSeconds, 0);
+            dbPercent = Math.Round(dbPercent, 1);
+
+            if (Download.downloadDone && !Download.isRunning)
+            {
+               switchtimer();
+               Download.downloadDone = false;
+               AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
+               elapsedTime = sw.Elapsed.Milliseconds >= 50 ? elapsedTime + 1 : elapsedTime;
+               //labels:
+               lbAllOffers.Text = $"all offers: {BazosOffers.ListBazosOffers.Count}";
+               lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
+               lbUpdatedCount.Text = $"updated: {DB_Access.updatedList.Count}";
+               lbDeletedCount.Text = $"deleted: {DB_Access.deletedList.Count}";
+            }
+            lbProgress.Text = !Download.downloadDone ? $"Download progress: {Download.count} / {Download.fullCount} - {percent}%\nTime elapsed: {elapsedTime} sec." : $"Download progress: {Download.count} / {Download.fullCount} - {percent}% - done!\nUpdating data to DB: {DB_Access.i} / {DB_Access.offersCount} - {dbPercent}% \nTime elapsed: {elapsedTime} sec.";
          }
-         lbProgress.Text = !Download.downloadDone ? $"Download progress: {Download.count} / {Download.fullCount} - {percent}%\nTime elapsed: {elapsedTime} sec" : $"Download progress: {Download.count} / {Download.fullCount} - {percent}% - done!\nUpdating data to DB: {DB_Access.i} / {DB_Access.offersCount} - {dbPercent}% \nTime elapsed: {elapsedTime} sec";
+         else
+         {
+            lbProgress.Text = !Download.downloadDone ? "download: in progress" : "download: done!";
+            if (Download.downloadDone && !Download.isRunning)
+            {
+               switchtimer();
+               Download.downloadDone = false;
+               lbAllOffers.Text = $"all offers: {Download.fullCount}";
+               lbNewOffers.Text = $"new offers: {DB_Access.newOffersList.Count}";
+               lbUpdatedCount.Text = $"updated: not found";
+               lbDeletedCount.Text = $"deleted: not found";
+            }
+         }
       }
 
       private bool switchAutoBot = false; //autobot get full offers - start stopwatch after getted
-		 private void switchtimer()
+		
+      /// <summary>
+      /// 
+      /// </summary>
+      private void switchtimer()
 		 {
 			if (!timer.Enabled)
 			{
@@ -87,7 +105,6 @@ namespace BazosBot
 		 }
 
       //autobot timer:
-      //double elapsedSec = 0;
       private void auto_timer_tick(object s, EventArgs a)
       {
          foreach (AutoBot aBot in AutoBot.AutoBotList.ToList()) //not enqueued autobot - wait to interval
@@ -141,7 +158,9 @@ namespace BazosBot
          thread.Start();
       }
 
-      //initialize timers:
+      /// <summary>
+      /// initialize timers
+      /// </summary>
       private void InitTimers()
       {
          timer = new System.Windows.Forms.Timer();
@@ -154,45 +173,6 @@ namespace BazosBot
 
       #endregion
 
-      #region PrepareUserInteface
-      private void PrepareUserInterface()
-      {
-         activePanel = "main";
-         resultLbox.HorizontalScrollbar = true;
-         offerLbox.HorizontalScrollbar = true;
-         PrepareComboboxes();     
-      }
-
-      private void PrepareComboboxes()
-      {
-         string[] cmbSelectOffersTypeString = new string[] { "all offers", "new offers", "updated", "deleted" };
-         cmbSelectOffersType.Items.AddRange(cmbSelectOffersTypeString);
-         cmbSelectOffersType.SelectedIndex = 0;
-
-         foreach (Control cmb in Controls.OfType<ComboBox>())
-         {
-            if ((cmb as ComboBox).Items.Count > 0)
-            {
-               (cmb as ComboBox).SelectedIndex = 0;
-            }
-         }
-         foreach (Control control in Controls.OfType<Panel>())
-         {
-            cmbSelectPanel.Items.Add(Settings.DictMainPanelsNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value
-            control.Size = Settings.defaultPanelSize;
-            control.Location = Settings.defaultPanelLocation;
-         }
-         cmbSelectPanel.SelectedItem = "main panel";
-     }
-
-      private void btnSelectPanel_Click(object sender, EventArgs e)
-      {   
-         //ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
-         //DB_Access.InsertNewOffers("test");
-      }
-
-      #endregion
-
       #region Main Panel
       /// <summary>
       /// Main method to get items from bazos.
@@ -201,21 +181,18 @@ namespace BazosBot
       {
          if (!Download.isRunning)
          {
+            cmbSelectOffersType.SelectedIndex = 0;
             ResetList(); //reset list of offers and result lisbox
             BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
             //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
-            Thread thread = new Thread(() => Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked));
+            Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
             thread.Start();
+            ChangeCmbSelectQuickFilter(BazosOffers.actualCategoryURL);
             switchtimer();
          }
       }
 
-
-      /// <summary>
-      /// resultLbox
-      /// </summary>
-      /// <param name="itemCount"></param>
-      /// <param name="item"></param>
+      #region results lbox
       private void AddItemToResultLbox(int itemCount, BazosOffers item)
       {
          resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
@@ -243,19 +220,18 @@ namespace BazosBot
       private void resultLbox_SelectedIndexChanged(object sender, EventArgs e)
       {
          offerLbox.Items.Clear();
-         if (!Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase))
+         List<BazosOffers> actualList = !Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase) ? BazosOffers.ListBazosOffers : DB_Access.deletedList;
+         BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
+         foreach (var prop in item.GetType().GetProperties())
          {
-            BazosOffers item = BazosOffers.ListBazosOffers.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
-            foreach (var prop in item.GetType().GetProperties())
-            {
-               offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
-            }
+            offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
          }
       }
 
       private void resultLbox_DoubleClick(object sender, EventArgs e)
       {
-         BazosOffers item = BazosOffers.ListBazosOffers.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
+         List<BazosOffers> actualList = !Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase) ? BazosOffers.ListBazosOffers : DB_Access.deletedList;
+         BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
          string url = item.url;
          Process process = new Process();
          process.StartInfo = new ProcessStartInfo()
@@ -266,7 +242,9 @@ namespace BazosBot
          process.Start();
       }
 
+      #endregion
 
+      #region offers control
       /// <summary>
       /// offerLbox
       /// </summary>
@@ -287,42 +265,56 @@ namespace BazosBot
          }
       }
 
-
       /// <summary>
-      /// reset list
+      /// bugged !
       /// </summary>
-      private void ResetList()
-      {
-         BazosOffers.ListBazosOffers.Clear();
-         resultLbox.Items.Clear();
-      }
-
-
-      /// <summary>
-      /// 
-      /// </summary>
-      Dictionary<string, List<BazosOffers>> DictNameOffersList = new Dictionary<string, List<BazosOffers>>()
-      {
-         { "all offers" , BazosOffers.ListBazosOffers },
-         { "new offers" , DB_Access.newOffersList },
-         { "updated" , DB_Access.updatedList },
-         { "deleted" , DB_Access.deletedList }
-      };
+      //Dictionary<string, List<BazosOffers>> DictNameOffersList = new Dictionary<string, List<BazosOffers>>()
+      //{
+      //   { "all offers" , BazosOffers.ListBazosOffers },
+      //   { "new offers" , DB_Access.newOffersList },
+      //   { "updated" , DB_Access.updatedList },
+      //   { "deleted" , DB_Access.deletedList }
+      //};
 
       private void cmbSelectOffersType_SelectedIndexChanged(object sender, EventArgs e)
       {
          if (DB_Access.downloaded)
          {
             resultLbox.Items.Clear();
+            switch (cmbSelectOffersType.Text)
+            {
+               case "all offers":
+                  {
+                     AddOffersToResultLbox(BazosOffers.ListBazosOffers);
+                     break;
+                  }
+               case "new offers":
+                  {
+                     AddOffersToResultLbox(DB_Access.newOffersList);
+                     break;
+                  }
+               case "updated":
+                  {
+                     AddOffersToResultLbox(DB_Access.updatedList);
+                     break;
+                  }
+               case "deleted":
+                  {
+                     AddOffersToResultLbox(DB_Access.deletedList);
+                     break;
+                  }
+               default:
+                  break;
+            }
             //Dictionary<string, List<BazosOffers>> innerDictionary = DictNameOffersList;
-            if (cmbSelectOffersType.Text != "updated")
-            {
-               AddOffersToResultLbox(DictNameOffersList[cmbSelectOffersType.Text], cmbSelectOffersType.Text);
-            }
-            else
-            {
-               AddOffersToResultLbox(DB_Access.updatedList, "updated");
-            }
+            //if (cmbSelectOffersType.Text != "updated")
+            //{
+            //   AddOffersToResultLbox(DictNameOffersList[cmbSelectOffersType.Text], cmbSelectOffersType.Text);
+            //}
+            //else
+            //{
+            //   AddOffersToResultLbox(DB_Access.updatedList, "updated");
+            //}
          }
       }
 
@@ -335,22 +327,42 @@ namespace BazosBot
             BazosOffers.ListBazosOffers = DB_Access.ListActualOffersInDB(cmbSelectOffers.Text);
             AddOffersToResultLbox(BazosOffers.ListBazosOffers);
             lastSelectedItem = cmbSelectOffers.Text;
-            cmbSelectQuickFilter.Items.Clear();
-            cmbSelectQuickFilter.Items.Add("none");
-            cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(cmbSelectOffers.Text).ToArray());
-            lastSearched = false;
+            ChangeCmbSelectQuickFilter(cmbSelectOffers.Text);
          }
       }
 
-
       /// <summary>
-      /// Quick filter
+      /// reset list
       /// </summary>
+      private void ResetList()
+      {
+         BazosOffers.ListBazosOffers.Clear();
+         resultLbox.Items.Clear();
+      }
+
+      #endregion
+
+      #region Quick filter
       private void btnApplyQuickFilter_Click(object sender, EventArgs e)
       {
          QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
          ApplyQuickFilterChanges();
       }
+
+      private void btnCreateQuickFilter_Click(object sender, EventArgs e)
+      {
+         if (!string.IsNullOrEmpty(tbQuickFilter.Text) && !string.IsNullOrEmpty(tbSearchUrl.Text) || !string.IsNullOrEmpty(cmbSelectOffers.Text))
+         {
+            //QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
+            string[] filterSplit = tbQuickFilter.Text.Split(";");
+            QuickFilter.Name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
+            string categoryUrl = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text;
+            QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, categoryUrl);
+            cmbSelectQuickFilter.Items.Add(tbQuickFilter.Text);
+            cmbSelectQuickFilter.SelectedItem = tbQuickFilter.Text;
+         }
+      }
+
 
       private void cmbSelectQuickFilter_SelectedIndexChanged(object sender, EventArgs e)
       {
@@ -362,16 +374,32 @@ namespace BazosBot
             tbQuickFilter.Text = cmbSelectQuickFilter.SelectedItem.ToString();
             ApplyQuickFilterChanges();
          }
+         else
+         {
+            QuickFilter.QuickFilterList.Clear();
+            tbQuickFilter.Clear();
+            ApplyQuickFilterChanges();
+         }
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      private void ChangeCmbSelectQuickFilter(string actualCategoryUrl)
+      {
+         cmbSelectQuickFilter.Items.Clear();
+         cmbSelectQuickFilter.Items.Add("none");
+         cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(actualCategoryUrl).ToArray());
+         cmbSelectQuickFilter.SelectedIndex = 0;
       }
 
       private void ApplyQuickFilterChanges()
       {
+         int itemCount = 1;
          resultLbox.Items.Clear();
          List<QuickFilter> qfList = QuickFilter.QuickFilterList;
          if (qfList.Count > 0)
          {
-            int itemCount = 1;
-            //bool itemPlus = false;
             foreach (BazosOffers item in BazosOffers.ListBazosOffers)
             {
                int cena = 0;
@@ -379,11 +407,22 @@ namespace BazosBot
                {
                   QuickFilter quickfilter = qfList.FirstOrDefault(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
                   int.TryParse(item.cena, out cena);
-                  if ((!quickfilter.fullNadpisName || item.nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena > 0 && cena <= quickfilter.maxCena) || cena == 0) && !QuickFilter.Blacklist.Any(nadpis => item.nadpis.Contains(nadpis, StringComparison.OrdinalIgnoreCase) && (tbLokalita.Text == string.Empty || item.lokace.Contains(tbLokalita.Text)))) //test if item is matched to max cena
+                  if ((!quickfilter.fullNadpisName || item.nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena > 0 && cena <= quickfilter.maxCena) || cena == 0) && !QuickFilter.Blacklist.Any(nadpis => item.nadpis.Contains(nadpis, StringComparison.OrdinalIgnoreCase) && (tbLokalita.Text == string.Empty || item.lokace.Contains(tbLokalita.Text, StringComparison.OrdinalIgnoreCase)))) //test if item is matched to max cena
                   {
                      AddItemToResultLbox(itemCount, item);
                      itemCount++; //itemPlus = true;
                   }
+               }
+            } 
+         }
+         else if (tbLokalita.Text.Trim() != string.Empty)
+         {
+            foreach (BazosOffers item in BazosOffers.ListBazosOffers)
+            {
+               if (item.lokace.Contains(tbLokalita.Text, StringComparison.OrdinalIgnoreCase))
+               {
+                  AddItemToResultLbox(itemCount, item);
+                  itemCount++;
                }
             }
          }
@@ -393,27 +432,14 @@ namespace BazosBot
          }
       }
 
-      bool lastSearched = false;
-      private void btnCreateQuickFilter_Click(object sender, EventArgs e)
-      {
-         if (!string.IsNullOrEmpty(tbQuickFilter.Text) && !string.IsNullOrEmpty(tbSearchUrl.Text) || !string.IsNullOrEmpty(cmbSelectOffers.Text))
-         {
-            //QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
-            string[] filterSplit = tbQuickFilter.Text.Split(";");
-            QuickFilter.Name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
-            string categoryUrl = lastSearched ? tbSearchUrl.Text : cmbSelectOffers.Text;
-            QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, categoryUrl);
-            cmbSelectQuickFilter.Items.Add(tbQuickFilter.Text);
-            cmbSelectQuickFilter.SelectedItem = tbQuickFilter.Text;
-         }      
-      }
+      #endregion
 
       #endregion
 
-	   #region Auto-bot Panel
-	  
-	  
-	  #endregion
+      #region Auto-bot Panel
+
+
+      #endregion
 
       #region Control methods
       private void cmbSelectPanel_SelectedIndexChanged(object sender, EventArgs e)
@@ -489,6 +515,45 @@ namespace BazosBot
       {
          base.OnFormClosing(e);
          Environment.Exit(0);
+      }
+
+      #endregion
+
+      #region PrepareUserInteface
+      private void PrepareUserInterface()
+      {
+         activePanel = "main";
+         resultLbox.HorizontalScrollbar = true;
+         offerLbox.HorizontalScrollbar = true;
+         PrepareComboboxes();
+      }
+
+      private void PrepareComboboxes()
+      {
+         string[] cmbSelectOffersTypeString = new string[] { "all offers", "new offers", "updated", "deleted" };
+         cmbSelectOffersType.Items.AddRange(cmbSelectOffersTypeString);
+         cmbSelectOffersType.SelectedIndex = 0;
+
+         foreach (Control cmb in Controls.OfType<ComboBox>())
+         {
+            if ((cmb as ComboBox).Items.Count > 0)
+            {
+               (cmb as ComboBox).SelectedIndex = 0;
+            }
+         }
+         foreach (Control control in Controls.OfType<Panel>())
+         {
+            cmbSelectPanel.Items.Add(Settings.DictMainPanelsNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value
+            control.Size = Settings.defaultPanelSize;
+            control.Location = Settings.defaultPanelLocation;
+         }
+         cmbSelectPanel.SelectedItem = "main panel";
+      }
+
+      private void btnSelectPanel_Click(object sender, EventArgs e)
+      {
+         //ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
+         //DB_Access.InsertNewOffers("test");
       }
 
       #endregion

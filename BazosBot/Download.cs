@@ -23,13 +23,14 @@ namespace BazosBot
       /// 
       /// </summary>
       /// <param name="url"></param>
-      public static /*async Task*/ /*IEnumerable<int>*/ void DownloadAllFromCategory(string url, bool getOnlyNewOffers = false, bool autobot = false) //from bazos section
+      public static /*async Task*/ /*IEnumerable<int>*/ void DownloadAllFromCategory(string url, bool onlyNewOffers = false, bool autobot = false) //from bazos section
       {
          //await Task.Run(() =>
          //{
          int actualNumber = 0;
          downloadDone = false;
          isRunning = true;
+         getOnlyNewOffers = onlyNewOffers;
          url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
          WebClient wc = new WebClient();
          do
@@ -38,12 +39,12 @@ namespace BazosBot
             string[] lineSplit = html.Split("\n");
             int containerLineNumber = 0;
             fullCount = GetFullCount(lineSplit, ref containerLineNumber);
-            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, getOnlyNewOffers)) //download only new offers
+            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers
             {
                downloadDone = true;
-               DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
+               DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL, true);
                BazosOffers.ListBazosOffers.Clear(); //for showing in resultLbox
-               BazosOffers.ListBazosOffers.AddRange(DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL));
+               BazosOffers.ListBazosOffers = onlyNewOffers ? DB_Access.newOffersList : DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL);
                isRunning = false;
                if (autobot)
                {
