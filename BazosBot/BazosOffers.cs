@@ -69,7 +69,7 @@ namespace BazosBot
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
                DictNameValue["nadpis"] = GetNadpis(line);
                DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
-               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryURL))
+               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], DictNameValue["datum"], actualCategoryURL))
                {
                   return true; //only new offers
                }

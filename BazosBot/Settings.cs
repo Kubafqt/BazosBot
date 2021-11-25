@@ -18,7 +18,8 @@ namespace BazosBot
       public static Dictionary<string, string> DictMainPanelsNameValue = new Dictionary<string, string>()
       {
          { "main panel", "panelMain" },
-         { "settings", "settingsPanel" },
+         { "auto bot", "panelAutoBot" },
+         //{ "settings", "settingsPanel" },
       };
 
       public static Point filterPanelLocation = new Point(10, 39);

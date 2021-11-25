@@ -11,38 +11,70 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Data.SqlClient;
 
 namespace BazosBot
 {
 	class AutoBot
 	{
+		//class variables:
+		public static AutoBot LastAutoBot;
 		public static List<AutoBot> AutoBotList = new List<AutoBot>();
 		public static Queue<AutoBot> AutoBotQueue = new Queue<AutoBot>();
-		public static AutoBot LastAutoBot;
+		public static List<AutoBot> SavedAutoBotList = new List<AutoBot>();
+		//object variables:
+		public List<string> QuickFilterTextList = new List<string>();
+		public List<QuickFilter> QuickFilterList = new List<QuickFilter>();
+		public string name;
+		public string category; //kategorie, která uložená je -> quickfiltery k ní na výbìr & možnost nových kategoriíí, možnost nových quickfilterù
+		public int interval; //seconds
+		public int? fullInterval; //every x times - expensive work
+		public int timesUsed;
+		public Stopwatch sw;
+		public bool isRunning;
+
 		//public Queue<string> CategoryQueue = new Queue<string>();
 		//public Dictionary<string, List<QuickFilter>> DictCategoryUrlQuickFilterList = new Dictionary<string, List<QuickFilter>>();
 		//public List<string> CategoryUrlList = new List<string>();
-		public List<QuickFilter> QuickFilterList = new List<QuickFilter>();
-		public string category; //kategorie, která uložená je -> quickfiltery k ní na výbìr & možnost nových kategoriíí, možnost nových quickfilterù
-		public bool isRunning;
-		//interval work:
-		public int interval; //seconds
-		public int fullInterval; //every x times - expensive work
-		public int timesUsed;
-		public Stopwatch sw;
-	   //public DateTime lastRun;
+		//public DateTime lastRun;
 		//public DateTime lastDownloadedTime;
 		//public bool sendMail; //later implementation
-		public AutoBot(string category, List<QuickFilter> QuickFilterList, int interval, int fullInterval)
+
+		public AutoBot(string name, string category, List<string> QuickFilterTextList, int interval, int? fullInterval = 0)
 		{
 			sw = new Stopwatch();
 			timesUsed = 0;
+			this.name = name;
 			this.category = category;
-			this.QuickFilterList = QuickFilterList;
+			this.QuickFilterTextList = QuickFilterTextList;
 			this.interval = interval;
 			this.fullInterval = fullInterval;
+			this.isRunning = false;
 		}
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <returns></returns>
+      public static List<string> GetAutoBotNamesFromDB()
+      {
+         List<string> listSavedAutobotNames = new List<string>();
+         SqlConnection conn = new SqlConnection(Settings.DBconnString);
+         string cmdText = $"SELECT * FROM BazosAutobot;";
+         SqlCommand cmd = new SqlCommand(cmdText, conn);
+         conn.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+				string test = (string)reader["QuickFilterList"];
+				List<string> testQuickList = test.Split(";").ToList();
+				string name = (string)reader["Name"];
+				SavedAutoBotList.Add(new AutoBot(name, (string)reader["CategoryURL"], testQuickList, (int)reader["Interval"], (int)reader["FullInterval"]));
+				listSavedAutobotNames.Add(name);
 
-	}
+			}
+         conn.Close();
+         return listSavedAutobotNames;
+      }
+   }
 }
