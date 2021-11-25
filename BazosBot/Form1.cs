@@ -12,6 +12,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 //.net maui
+//corona filter program - 
 
 namespace BazosBot
 {
@@ -34,6 +35,7 @@ namespace BazosBot
          cmbSelectOffers.Items.AddRange(DB_Access.ListActualOffersCategoryURLInDB().ToArray());
          cmbSelectQuickFilter.Items.Add("none");
          cmbSelectQuickFilter.SelectedIndex = 0;
+         cmbAutobot.Items.AddRange(AutoBot.GetAutoBotNamesFromDB().ToArray());
       }
 
       #region timers
@@ -49,7 +51,7 @@ namespace BazosBot
             dbPercent = Math.Round(dbPercent, 1);            
          }
          double elapsedTime = Math.Round(sw.Elapsed.TotalSeconds, 0);
-         if (Download.downloadDone && !Download.isRunning)
+         if (Download.downloadDone && !Download.isRunning) //finished routine
          {
             switchtimer();
             Download.downloadDone = false;
@@ -70,11 +72,10 @@ namespace BazosBot
             !Download.downloadDone ? $"download: in progress\nTime elapsed: {elapsedTime} sec." : $"download: done!\nTime elapsed: {elapsedTime} sec.";
       }
 
-      private bool switchAutoBot = false; //autobot get full offers - start stopwatch after getted
-		
       /// <summary>
       /// timer switch
       /// </summary> 
+     private bool switchAutoBot = false; //autobot get full offers - start stopwatch after getted
       private void switchtimer()
 		 {
 			if (!timer.Enabled)
@@ -110,7 +111,7 @@ namespace BazosBot
                aBot.sw.Reset();
             }
          }
-         if (AutoBot.AutoBotQueue.Count > 0)
+         if (AutoBot.AutoBotQueue.Count > 0) //some autobot is ready in queue
          {
             if (AutoBot.LastAutoBot == null) //first autobot run
             {
@@ -124,10 +125,6 @@ namespace BazosBot
                RunAutoBot();
             }
          }
-         //if (AutoBot.LastAutoBot.isRunning)
-         //{
-         //   elapsedSec = Math.Round(AutoBot.LastAutoBot.sw.Elapsed.TotalSeconds, 0);
-         //}
       }
 
       /// <summary>
@@ -135,17 +132,17 @@ namespace BazosBot
       /// </summary>
       private void RunAutoBot()
       {
-         bool getOnlyNewOffers = AutoBot.LastAutoBot.timesUsed < AutoBot.LastAutoBot.fullInterval;
+         bool getOnlyNewOffers = AutoBot.LastAutoBot.fullInterval == 0 || AutoBot.LastAutoBot.timesUsed < AutoBot.LastAutoBot.fullInterval;
          AutoBot.LastAutoBot.timesUsed = getOnlyNewOffers ? AutoBot.LastAutoBot.timesUsed : 0;
          AutoBot.LastAutoBot.isRunning = true;
-         if (!getOnlyNewOffers)
+         if (getOnlyNewOffers)
          {
-            switchAutoBot = true;
-            switchtimer();
+            AutoBot.LastAutoBot.sw.Start();        
          }
          else
          {
-            AutoBot.LastAutoBot.sw.Start();
+            switchAutoBot = true;
+            switchtimer();
          }
          Thread thread = new Thread(() => Download.DownloadAllFromCategory(AutoBot.LastAutoBot.category, getOnlyNewOffers, true));
          thread.Start();
@@ -160,7 +157,7 @@ namespace BazosBot
          timer.Tick += new EventHandler(timer_tick);
          timer.Interval = 20;
          autoTimer = new System.Windows.Forms.Timer();
-         autoTimer.Tick += new EventHandler(timer_tick);
+         autoTimer.Tick += new EventHandler(auto_timer_tick);
          autoTimer.Interval = 500;
       }
 
@@ -440,7 +437,40 @@ namespace BazosBot
       #endregion
 
       #region Auto-bot Panel
+      /// <summary>
+      /// Comboboxes:
+      /// </summary>
+      private void cmbAutobot_SelectedIndexChanged(object sender, EventArgs e)
+      {
 
+      }
+
+      private void cmbCategoryUrlAutobot_SelectedIndexChanged(object sender, EventArgs e)
+      {
+
+      }
+      private void cmbQuickFilterAutobot_SelectedIndexChanged(object sender, EventArgs e)
+      {
+
+      }
+
+      /// <summary>
+      /// Buttons:
+      /// </summary>
+      private void btnAddToQuickFilterAutobot_Click(object sender, EventArgs e)
+      {
+
+      }
+
+      private void btnCreateAutobot_Click(object sender, EventArgs e)
+      {
+
+      }
+
+      private void btnStartAutoBot_Click(object sender, EventArgs e)
+      {
+
+      }
 
       #endregion
 
@@ -558,6 +588,9 @@ namespace BazosBot
          //ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
          //DB_Access.InsertNewOffers("test");
       }
+
+
+
 
       #endregion
 

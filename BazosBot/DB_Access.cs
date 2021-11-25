@@ -1,10 +1,9 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-//corona filter program - 
+using Microsoft.Data.SqlClient;
 
 namespace BazosBot
 {
