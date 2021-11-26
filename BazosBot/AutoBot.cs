@@ -18,10 +18,10 @@ namespace BazosBot
 	class AutoBot
 	{
 		//class variables:
-		public static AutoBot LastAutoBot;
-		public static List<AutoBot> AutoBotList = new List<AutoBot>();
-		public static Queue<AutoBot> AutoBotQueue = new Queue<AutoBot>();
-		public static List<AutoBot> SavedAutoBotList = new List<AutoBot>();
+		public static AutoBot LastBot;
+		public static List<AutoBot> BotList = new List<AutoBot>();
+		public static Queue<AutoBot> BotQueue = new Queue<AutoBot>();
+		public static List<AutoBot> SavedBotList = new List<AutoBot>();
 		//object variables:
 		public List<string> QuickFilterTextList = new List<string>();
 		public List<QuickFilter> QuickFilterList = new List<QuickFilter>();
@@ -56,9 +56,9 @@ namespace BazosBot
       /// 
       /// </summary>
       /// <returns></returns>
-      public static List<string> GetAutoBotNamesFromDB()
+      public static List<string> GetBotNamesFromDB()
       {
-         List<string> listSavedAutobotNames = new List<string>();
+         List<string> listSavedBotNames = new List<string>();
          SqlConnection conn = new SqlConnection(Settings.DBconnString);
          string cmdText = $"SELECT * FROM BazosAutobot;";
          SqlCommand cmd = new SqlCommand(cmdText, conn);
@@ -69,12 +69,12 @@ namespace BazosBot
 				string test = (string)reader["QuickFilterList"];
 				List<string> testQuickList = test.Split(";").ToList();
 				string name = (string)reader["Name"];
-				SavedAutoBotList.Add(new AutoBot(name, (string)reader["CategoryURL"], testQuickList, (int)reader["Interval"], (int)reader["FullInterval"]));
-				listSavedAutobotNames.Add(name);
+				SavedBotList.Add(new AutoBot(name, (string)reader["CategoryURL"], testQuickList, (int)reader["Interval"], (int)reader["FullInterval"]));
+				listSavedBotNames.Add(name);
 
 			}
          conn.Close();
-         return listSavedAutobotNames;
+         return listSavedBotNames;
       }
    }
 }

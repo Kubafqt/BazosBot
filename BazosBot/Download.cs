@@ -19,11 +19,12 @@ namespace BazosBot
       public static double count = 1;
       public static bool downloadDone = false;
       public static bool isRunning = false;
+
       /// <summary>
       /// 
       /// </summary>
       /// <param name="url"></param>
-      public static /*async Task*/ /*IEnumerable<int>*/ void DownloadAllFromCategory(string url, bool onlyNewOffers = false, bool autobot = false) //from bazos section
+      public static /*async Task*/ /*IEnumerable<int>*/ void DownloadAllFromCategory(string url, bool onlyNewOffers = false, bool botted = false) //from bazos section
       {
          try
          {
@@ -48,9 +49,9 @@ namespace BazosBot
                   BazosOffers.ListBazosOffers.Clear(); //for showing in resultLbox
                   BazosOffers.ListBazosOffers = onlyNewOffers ? DB_Access.newOffersList : DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL);
                   isRunning = false;
-                  if (autobot)
+                  if (botted)
                   {
-                     AutoBot.LastAutoBot.isRunning = false;
+                     AutoBot.LastBot.isRunning = false;
                   }
                   return;
                   //yield break; //means return
@@ -63,9 +64,9 @@ namespace BazosBot
             downloadDone = true;
             DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
             isRunning = false;
-            if (autobot)
+            if (botted)
             {
-               AutoBot.LastAutoBot.isRunning = false;
+               AutoBot.LastBot.isRunning = false;
             }
             //});
          }

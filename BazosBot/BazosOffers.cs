@@ -92,7 +92,7 @@ namespace BazosBot
             if (line.Contains("class=\"inzeratyview\"")) //viewed count
             {
                DictNameValue["viewed"] = Regex.Match(line, @"\d+").ToString();
-               OfferDictionaryToObject(); //last line - viewed count
+               OfferDictionaryToObjectList(); //last line - viewed count
             }
             lineNumber++;
          }
@@ -219,7 +219,7 @@ namespace BazosBot
       /// <summary>
       /// 
       /// </summary>
-      private static void OfferDictionaryToObject()
+      private static void OfferDictionaryToObjectList()
       {
          ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"], DateTime.Now.ToString()));
          ResetStaticVariables();
