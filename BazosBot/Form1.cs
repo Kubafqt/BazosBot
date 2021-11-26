@@ -20,7 +20,7 @@ namespace BazosBot
    {
       string activePanel;
 	   System.Windows.Forms.Timer timer; //showing progress timer
-      System.Windows.Forms.Timer autoTimer; //autobot timer
+      System.Windows.Forms.Timer autoTimer; //Bot timer
       Stopwatch sw = new Stopwatch();
 
       public Form1()
@@ -35,7 +35,7 @@ namespace BazosBot
          cmbSelectOffers.Items.AddRange(DB_Access.ListActualOffersCategoryURLInDB().ToArray());
          cmbSelectQuickFilter.Items.Add("none");
          cmbSelectQuickFilter.SelectedIndex = 0;
-         cmbAutobot.Items.AddRange(AutoBot.GetAutoBotNamesFromDB().ToArray());
+         cmbBot.Items.AddRange(AutoBot.GetBotNamesFromDB().ToArray());
       }
 
       #region timers
@@ -75,7 +75,7 @@ namespace BazosBot
       /// <summary>
       /// timer switch
       /// </summary> 
-     private bool switchAutoBot = false; //autobot get full offers - start stopwatch after getted
+     private bool switchBot = false; //Bot get full offers - start stopwatch after getted
       private void switchtimer()
 		 {
 			if (!timer.Enabled)
@@ -89,40 +89,40 @@ namespace BazosBot
 				timer.Stop();
             sw.Stop();
             sw.Reset();
-            if (switchAutoBot)
+            if (switchBot)
             {
-               switchAutoBot = false;
-               AutoBot.LastAutoBot.sw.Start();
+               switchBot = false;
+               AutoBot.LastBot.sw.Start();
             }
             //lbProgress.Hide();
 			}
 		 }
 
-      //autobot timer:
+      //Bot timer:
       private void auto_timer_tick(object s, EventArgs a)
       {
-         foreach (AutoBot aBot in AutoBot.AutoBotList.ToList()) //not enqueued autobot - wait to interval
+         foreach (AutoBot aBot in AutoBot.BotList.ToList()) //not enqueued Bot - wait to interval
          {
             double elapsedSec = Math.Round(aBot.sw.Elapsed.TotalSeconds, 0);
             if (elapsedSec > aBot.interval || !aBot.sw.IsRunning)
             {
-               AutoBot.AutoBotList.Remove(aBot);
-               AutoBot.AutoBotQueue.Enqueue(aBot);
+               AutoBot.BotList.Remove(aBot);
+               AutoBot.BotQueue.Enqueue(aBot);
                aBot.sw.Reset();
             }
          }
-         if (AutoBot.AutoBotQueue.Count > 0) //some autobot is ready in queue
+         if (AutoBot.BotQueue.Count > 0) //some Bot is ready in queue
          {
-            if (AutoBot.LastAutoBot == null) //first autobot run
+            if (AutoBot.LastBot == null) //first Bot run
             {
-               AutoBot.LastAutoBot = AutoBot.AutoBotQueue.Dequeue();
-               RunAutoBot();
+               AutoBot.LastBot = AutoBot.BotQueue.Dequeue();
+               RunBot();
             }
-            else if (!AutoBot.LastAutoBot.isRunning) //after lastAutobot finished run
+            else if (!AutoBot.LastBot.isRunning) //after lastBot finished run
             {
-               AutoBot.AutoBotList.Add(AutoBot.LastAutoBot);
-               AutoBot.LastAutoBot = AutoBot.AutoBotQueue.Dequeue();
-               RunAutoBot();
+               AutoBot.BotList.Add(AutoBot.LastBot);
+               AutoBot.LastBot = AutoBot.BotQueue.Dequeue();
+               RunBot();
             }
          }
       }
@@ -130,21 +130,21 @@ namespace BazosBot
       /// <summary>
       /// 
       /// </summary>
-      private void RunAutoBot()
+      private void RunBot()
       {
-         bool getOnlyNewOffers = AutoBot.LastAutoBot.fullInterval == 0 || AutoBot.LastAutoBot.timesUsed < AutoBot.LastAutoBot.fullInterval;
-         AutoBot.LastAutoBot.timesUsed = getOnlyNewOffers ? AutoBot.LastAutoBot.timesUsed : 0;
-         AutoBot.LastAutoBot.isRunning = true;
+         bool getOnlyNewOffers = AutoBot.LastBot.fullInterval == 0 || AutoBot.LastBot.timesUsed < AutoBot.LastBot.fullInterval;
+         AutoBot.LastBot.timesUsed = getOnlyNewOffers ? AutoBot.LastBot.timesUsed : 0;
+         AutoBot.LastBot.isRunning = true;
          if (getOnlyNewOffers)
          {
-            AutoBot.LastAutoBot.sw.Start();        
+            AutoBot.LastBot.sw.Start();        
          }
          else
          {
-            switchAutoBot = true;
+            switchBot = true;
             switchtimer();
          }
-         Thread thread = new Thread(() => Download.DownloadAllFromCategory(AutoBot.LastAutoBot.category, getOnlyNewOffers, true));
+         Thread thread = new Thread(() => Download.DownloadAllFromCategory(AutoBot.LastBot.category, getOnlyNewOffers, true));
          thread.Start();
       }
 
@@ -440,16 +440,16 @@ namespace BazosBot
       /// <summary>
       /// Comboboxes:
       /// </summary>
-      private void cmbAutobot_SelectedIndexChanged(object sender, EventArgs e)
+      private void cmbBot_SelectedIndexChanged(object sender, EventArgs e)
       {
 
       }
 
-      private void cmbCategoryUrlAutobot_SelectedIndexChanged(object sender, EventArgs e)
+      private void cmbCategoryUrlBot_SelectedIndexChanged(object sender, EventArgs e)
       {
 
       }
-      private void cmbQuickFilterAutobot_SelectedIndexChanged(object sender, EventArgs e)
+      private void cmbQuickFilterBot_SelectedIndexChanged(object sender, EventArgs e)
       {
 
       }
@@ -457,17 +457,17 @@ namespace BazosBot
       /// <summary>
       /// Buttons:
       /// </summary>
-      private void btnAddToQuickFilterAutobot_Click(object sender, EventArgs e)
+      private void btnAddToQuickFilterBot_Click(object sender, EventArgs e)
       {
 
       }
 
-      private void btnCreateAutobot_Click(object sender, EventArgs e)
+      private void btnCreateBot_Click(object sender, EventArgs e)
       {
 
       }
 
-      private void btnStartAutoBot_Click(object sender, EventArgs e)
+      private void btnStartBot_Click(object sender, EventArgs e)
       {
 
       }
