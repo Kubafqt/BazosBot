@@ -10,20 +10,22 @@ namespace BazosBot
 {
    class QuickFilter
    {
-      public static List<QuickFilter> QuickFilterList = new List<QuickFilter>();
+      public static List<QuickFilter> QuickFilterList = new List<QuickFilter>(); //more quickfilters in line
+      public static List<string> QuickFilterTextList = new List<string>(); //list of all quickfilter text in combobox
       public static List<string> Blacklist = new List<string>();
+      public static int selectedIndex = 0;
       public static string Name;
       public string nadpis { get; set; }
       public string popis { get; set; }
       public int maxCena { get; set; }
-      public bool fullNadpisName { get; set; }
+      public bool FullNadpisName { get; set; }
       public QuickFilter(string nadpis, string popis, int maxCena, bool fullNadpisName)
       {
          this.nadpis = nadpis;
          this.popis = popis;
          this.maxCena = maxCena;
-         this.fullNadpisName = fullNadpisName;
-         QuickFilterList.Add(this);
+         this.FullNadpisName = fullNadpisName;
+         //QuickFilterList.Add(this);
       }
 
       /// <summary>
@@ -39,30 +41,39 @@ namespace BazosBot
          filterSplit[0] = filterSplit[0].Replace($"{Name}:", string.Empty);
          foreach (string item in filterSplit)
          {
-            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0]; //split name from max price
-            string nadpis = ndpsSplit.Length == 0 ? Regex.Match(item, @"[0-9]+|[A-Z]+", RegexOptions.IgnoreCase).ToString() : Regex.Match(ndpsSplit[0], @"[0-9]+|[A-Z]+").ToString(); //nadpis
+            //split name from max price:
+            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0];
+            //nadpis:
+            string nadpis = ndpsSplit.Length == 0 ? Regex.Match(item, @"[0-9]+|[A-Z]+", RegexOptions.IgnoreCase).ToString() : Regex.Match(ndpsSplit[0], @"[0-9]+|[A-Z]+").ToString();
+            nadpis = TextAdjust.RemoveDiacritics(nadpis);
             string popis = string.Empty;
             int maxCena = 0;
-            bool fullNadpisName = item.Contains("!") ? true : false; //full nadpis name
+            //full nadpis name:
+            bool fullNadpisName = item.Contains("!") ? true : false;
+            //blacklist:
             if (item.Contains("."))
             {
-               string it = item.Replace(".", string.Empty);
+               string it = TextAdjust.RemoveDiacritics(item.Replace(".", string.Empty));
                blackListNadpisList.Add(it);
             }
-            if (item.Contains("?")) //popis
+            //popis:
+            if (item.Contains("?"))
             {
                popis = item.Replace("?", string.Empty).Replace("!", string.Empty);
                popis = item.Contains("<") ? popis.Split("<")[0] : popis;
+               popis = TextAdjust.RemoveDiacritics(popis);
             }
-            if (item.Contains("<")) //maxcena
+            //maxcena:
+            if (item.Contains("<"))
             {
                //mincena later, ... ;
                int cena = int.Parse(Regex.Match(item.Split("<")[1], @"\d+").ToString());
                maxCena = item.Contains("=") ? cena : cena - 1;
             }
-            if (nadpis != string.Empty && !blackListNadpisList.Contains(nadpis)) //add quick filter to list
+            QuickFilter qf = new QuickFilter(nadpis, popis, maxCena, fullNadpisName);
+            if (nadpis != string.Empty && !blackListNadpisList.Contains(nadpis) && !QuickFilterList.Contains(qf)) //add quick filter to list
             {
-               QuickFilter qf = new QuickFilter(nadpis, popis, maxCena, fullNadpisName);
+               QuickFilterList.Add(qf);
             }
          }
          Blacklist = blackListNadpisList;
@@ -134,6 +145,10 @@ namespace BazosBot
          return ID;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <returns></returns>
       private static bool DbContainsItem()
       {
          SqlConnection connection = new SqlConnection(Settings.DBconnString);
@@ -164,11 +179,32 @@ namespace BazosBot
          SqlDataReader reader = cmd.ExecuteReader();
          while (reader.Read())
          {
-            listQuickFilters.Add($"{(string)reader["FilterName"]}: {(string)reader["FilterString"]}");
+            string filterName = (string)reader["FilterName"];
+            string filterString = (string)reader["FilterString"];
+            GetQuickFiltersFromTextbox(filterString); //and add it to list
+            listQuickFilters.Add($"{filterName}: {filterString}");
          }
          conn.Close();
+         QuickFilterTextList = listQuickFilters;
          return listQuickFilters;
       }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="index">Selected index from combobox.</param>
+      public static void DeleteQuickFilter(int index)
+      {
+         QuickFilterTextList.RemoveAt(index);
+         SqlConnection connection = new SqlConnection(Settings.DBconnString);
+         string cmdText = $"DELETE FROM BazosQuickFilter WHERE FilterName = @filterName";
+         SqlCommand cmd = new SqlCommand(cmdText, connection);
+         cmd.Parameters.AddWithValue("@filterName", Name);
+         connection.Open();
+         cmd.ExecuteNonQuery();
+         connection.Close();
+      }
+
 
    }
 }
