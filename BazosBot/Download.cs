@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.Windows.Forms;
 using System.Threading;
+using RestSharp;
+//next - proxy server to webclient, DB save exception repair
 
 
 namespace BazosBot
@@ -38,7 +40,10 @@ namespace BazosBot
          isRunning = true;
          getOnlyNewOffers = onlyNewOffers;
          url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
-         WebClient wc = new WebClient();
+         //WebClient wc = new WebClient();
+         RestClient client = new RestClient();
+         //string proxySite = Settings.proxyList[random.Next(Settings.proxyList.Length)];
+         //client.Proxy = new WebProxy("169.57.1.84:8123"); //use proxy server - later not random, but choosed
          int downCount = 0;
          do
          {
@@ -50,7 +55,9 @@ namespace BazosBot
             }
             downCount++;
             waiting = false;
-            string html = wc.DownloadString(url); //download html source from new url
+            RestRequest request = new RestRequest(url);
+            string html = Encoding.Default.GetString(client.DownloadData(request));
+            //string html = wc.DownloadString(url); //download html source from new url
             string[] lineSplit = html.Split("\n");
             int containerLineNumber = 0;
             fullCount = GetFullCount(lineSplit, ref containerLineNumber);
