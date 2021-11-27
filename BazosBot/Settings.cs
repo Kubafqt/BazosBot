@@ -11,14 +11,14 @@ namespace BazosBot
 {
    class Settings
    {
-      public static readonly string DBconnString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}Database.mdf;Integrated Security = True; Connect Timeout = 30";
+      public static readonly string DBconnString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}BazosDb.mdf;Integrated Security = True; Connect Timeout = 30";
 
       public static Size defaultPanelSize = new Size(1003, 593);//(1000, 549);
       public static Point defaultPanelLocation = new Point(12, 34);
       public static Dictionary<string, string> DictMainPanelsNameValue = new Dictionary<string, string>()
       {
          { "main panel", "panelMain" },
-         { "auto bot", "panelBot" },
+         { "auto bot", "panelAutoBot" },
          //{ "settings", "settingsPanel" },
       };
 

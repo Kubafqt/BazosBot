@@ -76,7 +76,7 @@ namespace BazosBot
       /// timer switch
       /// </summary> 
      private bool switchBot = false; //Bot get full offers - start stopwatch after getted
-      private void switchtimer()
+      private void switchtimer(bool exeption = false)
 		 {
 			if (!timer.Enabled)
 			{
@@ -94,7 +94,11 @@ namespace BazosBot
                switchBot = false;
                AutoBot.LastBot.sw.Start();
             }
-            //lbProgress.Hide();
+            if (exeption)
+            {
+               lbProgress.Text = string.Empty;
+               lbProgress.Hide();
+            }
 			}
 		 }
 
@@ -176,6 +180,7 @@ namespace BazosBot
                cmbSelectOffersType.SelectedIndex = 0;
                ResetList(); //reset list of offers and result lisbox
                BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
+               DB_Access.notUpdateViewedAndLastChecked = cboxNotUpdateViewedAndLastChecked.Checked;
                Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
                //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
                thread.Start();
@@ -185,6 +190,7 @@ namespace BazosBot
          }
          catch (Exception exeption)
          {
+            switchtimer();
             MessageBox.Show($"An error occured when trying to get data from bazos - {exeption.GetType()}");
          }
       }
@@ -393,6 +399,15 @@ namespace BazosBot
          cmbSelectQuickFilter.SelectedIndex = 0;
       }
 
+      private void cmbSelectQuickFilter_KeyDown(object sender, KeyEventArgs e)
+      {
+         if (e.KeyCode == Keys.Delete && cmbSelectQuickFilter.Text != "none" && MessageBox.Show("Opravdu smazat quick filter?", "smazat quickfilter", MessageBoxButtons.YesNo) == DialogResult.Yes)
+         {
+            QuickFilter.DeleteQuickFilter(cmbSelectQuickFilter.SelectedIndex - 1);
+         }
+      }
+
+
       private void ApplyQuickFilterChanges()
       {
          int itemCount = 1;
@@ -403,11 +418,12 @@ namespace BazosBot
             foreach (BazosOffers item in BazosOffers.ListBazosOffers)
             {
                int cena = 0;
-               if (qfList.Any(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase))) //nadpis is matched in quickfilter
+               string nadpis = TextAdjust.RemoveDiacritics(item.nadpis);
+               if (qfList.Any(qf => nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase))) //nadpis is matched in quickfilter
                {
-                  QuickFilter quickfilter = qfList.FirstOrDefault(qf => item.nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
+                  QuickFilter quickfilter = qfList.FirstOrDefault(qf => nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
                   int.TryParse(item.cena, out cena);
-                  if ((!quickfilter.fullNadpisName || item.nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena > 0 && cena <= quickfilter.maxCena) || cena == 0) && !QuickFilter.Blacklist.Any(nadpis => item.nadpis.Contains(nadpis, StringComparison.OrdinalIgnoreCase) && (tbLokalita.Text == string.Empty || item.lokace.Contains(tbLokalita.Text, StringComparison.OrdinalIgnoreCase)))) //test if item is matched to max cena
+                  if ((!quickfilter.FullNadpisName || nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena >= 0 && cena <= quickfilter.maxCena) || cbDisableQuickFilterPrice.Checked) && !QuickFilter.Blacklist.Any(qfNadpis => nadpis.Contains(qfNadpis, StringComparison.OrdinalIgnoreCase) && (tbLokalita.Text == string.Empty || item.lokace.Contains(tbLokalita.Text, StringComparison.OrdinalIgnoreCase)))) //test if item is matched to max cena
                   {
                      AddItemToResultLbox(itemCount, item);
                      itemCount++; //itemPlus = true;

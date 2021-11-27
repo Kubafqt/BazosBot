@@ -12,10 +12,11 @@ namespace BazosBot
       public static List<BazosOffers> newOffersList;
       public static List<BazosOffers> updatedList;
       public static List<BazosOffers> deletedList;
-      static readonly string connString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}Database.mdf;Integrated Security = True; Connect Timeout = 30";
+      static readonly string connString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}BazosDb.mdf;Integrated Security = True; Connect Timeout = 30";
       public static bool downloaded = false;
       public static double i = 0;
       public static double offersCount = 0;
+      public static bool notUpdateViewedAndLastChecked = false;
 
       /// <summary>
       /// Insert new offers to offers DB, update updated offers in DB, then delete deleted offers from DB and add it to deleted offers table.
@@ -47,9 +48,10 @@ namespace BazosBot
                };
                foreach (string cmdText in updateCmdTextList.ToList())
                {
-                  string pureCmdText = cmdText.Contains(":") ? cmdText.Split(":")[1] : cmdText;
+                  bool changeReportIsContainedInCommand = DictBeforeUpdateChange.Any(r => cmdText.Substring(0, 7).Contains(r.Key));
+                  string pureCmdText = changeReportIsContainedInCommand ? cmdText.Split(new[] { ':' }, 2)[1] : cmdText;
                   int recordAffect = ExecuteNonQuery(pureCmdText); //update all updated properties to db
-                  if (recordAffect > 0 && cmdText.Contains(":")) //report changes to property
+                  if (recordAffect > 0 && changeReportIsContainedInCommand) //report changes to property
                   {
                      BazosOffers offer;
                      string changedType = cmdText.Split(":")[0];
@@ -190,23 +192,34 @@ namespace BazosBot
       private static List<string> GetUpdateCmdTextList(BazosOffers item, BazosOffers dbItem, string urlNameID)
       {
          List<string> updateCmdTextList = new List<string>();
+         //Dictionary<int, string> updateNames = new Dictionary<int, string>()
+         //{
+         //   { 0, "nadpis" },
+         //   { 1, "cena" },
+         //   { 2, "popis" },
+         //   { 3, "datum" },
+         //   { 4, "lokace" },
+         //};
+         //foreach (string updateCmdText in updateCmdTexts)
+         //{
+         //}
          string[] updateCmdTexts = new string[]
                {  // optimalize - create view of table or object comparison (?)
-               $"UPDATE BazosOffers SET Nadpis = '{item.nadpis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Nadpis != '{item.nadpis}';",
-               $"UPDATE BazosOffers SET Cena = '{item.cena}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Cena != '{item.cena}';",
-               $"UPDATE BazosOffers SET Popis = '{item.popis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Popis != '{item.popis}';",
-               $"UPDATE BazosOffers SET Datum = '{item.datum}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Datum != '{item.datum}';",
-               $"UPDATE BazosOffers SET Lokace = '{item.lokace}', PSC = '{item.psc}' WHERE URL = '{item.url}' AND Lokace != '{item.lokace}';",
-               $"UPDATE BazosOffers SET Viewed = '{item.viewed}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Viewed != '{item.viewed}';",
-               $"UPDATE BazosOffers SET LastChecked = '{DateTime.Now}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND LastChecked != '{item.lastChecked}';",
+               $"UPDATE BazosOffers SET Nadpis = '{item.nadpis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Nadpis != '{item.nadpis}'",
+               $"UPDATE BazosOffers SET Cena = '{item.cena}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Cena != '{item.cena}'",
+               $"UPDATE BazosOffers SET Popis = '{item.popis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Popis != '{item.popis}'",
+               $"UPDATE BazosOffers SET Datum = '{item.datum}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Datum != '{item.datum}'",
+               $"UPDATE BazosOffers SET Lokace = '{item.lokace}', PSC = '{item.psc}' WHERE URL = '{item.url}' AND Lokace != '{item.lokace}'",
+               $"UPDATE BazosOffers SET Viewed = '{item.viewed}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Viewed != '{item.viewed}'",
+               $"UPDATE BazosOffers SET LastChecked = '{DateTime.Now}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND LastChecked != '{item.lastChecked}'",
                };
-         string updateCmdTextToSplit = $"{updateCmdTexts[6]};";
-         updateCmdTextToSplit = dbItem.nadpis != item.nadpis ? $"nadpis:{updateCmdTextToSplit}{updateCmdTexts[0]};" : updateCmdTextToSplit;
-         updateCmdTextToSplit = dbItem.cena != item.cena ? $"cena:{updateCmdTextToSplit}{updateCmdTexts[1]};" : updateCmdTextToSplit;
-         updateCmdTextToSplit = dbItem.popis != item.popis ? $"popis:{updateCmdTextToSplit}{updateCmdTexts[2]};" : updateCmdTextToSplit;
-         updateCmdTextToSplit = dbItem.datum != item.datum ? $"datum:{updateCmdTextToSplit}{updateCmdTexts[3]};" : updateCmdTextToSplit;
-         updateCmdTextToSplit = dbItem.lokace != item.lokace ? $"lokace:{updateCmdTextToSplit}{updateCmdTexts[4]};" : updateCmdTextToSplit;
-         updateCmdTextToSplit = dbItem.viewed != item.viewed ? $"{updateCmdTextToSplit}{updateCmdTexts[5]};" : updateCmdTextToSplit;
+         string updateCmdTextToSplit = !notUpdateViewedAndLastChecked ? $"{updateCmdTexts[6]};" : string.Empty;
+         updateCmdTextToSplit = dbItem.nadpis != item.nadpis ? $"nadpis:{TextAdjust.RemoveSemicolons(updateCmdTexts[0])};{updateCmdTextToSplit}" : updateCmdTextToSplit;
+         updateCmdTextToSplit = dbItem.cena != item.cena ? $"cena:{updateCmdTexts[1]};{updateCmdTextToSplit}" : updateCmdTextToSplit;
+         updateCmdTextToSplit = dbItem.popis != item.popis ? $"popis:{TextAdjust.RemoveSemicolons(updateCmdTexts[2])};{updateCmdTextToSplit}" : updateCmdTextToSplit;
+         updateCmdTextToSplit = dbItem.datum != item.datum ? $"datum:{updateCmdTexts[3]};{updateCmdTextToSplit}" : updateCmdTextToSplit;
+         updateCmdTextToSplit = dbItem.lokace != item.lokace ? $"lokace:{updateCmdTexts[4]};{updateCmdTextToSplit}" : updateCmdTextToSplit;
+         updateCmdTextToSplit = dbItem.viewed != item.viewed && !notUpdateViewedAndLastChecked ? $"{updateCmdTexts[5]};{updateCmdTextToSplit}" : updateCmdTextToSplit;
          if (updateCmdTextToSplit.Length > 0)
          {
             updateCmdTextList.AddRange(updateCmdTextToSplit.Split(";"));
@@ -297,7 +310,7 @@ namespace BazosBot
       /// Execute SQL command
       /// </summary>
       /// <param name="cmdText">command text</param>
-      private static int ExecuteNonQuery(string cmdText)
+      public static int ExecuteNonQuery(string cmdText)
       {
          SqlConnection connection = new SqlConnection(connString);
          SqlCommand cmd = new SqlCommand(cmdText, connection);

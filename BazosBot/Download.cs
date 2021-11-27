@@ -42,7 +42,7 @@ namespace BazosBot
                string[] lineSplit = html.Split("\n");
                int containerLineNumber = 0;
                fullCount = GetFullCount(lineSplit, ref containerLineNumber);
-               if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers
+               if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers when condition met
                {
                   downloadDone = true;
                   DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL, true);
