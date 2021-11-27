@@ -35,5 +35,20 @@ namespace BazosBot
          return text;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
+      public static string RemoveSemicolonsAndDiacritics(string text)
+      {
+         if (string.IsNullOrWhiteSpace(text))
+         { return text; }
+
+         text = text.Replace(";", string.Empty);
+         text = text.Normalize(NormalizationForm.FormD);
+         var chars = text.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark).ToArray();
+         return text;
+      }
    }
 }
