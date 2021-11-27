@@ -12,7 +12,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 //.net maui
-//corona filter program - 
+//corona filter program - respirator
+//idea - sort by - price, name (select order to sort)
 
 namespace BazosBot
 {
@@ -22,6 +23,7 @@ namespace BazosBot
 	   System.Windows.Forms.Timer timer; //showing progress timer
       System.Windows.Forms.Timer autoTimer; //Bot timer
       Stopwatch sw = new Stopwatch();
+      Stopwatch waitingSw = new Stopwatch();
 
       public Form1()
       {
@@ -44,6 +46,7 @@ namespace BazosBot
       {
          double percent = 0;
          double dbPercent = 0;
+         DB_Access.notUpdateViewedAndLastChecked = cboxNotUpdateViewedAndLastChecked.Checked;
          if (!Download.getOnlyNewOffers)
          {
             percent = Math.Round(100 / (Download.fullCount / Download.count), 1);
@@ -55,7 +58,7 @@ namespace BazosBot
          {
             switchtimer();
             Download.downloadDone = false;
-            AddItemsToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
+            AddOffersToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
             elapsedTime = sw.Elapsed.Milliseconds >= 50 ? elapsedTime + 1 : elapsedTime;
             //labels
             string allOffers = Download.getOnlyNewOffers ? $"{Download.fullCount}" : $"{BazosOffers.ListBazosOffers.Count}";
@@ -70,6 +73,17 @@ namespace BazosBot
          lbProgress.Text = !Download.getOnlyNewOffers ? 
             !Download.downloadDone ? $"Download progress: {Download.count} / {Download.fullCount} - {percent}%\nTime elapsed: {elapsedTime} sec." : $"Download progress: {Download.count} / {Download.fullCount} - {percent}% - done!\nUpdating data to DB: {DB_Access.i} / {DB_Access.offersCount} - {dbPercent}% \nTime elapsed: {elapsedTime} sec." : 
             !Download.downloadDone ? $"download: in progress\nTime elapsed: {elapsedTime} sec." : $"download: done!\nTime elapsed: {elapsedTime} sec.";
+         lbProgress.Text = !Download.waiting ? lbProgress.Text : lbProgress.Text + $"\nWaiting to not overload the server - {Math.Round(waitingSw.Elapsed.TotalSeconds, 2)} sec.";
+         //report waiting time:
+         if (!Download.waiting && waitingSw.IsRunning)
+         {
+            waitingSw.Stop();
+            waitingSw.Reset();
+         }
+         else
+         {
+            waitingSw.Start();
+         }
       }
 
       /// <summary>
@@ -201,7 +215,7 @@ namespace BazosBot
          resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
       }
 
-      private void AddItemsToResultLbox(List<BazosOffers> itemList, int itemCount = 1)
+      private void AddOffersToResultLbox(List<BazosOffers> itemList, int itemCount = 1)
       {
          foreach (BazosOffers item in itemList.ToList())
          {
@@ -210,27 +224,46 @@ namespace BazosBot
          }
       }
 
-      private void AddOffersToResultLbox(List<BazosOffers> offersList, string name = "")
-      {
-         int itemCount = 1;
-         foreach (BazosOffers item in offersList.ToList())
-         {
-            resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
-            itemCount++;
-         }
-      }
+      //private void AddOffersToResultLbox(List<BazosOffers> offersList, string name = "")
+      //{
+      //   int itemCount = 1;
+      //   foreach (BazosOffers item in offersList.ToList())
+      //   {
+      //      resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
+      //      itemCount++;
+      //   }
+      //}
 
       private void resultLbox_SelectedIndexChanged(object sender, EventArgs e)
       {
          offerLbox.Items.Clear();
-         List<BazosOffers> actualList = !Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase) ? BazosOffers.ListBazosOffers : DB_Access.deletedList;
-         BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
-         foreach (var prop in item.GetType().GetProperties())
+         try
          {
-            if (!string.IsNullOrEmpty(prop.GetValue(item, null).ToString()))
+            string? result = resultLbox.SelectedItem.ToString();
+            if (!string.IsNullOrEmpty(result))
             {
-               offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
+               List<BazosOffers> actualList = !Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase) ? BazosOffers.ListBazosOffers : DB_Access.deletedList;
+               string nadpis = Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim();
+               if (actualList.Any(of => of.nadpis == nadpis))
+               {
+                  BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == nadpis);
+                  foreach (var prop in item.GetType().GetProperties())
+                  {
+                     if (!string.IsNullOrEmpty(prop.GetValue(item, null).ToString()))
+                     {
+                        offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
+                     }
+                  }
+                  if (!Regex.IsMatch(cmbSelectOffersType.Text, "updated", RegexOptions.IgnoreCase))
+                  {
+                     MessageBox.Show(item.changed);
+                  }
+               }
             }
+         }
+         catch (Exception exception)
+         {
+            MessageBox.Show(exception.ToString());
          }
       }
 
@@ -333,6 +366,7 @@ namespace BazosBot
             BazosOffers.ListBazosOffers = DB_Access.ListActualOffersInDB(cmbSelectOffers.Text);
             AddOffersToResultLbox(BazosOffers.ListBazosOffers);
             lastSelectedItem = cmbSelectOffers.Text;
+            changedCategory = true;
             ChangeCmbSelectQuickFilter(cmbSelectOffers.Text);
          }
       }
@@ -364,12 +398,19 @@ namespace BazosBot
             QuickFilter.Name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
             string categoryUrl = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text;
             QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, categoryUrl);
-            cmbSelectQuickFilter.Items.Add(tbQuickFilter.Text);
-            cmbSelectQuickFilter.SelectedItem = tbQuickFilter.Text;
+            if (btnCreateQuickFilter.Text != "edit") //create (button name on tbQuickFilter textchanged event)
+            {
+               cmbSelectQuickFilter.Items.Add(tbQuickFilter.Text);
+               cmbSelectQuickFilter.SelectedItem = tbQuickFilter.Text;
+            }
+            else //edit
+            {
+               cmbSelectQuickFilter.Items[cmbSelectQuickFilter.SelectedIndex] = tbQuickFilter.Text;
+            }
          }
       }
 
-
+      bool changedCategory = false; //not apply quick filter changes when changed category
       private void cmbSelectQuickFilter_SelectedIndexChanged(object sender, EventArgs e)
       {
          //tbQuickFilter.Text = cmbSelectQuickFilter.SelectedText;
@@ -380,11 +421,15 @@ namespace BazosBot
             tbQuickFilter.Text = cmbSelectQuickFilter.SelectedItem.ToString();
             ApplyQuickFilterChanges();
          }
-         else
+         else if (!changedCategory)
          {
             QuickFilter.QuickFilterList.Clear();
             tbQuickFilter.Clear();
             ApplyQuickFilterChanges();
+         }
+         else
+         {
+            changedCategory = false;
          }
       }
 
@@ -407,13 +452,16 @@ namespace BazosBot
          }
       }
 
-
+      /// <summary>
+      /// 
+      /// </summary>
       private void ApplyQuickFilterChanges()
       {
          int itemCount = 1;
          resultLbox.Items.Clear();
          List<QuickFilter> qfList = QuickFilter.QuickFilterList;
-         if (qfList.Count > 0)
+         string[] tbLokalitaSplit = tbLokalita.Text.Contains(";") ? tbLokalita.Text.Split(";") : new string[] { tbLokalita.Text }; //more locations
+         if (qfList.Count > 0) //quickfilter and lokalita
          {
             foreach (BazosOffers item in BazosOffers.ListBazosOffers)
             {
@@ -423,7 +471,10 @@ namespace BazosBot
                {
                   QuickFilter quickfilter = qfList.FirstOrDefault(qf => nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
                   int.TryParse(item.cena, out cena);
-                  if ((!quickfilter.FullNadpisName || nadpis.Split(' ').Contains(quickfilter.nadpis)) && (quickfilter.maxCena == 0 || (cena >= 0 && cena <= quickfilter.maxCena) || cbDisableQuickFilterPrice.Checked) && !QuickFilter.Blacklist.Any(qfNadpis => nadpis.Contains(qfNadpis, StringComparison.OrdinalIgnoreCase) && (tbLokalita.Text == string.Empty || item.lokace.Contains(tbLokalita.Text, StringComparison.OrdinalIgnoreCase)))) //test if item is matched to max cena
+                  if ((!quickfilter.FullNadpisName || nadpis.Split(' ').Contains(quickfilter.nadpis)) && 
+                     (quickfilter.maxCena == 0 || (cena >= 0 && cena <= quickfilter.maxCena) || cbDisableQuickFilterPrice.Checked) && 
+                     !QuickFilter.Blacklist.Any(qfNadpis => nadpis.Contains(qfNadpis, StringComparison.OrdinalIgnoreCase)) && 
+                     (tbLokalita.Text == string.Empty || tbLokalitaSplit.Any(lokalita => item.lokace.Contains(lokalita, StringComparison.OrdinalIgnoreCase)))) //test if item is matched to max cena
                   {
                      AddItemToResultLbox(itemCount, item);
                      itemCount++; //itemPlus = true;
@@ -431,21 +482,38 @@ namespace BazosBot
                }
             } 
          }
-         else if (tbLokalita.Text.Trim() != string.Empty)
+         else if (tbLokalita.Text.Trim() != string.Empty) //lokalita only
          {
-            foreach (BazosOffers item in BazosOffers.ListBazosOffers)
+            foreach (BazosOffers item in BazosOffers.ListBazosOffers) //+blacklist lokalita with dot - ? advaced minihelp (př. Praha;Brno.venkov)
             {
-               if (item.lokace.Contains(tbLokalita.Text, StringComparison.OrdinalIgnoreCase))
+               if (tbLokalitaSplit.Any(lokalita => item.lokace.Contains(lokalita, StringComparison.OrdinalIgnoreCase)))
                {
                   AddItemToResultLbox(itemCount, item);
                   itemCount++;
                }
             }
          }
-         else
+         else //everything - without filter
          {
-            AddItemsToResultLbox(BazosOffers.ListBazosOffers);
+            AddOffersToResultLbox(BazosOffers.ListBazosOffers);
          }
+      }
+
+      /// <summary>
+      /// Change create quickfilter button text to edit or create when quickfilter name in combobox exist.
+      /// </summary>
+      private void tbQuickFilter_TextChanged(object sender, EventArgs e)
+      {
+         string quickFilterName = tbQuickFilter.Text.Contains(":") ? tbQuickFilter.Text.Split(":")[0] : string.Empty;
+         List<string> selectQuickFilterList = new List<string>();
+         foreach (string item in cmbSelectQuickFilter.Items)
+         {
+            if (item != "none")
+            {
+               selectQuickFilterList.Add(item);
+            }
+         }
+         btnCreateQuickFilter.Text = quickFilterName != string.Empty && selectQuickFilterList.Count > 0 && selectQuickFilterList.Any(p => p.Split(":")[0] == quickFilterName) ? "edit" : "create";
       }
 
       #endregion

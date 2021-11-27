@@ -34,6 +34,10 @@ namespace BazosBot
          foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList()) //aktual downloaded
          {
             i++;
+            if (i > 180)
+            {
+               Console.WriteLine("breakpoint");
+            }
             if (actualDBList.Count > 0 && actualDBList.ToList().Any(p => p.url == item.url) && !onlyNewOffers) //offer is contained in db - check to update
             {
                BazosOffers dbItem = actualDBList.ToList().FirstOrDefault(p => p.url == item.url);
