@@ -13,7 +13,6 @@ namespace BazosBot
    {
       public static int downLimit = 25; //limit of html source download to not overload the server
       public static Point downLimitMinMax = new Point(1500, 2500);
-      public static string[] proxyList = new string[] { "190.15.200.31:8080" };
       public static readonly string DBconnString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}BazosDb.mdf;Integrated Security = True; Connect Timeout = 30";
 
       public static Size defaultPanelSize = new Size(1003, 593);//(1000, 549);
