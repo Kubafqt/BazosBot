@@ -14,7 +14,7 @@ namespace BazosBot
       public static List<BazosOffers> deletedList;
       static readonly string connString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}BazosDb.mdf;Integrated Security = True; Connect Timeout = 30";
       public static bool downloaded = false;
-      public static double i = 0;
+      public static double i = 0; //update to db item count
       public static double offersCount = 0;
       public static bool notUpdateViewedAndLastChecked = false;
 
