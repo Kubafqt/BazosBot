@@ -34,22 +34,32 @@ namespace BazosBot
          foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList()) //aktual downloaded
          {
             i++;
-            if (i > 180)
-            {
-               Console.WriteLine("breakpoint");
-            }
+            //if (i > 180)
+            //{
+            //   Console.WriteLine("breakpoint");
+            //}
             if (actualDBList.Count > 0 && actualDBList.ToList().Any(p => p.url == item.url) && !onlyNewOffers) //offer is contained in db - check to update
             {
+               //BazosOffers dbOffer;
+               //GetItemFromDbByURL(out offer, item.url); //perfomance test - db vs object get
                BazosOffers dbItem = actualDBList.ToList().FirstOrDefault(p => p.url == item.url);
                List<string> updateCmdTextList = GetUpdateCmdTextList(item, dbItem, urlNameID); //get commands for updated only
                Dictionary<string, string> DictBeforeUpdateChange = new Dictionary<string, string>()
                {
-                  { "nadpis", item.nadpis },
-                  { "cena", item.cena },
-                  { "popis", item.popis },
-                  { "datum", item.datum },
-                  { "lokace", $"{item.lokace} - {item.psc}" }
+                  { "nadpis", dbItem.nadpis },
+                  { "cena", dbItem.cena },
+                  { "popis", dbItem.popis },
+                  { "datum", dbItem.datum },
+                  { "lokace", $"{dbItem.lokace} - {dbItem.psc}" }
                };
+               Dictionary<string, string> DictAfterUpdateChange = new Dictionary<string, string>()
+                     {
+                        { "nadpis", item.nadpis },
+                        { "cena", item.cena },
+                        { "popis", item.popis },
+                        { "datum", item.datum },
+                        { "lokace", $"{item.lokace} - {item.psc}" }
+                     };
                foreach (string cmdText in updateCmdTextList.ToList())
                {
                   bool changeReportIsContainedInCommand = DictBeforeUpdateChange.Any(r => cmdText.Substring(0, 7).Contains(r.Key));
@@ -57,23 +67,13 @@ namespace BazosBot
                   int recordAffect = ExecuteNonQuery(pureCmdText); //update all updated properties to db
                   if (recordAffect > 0 && changeReportIsContainedInCommand) //report changes to property
                   {
-                     BazosOffers offer;
                      string changedType = cmdText.Split(":")[0];
-                     GetItemFromDbByURL(out offer, item.url);
-                     Dictionary<string, string> DictAfterUpdateChange = new Dictionary<string, string>()
-                     {
-                        { "nadpis", offer.nadpis },
-                        { "cena", offer.cena },
-                        { "popis", offer.popis },
-                        { "datum", offer.datum },
-                        { "lokace", $"{offer.lokace} - {offer.psc}" }
-                     };
                      if (!updatedList.Contains(item))
                      {
                         updatedList.Add(item);
                      }
-                     item.changed = item.changed == string.Empty ? 
-                        $"changed:\n {changedType}: {DictBeforeUpdateChange[changedType]} -> {DictAfterUpdateChange[changedType]}" : 
+                     item.changed = item.changed == string.Empty ?
+                        $"\n {changedType}: {DictBeforeUpdateChange[changedType]} -> {DictAfterUpdateChange[changedType]}" :
                         item.changed + $",\n {changedType}: {DictBeforeUpdateChange[changedType]} -> {DictAfterUpdateChange[changedType]}";
                   }
                }
@@ -220,7 +220,7 @@ namespace BazosBot
          string updateCmdTextToSplit = !notUpdateViewedAndLastChecked ? $"{updateCmdTexts[6]};" : string.Empty;
          updateCmdTextToSplit = dbItem.nadpis != item.nadpis ? $"nadpis:{TextAdjust.RemoveSemicolons(updateCmdTexts[0])};{updateCmdTextToSplit}" : updateCmdTextToSplit;
          updateCmdTextToSplit = dbItem.cena != item.cena ? $"cena:{updateCmdTexts[1]};{updateCmdTextToSplit}" : updateCmdTextToSplit;
-         updateCmdTextToSplit = dbItem.popis != item.popis ? $"popis:{TextAdjust.RemoveSemicolons(updateCmdTexts[2])};{updateCmdTextToSplit}" : updateCmdTextToSplit;
+         updateCmdTextToSplit = TextAdjust.RemoveDiacritics(dbItem.popis) != TextAdjust.RemoveDiacritics(item.popis) ? $"popis:{TextAdjust.RemoveSemicolons(updateCmdTexts[2])};{updateCmdTextToSplit}" : updateCmdTextToSplit;
          updateCmdTextToSplit = dbItem.datum != item.datum ? $"datum:{updateCmdTexts[3]};{updateCmdTextToSplit}" : updateCmdTextToSplit;
          updateCmdTextToSplit = dbItem.lokace != item.lokace ? $"lokace:{updateCmdTexts[4]};{updateCmdTextToSplit}" : updateCmdTextToSplit;
          updateCmdTextToSplit = dbItem.viewed != item.viewed && !notUpdateViewedAndLastChecked ? $"{updateCmdTexts[5]};{updateCmdTextToSplit}" : updateCmdTextToSplit;

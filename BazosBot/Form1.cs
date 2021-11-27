@@ -38,6 +38,7 @@ namespace BazosBot
          cmbSelectQuickFilter.Items.Add("none");
          cmbSelectQuickFilter.SelectedIndex = 0;
          cmbBot.Items.AddRange(AutoBot.GetBotNamesFromDB().ToArray());
+         cmbSelectOffers.Sorted = true;
       }
 
       #region timers
@@ -191,15 +192,26 @@ namespace BazosBot
          {
             if (!Download.isRunning)
             {
-               cmbSelectOffersType.SelectedIndex = 0;
-               ResetList(); //reset list of offers and result lisbox
                BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
-               DB_Access.notUpdateViewedAndLastChecked = cboxNotUpdateViewedAndLastChecked.Checked;
-               Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
-               //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
-               thread.Start();
-               ChangeCmbSelectQuickFilter(BazosOffers.actualCategoryURL);
-               switchtimer();
+               if (BazosOffers.actualCategoryURL.Contains("bazos.cz/") || BazosOffers.actualCategoryURL.Contains("bazos.sk/")) //+more contains in one command ?
+               {
+                  cmbSelectOffersType.SelectedIndex = 0;
+                  ResetList(); //reset list of offers and result lisbox
+                  DB_Access.notUpdateViewedAndLastChecked = cboxNotUpdateViewedAndLastChecked.Checked;
+                  Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
+                  //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
+                  thread.Start();
+                  if (!cmbSelectOffers.Items.Contains(tbSearchUrl.Text) && tbSearchUrl.Text != string.Empty) //+check if it is right url
+                  {
+                     cmbSelectOffers.Items.Add(tbSearchUrl.Text);
+                  }
+                  ChangeCmbSelectQuickFilter(BazosOffers.actualCategoryURL);
+                  switchtimer();
+               }
+               else //+then another method for aukro, etc. servers
+               {
+                  MessageBox.Show("Zadej URL pro bazoš!");
+               }
             }
          }
          catch (Exception exeption)
@@ -237,33 +249,36 @@ namespace BazosBot
       private void resultLbox_SelectedIndexChanged(object sender, EventArgs e)
       {
          offerLbox.Items.Clear();
-         try
+         if (resultLbox.SelectedIndex >= 0)
          {
-            string? result = resultLbox.SelectedItem.ToString();
-            if (!string.IsNullOrEmpty(result))
+            try
             {
-               List<BazosOffers> actualList = !Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase) ? BazosOffers.ListBazosOffers : DB_Access.deletedList;
-               string nadpis = Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim();
-               if (actualList.Any(of => of.nadpis == nadpis))
+               string? result = resultLbox.SelectedItem.ToString();
+               if (!string.IsNullOrEmpty(result))
                {
-                  BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == nadpis);
-                  foreach (var prop in item.GetType().GetProperties())
+                  List<BazosOffers> actualList = !Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase) ? BazosOffers.ListBazosOffers : DB_Access.deletedList;
+                  string nadpis = Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim();
+                  if (actualList.Any(of => of.nadpis == nadpis))
                   {
-                     if (!string.IsNullOrEmpty(prop.GetValue(item, null).ToString()))
+                     BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == nadpis);
+                     foreach (var prop in item.GetType().GetProperties())
                      {
-                        offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
+                        if (!string.IsNullOrEmpty(prop.GetValue(item, null).ToString()))
+                        {
+                           offerLbox.Items.Add($"{prop.Name}: {prop.GetValue(item, null)}");
+                        }
                      }
-                  }
-                  if (!Regex.IsMatch(cmbSelectOffersType.Text, "updated", RegexOptions.IgnoreCase))
-                  {
-                     MessageBox.Show(item.changed);
+                     if (Regex.IsMatch(cmbSelectOffersType.Text, "updated", RegexOptions.IgnoreCase))
+                     {
+                        MessageBox.Show(item.changed);
+                     }
                   }
                }
             }
-         }
-         catch (Exception exception)
-         {
-            MessageBox.Show(exception.ToString());
+            catch (Exception exception)
+            {
+               MessageBox.Show(exception.ToString());
+            }
          }
       }
 
@@ -362,6 +377,7 @@ namespace BazosBot
       {
          if (resultLbox.Items.Count == 0 || lastSelectedItem != cmbSelectOffers.Text && resultLbox.Items.Count > 0 && MessageBox.Show("Nahrát tento seznam věcí?", "Přemazat věci v listboxu?", MessageBoxButtons.YesNo) == DialogResult.Yes)
          {
+            tbSearchUrl.Clear();
             resultLbox.Items.Clear();
             BazosOffers.ListBazosOffers = DB_Access.ListActualOffersInDB(cmbSelectOffers.Text);
             AddOffersToResultLbox(BazosOffers.ListBazosOffers);

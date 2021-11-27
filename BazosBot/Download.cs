@@ -47,7 +47,7 @@ namespace BazosBot
          int downCount = 0;
          do
          {
-            if (downCount >= downLimit && fullCount - count >= downLimit * 20) //500 offers - waiting to not overload the server
+            if (downCount >= downLimit && fullCount - count >= downLimit * 10) //500 offers - waiting to not overload the server
             {
                downCount = 0;
                waiting = true; //add report to timer
