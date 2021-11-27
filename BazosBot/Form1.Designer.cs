@@ -35,6 +35,7 @@ namespace BazosBot
          this.offerLbox = new System.Windows.Forms.ListBox();
          this.tbSearchUrl = new System.Windows.Forms.TextBox();
          this.panelMain = new System.Windows.Forms.Panel();
+         this.cboxNotUpdateViewedAndLastChecked = new System.Windows.Forms.CheckBox();
          this.btnApplyQuickFilter = new System.Windows.Forms.Button();
          this.cbDisableQuickFilterPrice = new System.Windows.Forms.CheckBox();
          this.cmbSelectQuickFilter = new System.Windows.Forms.ComboBox();
@@ -77,7 +78,6 @@ namespace BazosBot
          this.tbBotQuickFilter = new System.Windows.Forms.TextBox();
          this.tbBotName = new System.Windows.Forms.TextBox();
          this.btnAddToQuickFilterBot = new System.Windows.Forms.Button();
-         this.cboxNotUpdateViewedAndLastChecked = new System.Windows.Forms.CheckBox();
          this.panelMain.SuspendLayout();
          this.panelAutoBot.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.BotFullTime)).BeginInit();
@@ -156,6 +156,16 @@ namespace BazosBot
          this.panelMain.Size = new System.Drawing.Size(998, 583);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
+         // 
+         // cboxNotUpdateViewedAndLastChecked
+         // 
+         this.cboxNotUpdateViewedAndLastChecked.AutoSize = true;
+         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(436, 12);
+         this.cboxNotUpdateViewedAndLastChecked.Name = "cboxNotUpdateViewedAndLastChecked";
+         this.cboxNotUpdateViewedAndLastChecked.Size = new System.Drawing.Size(301, 19);
+         this.cboxNotUpdateViewedAndLastChecked.TabIndex = 21;
+         this.cboxNotUpdateViewedAndLastChecked.Text = "dont update viewed and lastchecked to DB (quicker)";
+         this.cboxNotUpdateViewedAndLastChecked.UseVisualStyleBackColor = true;
          // 
          // btnApplyQuickFilter
          // 
@@ -240,6 +250,7 @@ namespace BazosBot
          this.tbQuickFilter.Name = "tbQuickFilter";
          this.tbQuickFilter.Size = new System.Drawing.Size(315, 23);
          this.tbQuickFilter.TabIndex = 11;
+         this.tbQuickFilter.TextChanged += new System.EventHandler(this.tbQuickFilter_TextChanged);
          // 
          // cmbSelectOffersType
          // 
@@ -562,16 +573,6 @@ namespace BazosBot
          this.btnAddToQuickFilterBot.Text = "add";
          this.btnAddToQuickFilterBot.UseVisualStyleBackColor = true;
          this.btnAddToQuickFilterBot.Click += new System.EventHandler(this.btnAddToQuickFilterBot_Click);
-         // 
-         // cboxNotUpdateViewedAndLastChecked
-         // 
-         this.cboxNotUpdateViewedAndLastChecked.AutoSize = true;
-         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(436, 12);
-         this.cboxNotUpdateViewedAndLastChecked.Name = "cboxNotUpdateViewedAndLastChecked";
-         this.cboxNotUpdateViewedAndLastChecked.Size = new System.Drawing.Size(301, 19);
-         this.cboxNotUpdateViewedAndLastChecked.TabIndex = 21;
-         this.cboxNotUpdateViewedAndLastChecked.Text = "dont update viewed and lastchecked to DB (quicker)";
-         this.cboxNotUpdateViewedAndLastChecked.UseVisualStyleBackColor = true;
          // 
          // Form1
          // 
