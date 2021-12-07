@@ -35,6 +35,32 @@ namespace BazosBot
          this.offerLbox = new System.Windows.Forms.ListBox();
          this.tbSearchUrl = new System.Windows.Forms.TextBox();
          this.panelMain = new System.Windows.Forms.Panel();
+         this.panelAutoBot = new System.Windows.Forms.Panel();
+         this.cboxMultiCategory = new System.Windows.Forms.CheckBox();
+         this.lboxBotCategory = new System.Windows.Forms.ListBox();
+         this.btnAddItemsToBot = new System.Windows.Forms.Button();
+         this.btnStartBot = new System.Windows.Forms.Button();
+         this.lbBotInt = new System.Windows.Forms.Label();
+         this.lbBotFT = new System.Windows.Forms.Label();
+         this.lbBotHeading = new System.Windows.Forms.Label();
+         this.lbBotFullTime = new System.Windows.Forms.Label();
+         this.lbBotInterval = new System.Windows.Forms.Label();
+         this.BotFullTime = new System.Windows.Forms.NumericUpDown();
+         this.BotInterval = new System.Windows.Forms.NumericUpDown();
+         this.lboxBotQuickFilter = new System.Windows.Forms.ListBox();
+         this.btnCreateBot = new System.Windows.Forms.Button();
+         this.lbBotQuickFilter = new System.Windows.Forms.Label();
+         this.lbBotCategoryUrl = new System.Windows.Forms.Label();
+         this.lbBotName = new System.Windows.Forms.Label();
+         this.cmbBotQuickFilter = new System.Windows.Forms.ComboBox();
+         this.cmbBotCategoryUrl = new System.Windows.Forms.ComboBox();
+         this.cmbBotName = new System.Windows.Forms.ComboBox();
+         this.tbBotCategoryUrl = new System.Windows.Forms.TextBox();
+         this.tbBotQuickFilter = new System.Windows.Forms.TextBox();
+         this.tbBotName = new System.Windows.Forms.TextBox();
+         this.btnAddQuickFilterBot = new System.Windows.Forms.Button();
+         this.btnHelpYouTube = new System.Windows.Forms.Button();
+         this.btnHelpQuickFilter = new System.Windows.Forms.Button();
          this.cboxNotUpdateViewedAndLastChecked = new System.Windows.Forms.CheckBox();
          this.btnApplyQuickFilter = new System.Windows.Forms.Button();
          this.cbDisableQuickFilterPrice = new System.Windows.Forms.CheckBox();
@@ -57,27 +83,6 @@ namespace BazosBot
          this.lbNewOffers = new System.Windows.Forms.Label();
          this.lbAllOffers = new System.Windows.Forms.Label();
          this.lbProgress = new System.Windows.Forms.Label();
-         this.panelAutoBot = new System.Windows.Forms.Panel();
-         this.btnStartBot = new System.Windows.Forms.Button();
-         this.lbBotInt = new System.Windows.Forms.Label();
-         this.lbBotFT = new System.Windows.Forms.Label();
-         this.lbBotHeading = new System.Windows.Forms.Label();
-         this.lbBotFullTime = new System.Windows.Forms.Label();
-         this.lbBotInterval = new System.Windows.Forms.Label();
-         this.BotFullTime = new System.Windows.Forms.NumericUpDown();
-         this.BotInterval = new System.Windows.Forms.NumericUpDown();
-         this.lboxBotQuickFilter = new System.Windows.Forms.ListBox();
-         this.btnCreateBot = new System.Windows.Forms.Button();
-         this.lbBotNewQuickFilter = new System.Windows.Forms.Label();
-         this.lbCategoryUrl = new System.Windows.Forms.Label();
-         this.lbBotName = new System.Windows.Forms.Label();
-         this.cmbQuickFilterBot = new System.Windows.Forms.ComboBox();
-         this.cmbCategoryUrlBot = new System.Windows.Forms.ComboBox();
-         this.cmbBot = new System.Windows.Forms.ComboBox();
-         this.tbCategoryURL = new System.Windows.Forms.TextBox();
-         this.tbBotQuickFilter = new System.Windows.Forms.TextBox();
-         this.tbBotName = new System.Windows.Forms.TextBox();
-         this.btnAddToQuickFilterBot = new System.Windows.Forms.Button();
          this.panelMain.SuspendLayout();
          this.panelAutoBot.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.BotFullTime)).BeginInit();
@@ -86,9 +91,9 @@ namespace BazosBot
          // 
          // btnGetBazos
          // 
-         this.btnGetBazos.Location = new System.Drawing.Point(9, 116);
+         this.btnGetBazos.Location = new System.Drawing.Point(9, 109);
          this.btnGetBazos.Name = "btnGetBazos";
-         this.btnGetBazos.Size = new System.Drawing.Size(75, 23);
+         this.btnGetBazos.Size = new System.Drawing.Size(75, 25);
          this.btnGetBazos.TabIndex = 2;
          this.btnGetBazos.Text = "get offers";
          this.btnGetBazos.UseVisualStyleBackColor = true;
@@ -133,6 +138,8 @@ namespace BazosBot
          // 
          // panelMain
          // 
+         this.panelMain.Controls.Add(this.btnHelpYouTube);
+         this.panelMain.Controls.Add(this.btnHelpQuickFilter);
          this.panelMain.Controls.Add(this.cboxNotUpdateViewedAndLastChecked);
          this.panelMain.Controls.Add(this.btnApplyQuickFilter);
          this.panelMain.Controls.Add(this.cbDisableQuickFilterPrice);
@@ -151,16 +158,321 @@ namespace BazosBot
          this.panelMain.Controls.Add(this.resultLbox);
          this.panelMain.Controls.Add(this.label1);
          this.panelMain.Controls.Add(this.btnGetBazos);
-         this.panelMain.Location = new System.Drawing.Point(51, 50);
+         this.panelMain.Location = new System.Drawing.Point(17, 48);
          this.panelMain.Name = "panelMain";
-         this.panelMain.Size = new System.Drawing.Size(998, 583);
+         this.panelMain.Size = new System.Drawing.Size(983, 314);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
+         // 
+         // panelAutoBot
+         // 
+         this.panelAutoBot.Controls.Add(this.cboxMultiCategory);
+         this.panelAutoBot.Controls.Add(this.lboxBotCategory);
+         this.panelAutoBot.Controls.Add(this.btnAddItemsToBot);
+         this.panelAutoBot.Controls.Add(this.btnStartBot);
+         this.panelAutoBot.Controls.Add(this.lbBotInt);
+         this.panelAutoBot.Controls.Add(this.lbBotFT);
+         this.panelAutoBot.Controls.Add(this.lbBotHeading);
+         this.panelAutoBot.Controls.Add(this.lbBotFullTime);
+         this.panelAutoBot.Controls.Add(this.lbBotInterval);
+         this.panelAutoBot.Controls.Add(this.BotFullTime);
+         this.panelAutoBot.Controls.Add(this.BotInterval);
+         this.panelAutoBot.Controls.Add(this.lboxBotQuickFilter);
+         this.panelAutoBot.Controls.Add(this.btnCreateBot);
+         this.panelAutoBot.Controls.Add(this.lbBotQuickFilter);
+         this.panelAutoBot.Controls.Add(this.lbBotCategoryUrl);
+         this.panelAutoBot.Controls.Add(this.lbBotName);
+         this.panelAutoBot.Controls.Add(this.cmbBotQuickFilter);
+         this.panelAutoBot.Controls.Add(this.cmbBotCategoryUrl);
+         this.panelAutoBot.Controls.Add(this.cmbBotName);
+         this.panelAutoBot.Controls.Add(this.tbBotCategoryUrl);
+         this.panelAutoBot.Controls.Add(this.tbBotQuickFilter);
+         this.panelAutoBot.Controls.Add(this.tbBotName);
+         this.panelAutoBot.Controls.Add(this.btnAddQuickFilterBot);
+         this.panelAutoBot.Location = new System.Drawing.Point(55, 387);
+         this.panelAutoBot.Name = "panelAutoBot";
+         this.panelAutoBot.Size = new System.Drawing.Size(168, 132);
+         this.panelAutoBot.TabIndex = 15;
+         // 
+         // cboxMultiCategory
+         // 
+         this.cboxMultiCategory.AutoSize = true;
+         this.cboxMultiCategory.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.cboxMultiCategory.Location = new System.Drawing.Point(757, 373);
+         this.cboxMultiCategory.Name = "cboxMultiCategory";
+         this.cboxMultiCategory.Size = new System.Drawing.Size(114, 21);
+         this.cboxMultiCategory.TabIndex = 27;
+         this.cboxMultiCategory.Text = "multicategory";
+         this.cboxMultiCategory.UseVisualStyleBackColor = true;
+         // 
+         // lboxBotCategory
+         // 
+         this.lboxBotCategory.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+         this.lboxBotCategory.FormattingEnabled = true;
+         this.lboxBotCategory.HorizontalScrollbar = true;
+         this.lboxBotCategory.ItemHeight = 17;
+         this.lboxBotCategory.Location = new System.Drawing.Point(398, 222);
+         this.lboxBotCategory.Name = "lboxBotCategory";
+         this.lboxBotCategory.Size = new System.Drawing.Size(325, 344);
+         this.lboxBotCategory.TabIndex = 26;
+         this.lboxBotCategory.SelectedIndexChanged += new System.EventHandler(this.lboxBotCategory_SelectedIndexChanged);
+         this.lboxBotCategory.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lboxBotCategory_KeyDown);
+         // 
+         // btnAddItemsToBot
+         // 
+         this.btnAddItemsToBot.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.btnAddItemsToBot.Location = new System.Drawing.Point(602, 170);
+         this.btnAddItemsToBot.Name = "btnAddItemsToBot";
+         this.btnAddItemsToBot.Size = new System.Drawing.Size(57, 23);
+         this.btnAddItemsToBot.TabIndex = 25;
+         this.btnAddItemsToBot.Text = "to bot";
+         this.btnAddItemsToBot.UseVisualStyleBackColor = true;
+         this.btnAddItemsToBot.Click += new System.EventHandler(this.btnAddItemsToBot_Click);
+         // 
+         // btnStartBot
+         // 
+         this.btnStartBot.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.btnStartBot.Location = new System.Drawing.Point(757, 497);
+         this.btnStartBot.Name = "btnStartBot";
+         this.btnStartBot.Size = new System.Drawing.Size(137, 69);
+         this.btnStartBot.TabIndex = 24;
+         this.btnStartBot.Text = "Start Bot";
+         this.btnStartBot.UseVisualStyleBackColor = true;
+         this.btnStartBot.Click += new System.EventHandler(this.btnStartBot_Click);
+         // 
+         // lbBotInt
+         // 
+         this.lbBotInt.AutoSize = true;
+         this.lbBotInt.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.lbBotInt.Location = new System.Drawing.Point(929, 291);
+         this.lbBotInt.Name = "lbBotInt";
+         this.lbBotInt.Size = new System.Drawing.Size(57, 17);
+         this.lbBotInt.TabIndex = 23;
+         this.lbBotInt.Text = "seconds";
+         // 
+         // lbBotFT
+         // 
+         this.lbBotFT.AutoSize = true;
+         this.lbBotFT.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.lbBotFT.Location = new System.Drawing.Point(929, 333);
+         this.lbBotFT.Name = "lbBotFT";
+         this.lbBotFT.Size = new System.Drawing.Size(75, 17);
+         this.lbBotFT.TabIndex = 22;
+         this.lbBotFT.Text = "times used";
+         // 
+         // lbBotHeading
+         // 
+         this.lbBotHeading.AutoSize = true;
+         this.lbBotHeading.Font = new System.Drawing.Font("Segoe UI", 20.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
+         this.lbBotHeading.Location = new System.Drawing.Point(334, 26);
+         this.lbBotHeading.Name = "lbBotHeading";
+         this.lbBotHeading.Size = new System.Drawing.Size(125, 37);
+         this.lbBotHeading.TabIndex = 21;
+         this.lbBotHeading.Text = "AutoBot";
+         // 
+         // lbBotFullTime
+         // 
+         this.lbBotFullTime.AutoSize = true;
+         this.lbBotFullTime.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.lbBotFullTime.Location = new System.Drawing.Point(744, 333);
+         this.lbBotFullTime.Name = "lbBotFullTime";
+         this.lbBotFullTime.Size = new System.Drawing.Size(66, 17);
+         this.lbBotFullTime.TabIndex = 20;
+         this.lbBotFullTime.Text = "FullTime:";
+         // 
+         // lbBotInterval
+         // 
+         this.lbBotInterval.AutoSize = true;
+         this.lbBotInterval.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.lbBotInterval.Location = new System.Drawing.Point(744, 291);
+         this.lbBotInterval.Name = "lbBotInterval";
+         this.lbBotInterval.Size = new System.Drawing.Size(60, 17);
+         this.lbBotInterval.TabIndex = 19;
+         this.lbBotInterval.Text = "Interval:";
+         // 
+         // BotFullTime
+         // 
+         this.BotFullTime.Location = new System.Drawing.Point(818, 333);
+         this.BotFullTime.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+         this.BotFullTime.Name = "BotFullTime";
+         this.BotFullTime.Size = new System.Drawing.Size(105, 23);
+         this.BotFullTime.TabIndex = 18;
+         this.BotFullTime.ValueChanged += new System.EventHandler(this.BotFullTime_ValueChanged);
+         // 
+         // BotInterval
+         // 
+         this.BotInterval.Location = new System.Drawing.Point(818, 291);
+         this.BotInterval.Maximum = new decimal(new int[] {
+            86400,
+            0,
+            0,
+            0});
+         this.BotInterval.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+         this.BotInterval.Name = "BotInterval";
+         this.BotInterval.Size = new System.Drawing.Size(105, 23);
+         this.BotInterval.TabIndex = 17;
+         this.BotInterval.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+         this.BotInterval.ValueChanged += new System.EventHandler(this.BotInterval_ValueChanged);
+         // 
+         // lboxBotQuickFilter
+         // 
+         this.lboxBotQuickFilter.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+         this.lboxBotQuickFilter.FormattingEnabled = true;
+         this.lboxBotQuickFilter.HorizontalScrollbar = true;
+         this.lboxBotQuickFilter.ItemHeight = 17;
+         this.lboxBotQuickFilter.Location = new System.Drawing.Point(39, 222);
+         this.lboxBotQuickFilter.Name = "lboxBotQuickFilter";
+         this.lboxBotQuickFilter.Size = new System.Drawing.Size(341, 344);
+         this.lboxBotQuickFilter.TabIndex = 14;
+         this.lboxBotQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lboxBotQuickFilter_KeyDown);
+         this.lboxBotQuickFilter.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lboxBotQuickFilter_MouseDown);
+         // 
+         // btnCreateBot
+         // 
+         this.btnCreateBot.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.btnCreateBot.Location = new System.Drawing.Point(757, 411);
+         this.btnCreateBot.Name = "btnCreateBot";
+         this.btnCreateBot.Size = new System.Drawing.Size(137, 69);
+         this.btnCreateBot.TabIndex = 13;
+         this.btnCreateBot.Text = "Create Bot";
+         this.btnCreateBot.UseVisualStyleBackColor = true;
+         this.btnCreateBot.Click += new System.EventHandler(this.btnCreateBot_Click);
+         // 
+         // lbBotQuickFilter
+         // 
+         this.lbBotQuickFilter.AutoSize = true;
+         this.lbBotQuickFilter.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.lbBotQuickFilter.Location = new System.Drawing.Point(48, 168);
+         this.lbBotQuickFilter.Name = "lbBotQuickFilter";
+         this.lbBotQuickFilter.Size = new System.Drawing.Size(98, 21);
+         this.lbBotQuickFilter.TabIndex = 11;
+         this.lbBotQuickFilter.Text = "quick filter:";
+         // 
+         // lbBotCategoryUrl
+         // 
+         this.lbBotCategoryUrl.AutoSize = true;
+         this.lbBotCategoryUrl.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.lbBotCategoryUrl.Location = new System.Drawing.Point(39, 128);
+         this.lbBotCategoryUrl.Name = "lbBotCategoryUrl";
+         this.lbBotCategoryUrl.Size = new System.Drawing.Size(107, 21);
+         this.lbBotCategoryUrl.TabIndex = 10;
+         this.lbBotCategoryUrl.Text = "category url:";
+         // 
+         // lbBotName
+         // 
+         this.lbBotName.AutoSize = true;
+         this.lbBotName.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.lbBotName.Location = new System.Drawing.Point(38, 91);
+         this.lbBotName.Name = "lbBotName";
+         this.lbBotName.Size = new System.Drawing.Size(107, 21);
+         this.lbBotName.TabIndex = 9;
+         this.lbBotName.Text = "name of Bot:";
+         // 
+         // cmbBotQuickFilter
+         // 
+         this.cmbBotQuickFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cmbBotQuickFilter.FormattingEnabled = true;
+         this.cmbBotQuickFilter.Location = new System.Drawing.Point(665, 170);
+         this.cmbBotQuickFilter.Name = "cmbBotQuickFilter";
+         this.cmbBotQuickFilter.Size = new System.Drawing.Size(284, 23);
+         this.cmbBotQuickFilter.TabIndex = 8;
+         this.cmbBotQuickFilter.SelectedIndexChanged += new System.EventHandler(this.cmbQuickFilterBot_SelectedIndexChanged);
+         this.cmbBotQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbBotQuickFilter_KeyDown);
+         // 
+         // cmbBotCategoryUrl
+         // 
+         this.cmbBotCategoryUrl.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cmbBotCategoryUrl.FormattingEnabled = true;
+         this.cmbBotCategoryUrl.Location = new System.Drawing.Point(553, 130);
+         this.cmbBotCategoryUrl.Name = "cmbBotCategoryUrl";
+         this.cmbBotCategoryUrl.Size = new System.Drawing.Size(396, 23);
+         this.cmbBotCategoryUrl.Sorted = true;
+         this.cmbBotCategoryUrl.TabIndex = 7;
+         this.cmbBotCategoryUrl.SelectedIndexChanged += new System.EventHandler(this.cmbCategoryUrlBot_SelectedIndexChanged);
+         // 
+         // cmbBotName
+         // 
+         this.cmbBotName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cmbBotName.FormattingEnabled = true;
+         this.cmbBotName.Location = new System.Drawing.Point(551, 89);
+         this.cmbBotName.Name = "cmbBotName";
+         this.cmbBotName.Size = new System.Drawing.Size(398, 23);
+         this.cmbBotName.TabIndex = 6;
+         this.cmbBotName.SelectedIndexChanged += new System.EventHandler(this.cmbBotName_SelectedIndexChanged);
+         this.cmbBotName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbBotName_KeyDown);
+         // 
+         // tbBotCategoryUrl
+         // 
+         this.tbBotCategoryUrl.Location = new System.Drawing.Point(152, 130);
+         this.tbBotCategoryUrl.Name = "tbBotCategoryUrl";
+         this.tbBotCategoryUrl.Size = new System.Drawing.Size(383, 23);
+         this.tbBotCategoryUrl.TabIndex = 5;
+         // 
+         // tbBotQuickFilter
+         // 
+         this.tbBotQuickFilter.Location = new System.Drawing.Point(152, 170);
+         this.tbBotQuickFilter.Name = "tbBotQuickFilter";
+         this.tbBotQuickFilter.Size = new System.Drawing.Size(383, 23);
+         this.tbBotQuickFilter.TabIndex = 4;
+         this.tbBotQuickFilter.TextChanged += new System.EventHandler(this.tbBotQuickFilter_TextChanged);
+         // 
+         // tbBotName
+         // 
+         this.tbBotName.Location = new System.Drawing.Point(152, 89);
+         this.tbBotName.Name = "tbBotName";
+         this.tbBotName.Size = new System.Drawing.Size(383, 23);
+         this.tbBotName.TabIndex = 2;
+         // 
+         // btnAddQuickFilterBot
+         // 
+         this.btnAddQuickFilterBot.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.btnAddQuickFilterBot.Location = new System.Drawing.Point(553, 170);
+         this.btnAddQuickFilterBot.Name = "btnAddQuickFilterBot";
+         this.btnAddQuickFilterBot.Size = new System.Drawing.Size(43, 23);
+         this.btnAddQuickFilterBot.TabIndex = 1;
+         this.btnAddQuickFilterBot.Text = "add";
+         this.btnAddQuickFilterBot.UseVisualStyleBackColor = true;
+         this.btnAddQuickFilterBot.Click += new System.EventHandler(this.btnAddQuickFilterBot_Click);
+         // 
+         // btnHelpYouTube
+         // 
+         this.btnHelpYouTube.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+         this.btnHelpYouTube.Location = new System.Drawing.Point(9, 217);
+         this.btnHelpYouTube.Name = "btnHelpYouTube";
+         this.btnHelpYouTube.Size = new System.Drawing.Size(75, 50);
+         this.btnHelpYouTube.TabIndex = 25;
+         this.btnHelpYouTube.Text = "HELP YouTube";
+         this.btnHelpYouTube.UseVisualStyleBackColor = true;
+         this.btnHelpYouTube.Visible = false;
+         this.btnHelpYouTube.Click += new System.EventHandler(this.btnHelpYouTube_Click);
+         // 
+         // btnHelpQuickFilter
+         // 
+         this.btnHelpQuickFilter.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+         this.btnHelpQuickFilter.Location = new System.Drawing.Point(9, 154);
+         this.btnHelpQuickFilter.Name = "btnHelpQuickFilter";
+         this.btnHelpQuickFilter.Size = new System.Drawing.Size(75, 50);
+         this.btnHelpQuickFilter.TabIndex = 22;
+         this.btnHelpQuickFilter.Text = "HELP quickfilter";
+         this.btnHelpQuickFilter.UseVisualStyleBackColor = true;
+         this.btnHelpQuickFilter.Click += new System.EventHandler(this.btnHelpQuickFilter_Click);
          // 
          // cboxNotUpdateViewedAndLastChecked
          // 
          this.cboxNotUpdateViewedAndLastChecked.AutoSize = true;
-         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(436, 12);
+         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(435, 7);
          this.cboxNotUpdateViewedAndLastChecked.Name = "cboxNotUpdateViewedAndLastChecked";
          this.cboxNotUpdateViewedAndLastChecked.Size = new System.Drawing.Size(301, 19);
          this.cboxNotUpdateViewedAndLastChecked.TabIndex = 21;
@@ -180,7 +492,7 @@ namespace BazosBot
          // cbDisableQuickFilterPrice
          // 
          this.cbDisableQuickFilterPrice.AutoSize = true;
-         this.cbDisableQuickFilterPrice.Location = new System.Drawing.Point(264, 12);
+         this.cbDisableQuickFilterPrice.Location = new System.Drawing.Point(263, 7);
          this.cbDisableQuickFilterPrice.Name = "cbDisableQuickFilterPrice";
          this.cbDisableQuickFilterPrice.Size = new System.Drawing.Size(164, 19);
          this.cbDisableQuickFilterPrice.TabIndex = 19;
@@ -221,7 +533,7 @@ namespace BazosBot
          // cboxDownOnlyLast
          // 
          this.cboxDownOnlyLast.AutoSize = true;
-         this.cboxDownOnlyLast.Location = new System.Drawing.Point(95, 12);
+         this.cboxDownOnlyLast.Location = new System.Drawing.Point(94, 7);
          this.cboxDownOnlyLast.Name = "cboxDownOnlyLast";
          this.cboxDownOnlyLast.Size = new System.Drawing.Size(163, 19);
          this.cboxDownOnlyLast.TabIndex = 15;
@@ -271,6 +583,7 @@ namespace BazosBot
          this.cmbSelectOffers.Size = new System.Drawing.Size(300, 23);
          this.cmbSelectOffers.TabIndex = 9;
          this.cmbSelectOffers.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffers_SelectedIndexChanged);
+         this.cmbSelectOffers.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectOffers_KeyDown);
          // 
          // textBox9
          // 
@@ -352,233 +665,18 @@ namespace BazosBot
          // lbProgress
          // 
          this.lbProgress.AutoSize = true;
-         this.lbProgress.Location = new System.Drawing.Point(768, 13);
+         this.lbProgress.Location = new System.Drawing.Point(768, 11);
          this.lbProgress.Name = "lbProgress";
          this.lbProgress.Size = new System.Drawing.Size(55, 15);
          this.lbProgress.TabIndex = 14;
          this.lbProgress.Text = "progress:";
          this.lbProgress.Visible = false;
          // 
-         // panelAutoBot
-         // 
-         this.panelAutoBot.Controls.Add(this.btnStartBot);
-         this.panelAutoBot.Controls.Add(this.lbBotInt);
-         this.panelAutoBot.Controls.Add(this.lbBotFT);
-         this.panelAutoBot.Controls.Add(this.lbBotHeading);
-         this.panelAutoBot.Controls.Add(this.lbBotFullTime);
-         this.panelAutoBot.Controls.Add(this.lbBotInterval);
-         this.panelAutoBot.Controls.Add(this.BotFullTime);
-         this.panelAutoBot.Controls.Add(this.BotInterval);
-         this.panelAutoBot.Controls.Add(this.lboxBotQuickFilter);
-         this.panelAutoBot.Controls.Add(this.btnCreateBot);
-         this.panelAutoBot.Controls.Add(this.lbBotNewQuickFilter);
-         this.panelAutoBot.Controls.Add(this.lbCategoryUrl);
-         this.panelAutoBot.Controls.Add(this.lbBotName);
-         this.panelAutoBot.Controls.Add(this.cmbQuickFilterBot);
-         this.panelAutoBot.Controls.Add(this.cmbCategoryUrlBot);
-         this.panelAutoBot.Controls.Add(this.cmbBot);
-         this.panelAutoBot.Controls.Add(this.tbCategoryURL);
-         this.panelAutoBot.Controls.Add(this.tbBotQuickFilter);
-         this.panelAutoBot.Controls.Add(this.tbBotName);
-         this.panelAutoBot.Controls.Add(this.btnAddToQuickFilterBot);
-         this.panelAutoBot.Location = new System.Drawing.Point(21, 48);
-         this.panelAutoBot.Name = "panelAutoBot";
-         this.panelAutoBot.Size = new System.Drawing.Size(24, 21);
-         this.panelAutoBot.TabIndex = 15;
-         // 
-         // btnStartBot
-         // 
-         this.btnStartBot.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.btnStartBot.Location = new System.Drawing.Point(428, 412);
-         this.btnStartBot.Name = "btnStartBot";
-         this.btnStartBot.Size = new System.Drawing.Size(137, 69);
-         this.btnStartBot.TabIndex = 24;
-         this.btnStartBot.Text = "Start Bot";
-         this.btnStartBot.UseVisualStyleBackColor = true;
-         this.btnStartBot.Click += new System.EventHandler(this.btnStartBot_Click);
-         // 
-         // lbBotInt
-         // 
-         this.lbBotInt.AutoSize = true;
-         this.lbBotInt.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotInt.Location = new System.Drawing.Point(651, 236);
-         this.lbBotInt.Name = "lbBotInt";
-         this.lbBotInt.Size = new System.Drawing.Size(57, 17);
-         this.lbBotInt.TabIndex = 23;
-         this.lbBotInt.Text = "seconds";
-         // 
-         // lbBotFT
-         // 
-         this.lbBotFT.AutoSize = true;
-         this.lbBotFT.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotFT.Location = new System.Drawing.Point(651, 278);
-         this.lbBotFT.Name = "lbBotFT";
-         this.lbBotFT.Size = new System.Drawing.Size(75, 17);
-         this.lbBotFT.TabIndex = 22;
-         this.lbBotFT.Text = "times used";
-         // 
-         // lbBotHeading
-         // 
-         this.lbBotHeading.AutoSize = true;
-         this.lbBotHeading.Font = new System.Drawing.Font("Segoe UI", 20.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
-         this.lbBotHeading.Location = new System.Drawing.Point(334, 26);
-         this.lbBotHeading.Name = "lbBotHeading";
-         this.lbBotHeading.Size = new System.Drawing.Size(125, 37);
-         this.lbBotHeading.TabIndex = 21;
-         this.lbBotHeading.Text = "AutoBot";
-         // 
-         // lbBotFullTime
-         // 
-         this.lbBotFullTime.AutoSize = true;
-         this.lbBotFullTime.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotFullTime.Location = new System.Drawing.Point(466, 278);
-         this.lbBotFullTime.Name = "lbBotFullTime";
-         this.lbBotFullTime.Size = new System.Drawing.Size(66, 17);
-         this.lbBotFullTime.TabIndex = 20;
-         this.lbBotFullTime.Text = "FullTime:";
-         // 
-         // lbBotInterval
-         // 
-         this.lbBotInterval.AutoSize = true;
-         this.lbBotInterval.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotInterval.Location = new System.Drawing.Point(466, 236);
-         this.lbBotInterval.Name = "lbBotInterval";
-         this.lbBotInterval.Size = new System.Drawing.Size(60, 17);
-         this.lbBotInterval.TabIndex = 19;
-         this.lbBotInterval.Text = "Interval:";
-         // 
-         // BotFullTime
-         // 
-         this.BotFullTime.Location = new System.Drawing.Point(540, 278);
-         this.BotFullTime.Name = "BotFullTime";
-         this.BotFullTime.Size = new System.Drawing.Size(105, 23);
-         this.BotFullTime.TabIndex = 18;
-         // 
-         // BotInterval
-         // 
-         this.BotInterval.Location = new System.Drawing.Point(540, 236);
-         this.BotInterval.Name = "BotInterval";
-         this.BotInterval.Size = new System.Drawing.Size(105, 23);
-         this.BotInterval.TabIndex = 17;
-         // 
-         // lboxBotQuickFilter
-         // 
-         this.lboxBotQuickFilter.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.lboxBotQuickFilter.FormattingEnabled = true;
-         this.lboxBotQuickFilter.ItemHeight = 17;
-         this.lboxBotQuickFilter.Location = new System.Drawing.Point(58, 222);
-         this.lboxBotQuickFilter.Name = "lboxBotQuickFilter";
-         this.lboxBotQuickFilter.Size = new System.Drawing.Size(341, 259);
-         this.lboxBotQuickFilter.TabIndex = 14;
-         // 
-         // btnCreateBot
-         // 
-         this.btnCreateBot.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.btnCreateBot.Location = new System.Drawing.Point(597, 412);
-         this.btnCreateBot.Name = "btnCreateBot";
-         this.btnCreateBot.Size = new System.Drawing.Size(137, 69);
-         this.btnCreateBot.TabIndex = 13;
-         this.btnCreateBot.Text = "Create Bot";
-         this.btnCreateBot.UseVisualStyleBackColor = true;
-         this.btnCreateBot.Click += new System.EventHandler(this.btnCreateBot_Click);
-         // 
-         // lbBotNewQuickFilter
-         // 
-         this.lbBotNewQuickFilter.AutoSize = true;
-         this.lbBotNewQuickFilter.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotNewQuickFilter.Location = new System.Drawing.Point(68, 168);
-         this.lbBotNewQuickFilter.Name = "lbBotNewQuickFilter";
-         this.lbBotNewQuickFilter.Size = new System.Drawing.Size(98, 21);
-         this.lbBotNewQuickFilter.TabIndex = 11;
-         this.lbBotNewQuickFilter.Text = "quick filter:";
-         // 
-         // lbCategoryUrl
-         // 
-         this.lbCategoryUrl.AutoSize = true;
-         this.lbCategoryUrl.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbCategoryUrl.Location = new System.Drawing.Point(59, 128);
-         this.lbCategoryUrl.Name = "lbCategoryUrl";
-         this.lbCategoryUrl.Size = new System.Drawing.Size(107, 21);
-         this.lbCategoryUrl.TabIndex = 10;
-         this.lbCategoryUrl.Text = "category url:";
-         // 
-         // lbBotName
-         // 
-         this.lbBotName.AutoSize = true;
-         this.lbBotName.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotName.Location = new System.Drawing.Point(24, 87);
-         this.lbBotName.Name = "lbBotName";
-         this.lbBotName.Size = new System.Drawing.Size(107, 21);
-         this.lbBotName.TabIndex = 9;
-         this.lbBotName.Text = "name of Bot:";
-         // 
-         // cmbQuickFilterBot
-         // 
-         this.cmbQuickFilterBot.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cmbQuickFilterBot.FormattingEnabled = true;
-         this.cmbQuickFilterBot.Location = new System.Drawing.Point(517, 170);
-         this.cmbQuickFilterBot.Name = "cmbQuickFilterBot";
-         this.cmbQuickFilterBot.Size = new System.Drawing.Size(217, 23);
-         this.cmbQuickFilterBot.TabIndex = 8;
-         this.cmbQuickFilterBot.SelectedIndexChanged += new System.EventHandler(this.cmbQuickFilterBot_SelectedIndexChanged);
-         // 
-         // cmbCategoryUrlBot
-         // 
-         this.cmbCategoryUrlBot.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cmbCategoryUrlBot.FormattingEnabled = true;
-         this.cmbCategoryUrlBot.Location = new System.Drawing.Point(416, 132);
-         this.cmbCategoryUrlBot.Name = "cmbCategoryUrlBot";
-         this.cmbCategoryUrlBot.Size = new System.Drawing.Size(318, 23);
-         this.cmbCategoryUrlBot.TabIndex = 7;
-         this.cmbCategoryUrlBot.SelectedIndexChanged += new System.EventHandler(this.cmbCategoryUrlBot_SelectedIndexChanged);
-         // 
-         // cmbBot
-         // 
-         this.cmbBot.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cmbBot.FormattingEnabled = true;
-         this.cmbBot.Location = new System.Drawing.Point(416, 89);
-         this.cmbBot.Name = "cmbBot";
-         this.cmbBot.Size = new System.Drawing.Size(318, 23);
-         this.cmbBot.TabIndex = 6;
-         this.cmbBot.SelectedIndexChanged += new System.EventHandler(this.cmbBot_SelectedIndexChanged);
-         // 
-         // tbCategoryURL
-         // 
-         this.tbCategoryURL.Location = new System.Drawing.Point(172, 130);
-         this.tbCategoryURL.Name = "tbCategoryURL";
-         this.tbCategoryURL.Size = new System.Drawing.Size(220, 23);
-         this.tbCategoryURL.TabIndex = 5;
-         // 
-         // tbBotQuickFilter
-         // 
-         this.tbBotQuickFilter.Location = new System.Drawing.Point(172, 170);
-         this.tbBotQuickFilter.Name = "tbBotQuickFilter";
-         this.tbBotQuickFilter.Size = new System.Drawing.Size(220, 23);
-         this.tbBotQuickFilter.TabIndex = 4;
-         // 
-         // tbBotName
-         // 
-         this.tbBotName.Location = new System.Drawing.Point(172, 89);
-         this.tbBotName.Name = "tbBotName";
-         this.tbBotName.Size = new System.Drawing.Size(220, 23);
-         this.tbBotName.TabIndex = 2;
-         // 
-         // btnAddToQuickFilterBot
-         // 
-         this.btnAddToQuickFilterBot.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.btnAddToQuickFilterBot.Location = new System.Drawing.Point(416, 170);
-         this.btnAddToQuickFilterBot.Name = "btnAddToQuickFilterBot";
-         this.btnAddToQuickFilterBot.Size = new System.Drawing.Size(75, 23);
-         this.btnAddToQuickFilterBot.TabIndex = 1;
-         this.btnAddToQuickFilterBot.Text = "add";
-         this.btnAddToQuickFilterBot.UseVisualStyleBackColor = true;
-         this.btnAddToQuickFilterBot.Click += new System.EventHandler(this.btnAddToQuickFilterBot_Click);
-         // 
          // Form1
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(1049, 645);
+         this.ClientSize = new System.Drawing.Size(1064, 646);
          this.Controls.Add(this.panelAutoBot);
          this.Controls.Add(this.lbProgress);
          this.Controls.Add(this.lbAllOffers);
@@ -615,7 +713,6 @@ namespace BazosBot
       private System.Windows.Forms.ComboBox cmbSelectPanel;
       private System.Windows.Forms.TextBox tbMaxCena;
       private System.Windows.Forms.TextBox textBox2;
-      private System.Windows.Forms.TextBox bF;
       private System.Windows.Forms.ComboBox cmbSelectOffers;
       private System.Windows.Forms.TextBox textBox9;
       private System.Windows.Forms.ListBox lboxBlacklistSet;
@@ -635,18 +732,18 @@ namespace BazosBot
       private System.Windows.Forms.Label lbProgress;
       private System.Windows.Forms.Button btnApplyQuickFilter;
       private System.Windows.Forms.Panel panelAutoBot;
-      private System.Windows.Forms.ComboBox cmbBot;
-      private System.Windows.Forms.TextBox tbCategoryURL;
+      private System.Windows.Forms.ComboBox cmbBotName;
+      private System.Windows.Forms.TextBox tbBotCategoryUrl;
       private System.Windows.Forms.TextBox tbBotQuickFilter;
       private System.Windows.Forms.TextBox tbBotName;
-      private System.Windows.Forms.Button btnAddToQuickFilterBot;
+      private System.Windows.Forms.Button btnAddQuickFilterBot;
       private System.Windows.Forms.ListBox lboxBotQuickFilter;
       private System.Windows.Forms.Button btnCreateBot;
-      private System.Windows.Forms.Label lbBotNewQuickFilter;
-      private System.Windows.Forms.Label lbCategoryUrl;
+      private System.Windows.Forms.Label lbBotQuickFilter;
+      private System.Windows.Forms.Label lbBotCategoryUrl;
       private System.Windows.Forms.Label lbBotName;
-      private System.Windows.Forms.ComboBox cmbQuickFilterBot;
-      private System.Windows.Forms.ComboBox cmbCategoryUrlBot;
+      private System.Windows.Forms.ComboBox cmbBotQuickFilter;
+      private System.Windows.Forms.ComboBox cmbBotCategoryUrl;
       private System.Windows.Forms.Label lbBotInt;
       private System.Windows.Forms.Label lbBotFT;
       private System.Windows.Forms.Label lbBotHeading;
@@ -656,6 +753,11 @@ namespace BazosBot
       private System.Windows.Forms.NumericUpDown BotInterval;
       private System.Windows.Forms.Button btnStartBot;
       private System.Windows.Forms.CheckBox cboxNotUpdateViewedAndLastChecked;
+      private System.Windows.Forms.Button btnHelpYouTube;
+      private System.Windows.Forms.Button btnHelpQuickFilter;
+      private System.Windows.Forms.Button btnAddItemsToBot;
+      private System.Windows.Forms.ListBox lboxBotCategory;
+      private System.Windows.Forms.CheckBox cboxMultiCategory;
    }
 }
 

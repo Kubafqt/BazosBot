@@ -17,6 +17,12 @@ namespace BazosBot
       public static double i = 0; //update to db item count
       public static double offersCount = 0;
       public static bool notUpdateViewedAndLastChecked = false;
+      public static List<string> updateChangeTypes = new List<string>() //without date - not report to messagebox
+      {
+         "nadpis",
+         "popis",
+         "lokace"
+      };
 
       /// <summary>
       /// Insert new offers to offers DB, update updated offers in DB, then delete deleted offers from DB and add it to deleted offers table.
@@ -34,14 +40,14 @@ namespace BazosBot
          foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList()) //aktual downloaded
          {
             i++;
-            //if (i > 180)
-            //{
-            //   Console.WriteLine("breakpoint");
-            //}
+            if (i > 520)
+            {
+               Console.WriteLine("breakpoint");
+            }
             if (actualDBList.Count > 0 && actualDBList.ToList().Any(p => p.url == item.url) && !onlyNewOffers) //offer is contained in db - check to update
             {
                //BazosOffers dbOffer;
-               //GetItemFromDbByURL(out offer, item.url); //perfomance test - db vs object get
+               //GetItemFromDbByURL(out offer, item.url); //perfomance test - DB vs object get
                BazosOffers dbItem = actualDBList.ToList().FirstOrDefault(p => p.url == item.url);
                List<string> updateCmdTextList = GetUpdateCmdTextList(item, dbItem, urlNameID); //get commands for updated only
                Dictionary<string, string> DictBeforeUpdateChange = new Dictionary<string, string>()
@@ -73,8 +79,8 @@ namespace BazosBot
                         updatedList.Add(item);
                      }
                      item.changed = item.changed == string.Empty ?
-                        $"\n {changedType}: {DictBeforeUpdateChange[changedType]} -> {DictAfterUpdateChange[changedType]}" :
-                        item.changed + $",\n {changedType}: {DictBeforeUpdateChange[changedType]} -> {DictAfterUpdateChange[changedType]}";
+                        $"\n{changedType}: {DictBeforeUpdateChange[changedType]} \n->\n {DictAfterUpdateChange[changedType]}" :
+                        item.changed + $",\n {changedType}: {DictBeforeUpdateChange[changedType]} \n->\n {DictAfterUpdateChange[changedType]}";
                   }
                }
             }
@@ -292,6 +298,18 @@ namespace BazosBot
             item.endedDateTimeGetted = DateTime.Now.ToString();
             deletedList.Add(item);
          }
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="categoryUrlID"></param>
+      public static void DeleteOffersCategoryFromDB(string categoryUrlID)
+      {
+         string deleteOffers = $"DELETE FROM BazosOffers WHERE CategoryNameUrlID='{categoryUrlID}'";
+         string deleteQuickFilters = $"DELETE FROM BazosQuickFilter WHERE CategoryNameUrlID='{categoryUrlID}'";
+         ExecuteNonQuery(deleteOffers);
+         ExecuteNonQuery(deleteQuickFilters);
       }
 
       #endregion
