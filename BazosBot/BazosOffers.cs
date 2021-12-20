@@ -221,6 +221,10 @@ namespace BazosBot
       /// </summary>
       private static void OfferDictionaryToObjectList()
       {
+         foreach (var kvp in DictNameValue)
+         {
+            DictNameValue[kvp.Key] = TextAdjust.PrepareToCommand(kvp.Value);
+         }
          ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"], DateTime.Now.ToString()));
          ResetStaticVariables();
       }

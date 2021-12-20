@@ -8,6 +8,7 @@ using System.Net;
 using System.Windows.Forms;
 using System.Threading;
 using RestSharp;
+using System.Net.NetworkInformation;
 //next - proxy server to webclient, DB save exception repair
 
 
@@ -34,67 +35,84 @@ namespace BazosBot
          //{
          //await Task.Run(() =>
          //{
-         int downLimit = Settings.downLimit;
-         int actualNumber = 0;
-         downloadDone = false;
-         isRunning = true;
-         getOnlyNewOffers = onlyNewOffers;
-         url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
-         //WebClient wc = new WebClient();
-         RestClient client = new RestClient();
-         //string proxySite = Settings.proxyList[random.Next(Settings.proxyList.Length)];
-         //client.Proxy = new WebProxy("169.57.1.84:8123"); //use proxy server - later not random, but choosed
-         int downCount = 0;
-         do
-         {
-            if (downCount >= downLimit && fullCount - count >= downLimit * 10) //500 offers - waiting to not overload the server
+            int downLimit = Settings.downLimit;
+            int actualNumber = 0;
+            downloadDone = false;
+            isRunning = true;
+            getOnlyNewOffers = onlyNewOffers;
+            url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
+            //WebClient wc = new WebClient();
+            RestClient client = new RestClient();
+            //string proxySite = Settings.proxyList[random.Next(Settings.proxyList.Length)];
+            //client.Proxy = new WebProxy("169.57.1.84:8123"); //use proxy server - later not random, but choosed
+            int downCount = 0;
+            do
             {
-               downCount = 0;
-               waiting = true; //add report to timer
-               Thread.Sleep(random.Next(Settings.downLimitMinMax.X, Settings.downLimitMinMax.Y));
-            }
-            downCount++;
-            waiting = false;
-            RestRequest request = new RestRequest(url);
-            string html = Encoding.Default.GetString(client.DownloadData(request));
-            //string html = wc.DownloadString(url); //download html source from new url
-            string[] lineSplit = html.Split("\n");
-            int containerLineNumber = 0;
-            fullCount = GetFullCount(lineSplit, ref containerLineNumber);
-            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers when condition met
-            {
-               downloadDone = true;
-               DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL, true);
-               BazosOffers.ListBazosOffers.Clear(); //for showing in resultLbox
-               BazosOffers.ListBazosOffers = onlyNewOffers ? DB_Access.newOffersList : DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL);
-               isRunning = false;
-               if (botted)
+               if (downCount >= downLimit && fullCount - count >= downLimit * 10) //500 offers - waiting to not overload the server
                {
-                  AutoBot.LastBot.isRunning = false;
+                  downCount = 0;
+                  waiting = true; //add report to timer
+                  Thread.Sleep(random.Next(Settings.downLimitMinMax.X, Settings.downLimitMinMax.Y));
                }
-               return;
-               //yield break; //means return
+               downCount++;
+               waiting = false;
+               RestRequest request = new RestRequest(url);
+               string html = Encoding.Default.GetString(client.DownloadData(request));
+               //string html = wc.DownloadString(url); //download html source from new url
+               string[] lineSplit = html.Split("\n");
+               int containerLineNumber = 0;
+               fullCount = GetFullCount(lineSplit, ref containerLineNumber);
+               if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers when condition met
+               {
+                  downloadDone = true;
+                  DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL, true);
+                  BazosOffers.ListBazosOffers.Clear(); //for showing in resultLbox
+                  BazosOffers.ListBazosOffers = onlyNewOffers ? DB_Access.newOffersList : DB_Access.ListActualOffersInDB(BazosOffers.actualCategoryURL);
+                  isRunning = false;
+                  if (botted)
+                  {
+                     AutoBot.LastBot.isRunning = false;
+                  }
+                  return;
+                  //yield break; //means return
+               }
+               PrepareNextPage(ref actualNumber, ref url);
+               count = actualNumber <= fullCount ? actualNumber : fullCount;
+               //yield return actualNumber;
             }
-            PrepareNextPage(ref actualNumber, ref url);
-            count = actualNumber <= fullCount ? actualNumber : fullCount;
-            //yield return actualNumber;
-         }
-         while (actualNumber <= fullCount);
-         downloadDone = true;
-         DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
-         isRunning = false;
-         if (botted)
-         {
-            AutoBot.LastBot.isRunning = false;
-         }
-         //});
-         //}
-         //catch (Exception exeption)
-         //{
-         //   MessageBox.Show($"An error occured when trying to download offers from bazos - {exeption.GetType()}");
-         //}
+            while (actualNumber <= fullCount);
+            downloadDone = true;
+            DB_Access.InsertNewOffers(BazosOffers.actualCategoryURL);
+            isRunning = false;
+            if (botted)
+            {
+               AutoBot.LastBot.isRunning = false;
+            }
+            //});
+            //}
+            //catch (Exception exeption)
+            //{
+            //   MessageBox.Show($"An error occured when trying to download offers from bazos - {exeption.GetType()}");
+            //}
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <returns></returns>
+      public static bool IsConnectedToInternet(string url = "https://www.bazos.cz/")
+      {
+         Ping ping = new Ping();
+         try
+         {
+            PingReply reply = ping.Send("1.1.1.1", 1000);
+            if (reply.Status == IPStatus.Success)
+            { return true; }
+         }
+         catch { }
+         return false;
+      }
+      
       /// <summary>
       /// Prepare next bazos page.
       /// </summary>
