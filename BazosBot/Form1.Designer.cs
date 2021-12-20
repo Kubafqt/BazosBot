@@ -35,6 +35,28 @@ namespace BazosBot
          this.offerLbox = new System.Windows.Forms.ListBox();
          this.tbSearchUrl = new System.Windows.Forms.TextBox();
          this.panelMain = new System.Windows.Forms.Panel();
+         this.updatesPanel = new System.Windows.Forms.Panel();
+         this.lbShowUpdates = new System.Windows.Forms.Label();
+         this.cboxUpdateNadpis = new System.Windows.Forms.CheckBox();
+         this.cboxUpdateLocation = new System.Windows.Forms.CheckBox();
+         this.cboxUpdateCena = new System.Windows.Forms.CheckBox();
+         this.cboxUpdateDate = new System.Windows.Forms.CheckBox();
+         this.cboxUpdatePopis = new System.Windows.Forms.CheckBox();
+         this.btnHelpYouTube = new System.Windows.Forms.Button();
+         this.btnHelpQuickFilter = new System.Windows.Forms.Button();
+         this.cboxNotUpdateViewedAndLastChecked = new System.Windows.Forms.CheckBox();
+         this.btnApplyQuickFilter = new System.Windows.Forms.Button();
+         this.cbDisableQuickFilterPrice = new System.Windows.Forms.CheckBox();
+         this.cmbSelectQuickFilter = new System.Windows.Forms.ComboBox();
+         this.lbLokace = new System.Windows.Forms.Label();
+         this.btnCreateQuickFilter = new System.Windows.Forms.Button();
+         this.cboxDownOnlyLast = new System.Windows.Forms.CheckBox();
+         this.tbLokalita = new System.Windows.Forms.TextBox();
+         this.lbQuickFilter = new System.Windows.Forms.Label();
+         this.tbQuickFilter = new System.Windows.Forms.TextBox();
+         this.cmbSelectOffersType = new System.Windows.Forms.ComboBox();
+         this.cmbSelectOffers = new System.Windows.Forms.ComboBox();
+         this.textBox9 = new System.Windows.Forms.TextBox();
          this.panelAutoBot = new System.Windows.Forms.Panel();
          this.cboxMultiCategory = new System.Windows.Forms.CheckBox();
          this.lboxBotCategory = new System.Windows.Forms.ListBox();
@@ -59,21 +81,6 @@ namespace BazosBot
          this.tbBotQuickFilter = new System.Windows.Forms.TextBox();
          this.tbBotName = new System.Windows.Forms.TextBox();
          this.btnAddQuickFilterBot = new System.Windows.Forms.Button();
-         this.btnHelpYouTube = new System.Windows.Forms.Button();
-         this.btnHelpQuickFilter = new System.Windows.Forms.Button();
-         this.cboxNotUpdateViewedAndLastChecked = new System.Windows.Forms.CheckBox();
-         this.btnApplyQuickFilter = new System.Windows.Forms.Button();
-         this.cbDisableQuickFilterPrice = new System.Windows.Forms.CheckBox();
-         this.cmbSelectQuickFilter = new System.Windows.Forms.ComboBox();
-         this.lbLokace = new System.Windows.Forms.Label();
-         this.btnCreateQuickFilter = new System.Windows.Forms.Button();
-         this.cboxDownOnlyLast = new System.Windows.Forms.CheckBox();
-         this.tbLokalita = new System.Windows.Forms.TextBox();
-         this.lbQuickFilter = new System.Windows.Forms.Label();
-         this.tbQuickFilter = new System.Windows.Forms.TextBox();
-         this.cmbSelectOffersType = new System.Windows.Forms.ComboBox();
-         this.cmbSelectOffers = new System.Windows.Forms.ComboBox();
-         this.textBox9 = new System.Windows.Forms.TextBox();
          this.btnSelectPanel = new System.Windows.Forms.Button();
          this.cmbSelectPanel = new System.Windows.Forms.ComboBox();
          this.textBox2 = new System.Windows.Forms.TextBox();
@@ -84,6 +91,7 @@ namespace BazosBot
          this.lbAllOffers = new System.Windows.Forms.Label();
          this.lbProgress = new System.Windows.Forms.Label();
          this.panelMain.SuspendLayout();
+         this.updatesPanel.SuspendLayout();
          this.panelAutoBot.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.BotFullTime)).BeginInit();
          ((System.ComponentModel.ISupportInitialize)(this.BotInterval)).BeginInit();
@@ -125,7 +133,7 @@ namespace BazosBot
          this.offerLbox.ItemHeight = 15;
          this.offerLbox.Location = new System.Drawing.Point(747, 103);
          this.offerLbox.Name = "offerLbox";
-         this.offerLbox.Size = new System.Drawing.Size(244, 469);
+         this.offerLbox.Size = new System.Drawing.Size(244, 274);
          this.offerLbox.TabIndex = 4;
          this.offerLbox.DoubleClick += new System.EventHandler(this.offerLbox_DoubleClick);
          // 
@@ -138,6 +146,7 @@ namespace BazosBot
          // 
          // panelMain
          // 
+         this.panelMain.Controls.Add(this.updatesPanel);
          this.panelMain.Controls.Add(this.btnHelpYouTube);
          this.panelMain.Controls.Add(this.btnHelpQuickFilter);
          this.panelMain.Controls.Add(this.cboxNotUpdateViewedAndLastChecked);
@@ -160,9 +169,245 @@ namespace BazosBot
          this.panelMain.Controls.Add(this.btnGetBazos);
          this.panelMain.Location = new System.Drawing.Point(17, 48);
          this.panelMain.Name = "panelMain";
-         this.panelMain.Size = new System.Drawing.Size(983, 314);
+         this.panelMain.Size = new System.Drawing.Size(1029, 586);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
+         // 
+         // updatesPanel
+         // 
+         this.updatesPanel.Controls.Add(this.lbShowUpdates);
+         this.updatesPanel.Controls.Add(this.cboxUpdateNadpis);
+         this.updatesPanel.Controls.Add(this.cboxUpdateLocation);
+         this.updatesPanel.Controls.Add(this.cboxUpdateCena);
+         this.updatesPanel.Controls.Add(this.cboxUpdateDate);
+         this.updatesPanel.Controls.Add(this.cboxUpdatePopis);
+         this.updatesPanel.Location = new System.Drawing.Point(747, 396);
+         this.updatesPanel.Name = "updatesPanel";
+         this.updatesPanel.Size = new System.Drawing.Size(244, 170);
+         this.updatesPanel.TabIndex = 32;
+         this.updatesPanel.Visible = false;
+         // 
+         // lbShowUpdates
+         // 
+         this.lbShowUpdates.AutoSize = true;
+         this.lbShowUpdates.Font = new System.Drawing.Font("Segoe UI", 11.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
+         this.lbShowUpdates.Location = new System.Drawing.Point(16, 8);
+         this.lbShowUpdates.Name = "lbShowUpdates";
+         this.lbShowUpdates.Size = new System.Drawing.Size(110, 20);
+         this.lbShowUpdates.TabIndex = 31;
+         this.lbShowUpdates.Tag = "updateCboxes";
+         this.lbShowUpdates.Text = "show updates:";
+         // 
+         // cboxUpdateNadpis
+         // 
+         this.cboxUpdateNadpis.AutoSize = true;
+         this.cboxUpdateNadpis.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.cboxUpdateNadpis.Location = new System.Drawing.Point(32, 37);
+         this.cboxUpdateNadpis.Name = "cboxUpdateNadpis";
+         this.cboxUpdateNadpis.Size = new System.Drawing.Size(68, 21);
+         this.cboxUpdateNadpis.TabIndex = 26;
+         this.cboxUpdateNadpis.Tag = "updateCboxes";
+         this.cboxUpdateNadpis.Text = "nadpis";
+         this.cboxUpdateNadpis.UseVisualStyleBackColor = true;
+         this.cboxUpdateNadpis.CheckedChanged += new System.EventHandler(this.cboxUpdateNadpis_CheckedChanged);
+         // 
+         // cboxUpdateLocation
+         // 
+         this.cboxUpdateLocation.AutoSize = true;
+         this.cboxUpdateLocation.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.cboxUpdateLocation.Location = new System.Drawing.Point(32, 140);
+         this.cboxUpdateLocation.Name = "cboxUpdateLocation";
+         this.cboxUpdateLocation.Size = new System.Drawing.Size(66, 21);
+         this.cboxUpdateLocation.TabIndex = 30;
+         this.cboxUpdateLocation.Tag = "updateCboxes";
+         this.cboxUpdateLocation.Text = "lokace";
+         this.cboxUpdateLocation.UseVisualStyleBackColor = true;
+         this.cboxUpdateLocation.CheckedChanged += new System.EventHandler(this.cboxUpdateLocation_CheckedChanged);
+         // 
+         // cboxUpdateCena
+         // 
+         this.cboxUpdateCena.AutoSize = true;
+         this.cboxUpdateCena.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.cboxUpdateCena.Location = new System.Drawing.Point(32, 65);
+         this.cboxUpdateCena.Name = "cboxUpdateCena";
+         this.cboxUpdateCena.Size = new System.Drawing.Size(55, 21);
+         this.cboxUpdateCena.TabIndex = 27;
+         this.cboxUpdateCena.Tag = "updateCboxes";
+         this.cboxUpdateCena.Text = "cena";
+         this.cboxUpdateCena.UseVisualStyleBackColor = true;
+         this.cboxUpdateCena.CheckedChanged += new System.EventHandler(this.cboxUpdateCena_CheckedChanged);
+         // 
+         // cboxUpdateDate
+         // 
+         this.cboxUpdateDate.AutoSize = true;
+         this.cboxUpdateDate.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.cboxUpdateDate.Location = new System.Drawing.Point(32, 115);
+         this.cboxUpdateDate.Name = "cboxUpdateDate";
+         this.cboxUpdateDate.Size = new System.Drawing.Size(67, 21);
+         this.cboxUpdateDate.TabIndex = 29;
+         this.cboxUpdateDate.Tag = "updateCboxes";
+         this.cboxUpdateDate.Text = "datum";
+         this.cboxUpdateDate.UseVisualStyleBackColor = true;
+         this.cboxUpdateDate.CheckedChanged += new System.EventHandler(this.cboxUpdateDate_CheckedChanged);
+         // 
+         // cboxUpdatePopis
+         // 
+         this.cboxUpdatePopis.AutoSize = true;
+         this.cboxUpdatePopis.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+         this.cboxUpdatePopis.Location = new System.Drawing.Point(32, 90);
+         this.cboxUpdatePopis.Name = "cboxUpdatePopis";
+         this.cboxUpdatePopis.Size = new System.Drawing.Size(61, 21);
+         this.cboxUpdatePopis.TabIndex = 28;
+         this.cboxUpdatePopis.Tag = "updateCboxes";
+         this.cboxUpdatePopis.Text = "popis";
+         this.cboxUpdatePopis.UseVisualStyleBackColor = true;
+         this.cboxUpdatePopis.CheckedChanged += new System.EventHandler(this.cboxUpdatePopis_CheckedChanged);
+         // 
+         // btnHelpYouTube
+         // 
+         this.btnHelpYouTube.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+         this.btnHelpYouTube.Location = new System.Drawing.Point(9, 217);
+         this.btnHelpYouTube.Name = "btnHelpYouTube";
+         this.btnHelpYouTube.Size = new System.Drawing.Size(75, 50);
+         this.btnHelpYouTube.TabIndex = 25;
+         this.btnHelpYouTube.Text = "HELP YouTube";
+         this.btnHelpYouTube.UseVisualStyleBackColor = true;
+         this.btnHelpYouTube.Visible = false;
+         this.btnHelpYouTube.Click += new System.EventHandler(this.btnHelpYouTube_Click);
+         // 
+         // btnHelpQuickFilter
+         // 
+         this.btnHelpQuickFilter.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+         this.btnHelpQuickFilter.Location = new System.Drawing.Point(9, 154);
+         this.btnHelpQuickFilter.Name = "btnHelpQuickFilter";
+         this.btnHelpQuickFilter.Size = new System.Drawing.Size(75, 50);
+         this.btnHelpQuickFilter.TabIndex = 22;
+         this.btnHelpQuickFilter.Text = "HELP quickfilter";
+         this.btnHelpQuickFilter.UseVisualStyleBackColor = true;
+         this.btnHelpQuickFilter.Click += new System.EventHandler(this.btnHelpQuickFilter_Click);
+         // 
+         // cboxNotUpdateViewedAndLastChecked
+         // 
+         this.cboxNotUpdateViewedAndLastChecked.AutoSize = true;
+         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(435, 7);
+         this.cboxNotUpdateViewedAndLastChecked.Name = "cboxNotUpdateViewedAndLastChecked";
+         this.cboxNotUpdateViewedAndLastChecked.Size = new System.Drawing.Size(301, 19);
+         this.cboxNotUpdateViewedAndLastChecked.TabIndex = 21;
+         this.cboxNotUpdateViewedAndLastChecked.Text = "dont update viewed and lastchecked to DB (quicker)";
+         this.cboxNotUpdateViewedAndLastChecked.UseVisualStyleBackColor = true;
+         // 
+         // btnApplyQuickFilter
+         // 
+         this.btnApplyQuickFilter.Location = new System.Drawing.Point(416, 32);
+         this.btnApplyQuickFilter.Name = "btnApplyQuickFilter";
+         this.btnApplyQuickFilter.Size = new System.Drawing.Size(69, 23);
+         this.btnApplyQuickFilter.TabIndex = 20;
+         this.btnApplyQuickFilter.Text = "apply";
+         this.btnApplyQuickFilter.UseVisualStyleBackColor = true;
+         this.btnApplyQuickFilter.Click += new System.EventHandler(this.btnApplyQuickFilter_Click);
+         // 
+         // cbDisableQuickFilterPrice
+         // 
+         this.cbDisableQuickFilterPrice.AutoSize = true;
+         this.cbDisableQuickFilterPrice.Location = new System.Drawing.Point(263, 7);
+         this.cbDisableQuickFilterPrice.Name = "cbDisableQuickFilterPrice";
+         this.cbDisableQuickFilterPrice.Size = new System.Drawing.Size(164, 19);
+         this.cbDisableQuickFilterPrice.TabIndex = 19;
+         this.cbDisableQuickFilterPrice.Text = "disable price in quick filter";
+         this.cbDisableQuickFilterPrice.UseVisualStyleBackColor = true;
+         // 
+         // cmbSelectQuickFilter
+         // 
+         this.cmbSelectQuickFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cmbSelectQuickFilter.FormattingEnabled = true;
+         this.cmbSelectQuickFilter.Location = new System.Drawing.Point(572, 33);
+         this.cmbSelectQuickFilter.Name = "cmbSelectQuickFilter";
+         this.cmbSelectQuickFilter.Size = new System.Drawing.Size(225, 23);
+         this.cmbSelectQuickFilter.TabIndex = 18;
+         this.cmbSelectQuickFilter.SelectedIndexChanged += new System.EventHandler(this.cmbSelectQuickFilter_SelectedIndexChanged);
+         this.cmbSelectQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectQuickFilter_KeyDown);
+         // 
+         // lbLokace
+         // 
+         this.lbLokace.AutoSize = true;
+         this.lbLokace.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+         this.lbLokace.Location = new System.Drawing.Point(803, 33);
+         this.lbLokace.Name = "lbLokace";
+         this.lbLokace.Size = new System.Drawing.Size(57, 21);
+         this.lbLokace.TabIndex = 17;
+         this.lbLokace.Text = "lokace:";
+         // 
+         // btnCreateQuickFilter
+         // 
+         this.btnCreateQuickFilter.Location = new System.Drawing.Point(491, 32);
+         this.btnCreateQuickFilter.Name = "btnCreateQuickFilter";
+         this.btnCreateQuickFilter.Size = new System.Drawing.Size(75, 23);
+         this.btnCreateQuickFilter.TabIndex = 16;
+         this.btnCreateQuickFilter.Text = "create";
+         this.btnCreateQuickFilter.UseVisualStyleBackColor = true;
+         this.btnCreateQuickFilter.Click += new System.EventHandler(this.btnCreateQuickFilter_Click);
+         // 
+         // cboxDownOnlyLast
+         // 
+         this.cboxDownOnlyLast.AutoSize = true;
+         this.cboxDownOnlyLast.Location = new System.Drawing.Point(94, 7);
+         this.cboxDownOnlyLast.Name = "cboxDownOnlyLast";
+         this.cboxDownOnlyLast.Size = new System.Drawing.Size(163, 19);
+         this.cboxDownOnlyLast.TabIndex = 15;
+         this.cboxDownOnlyLast.Text = "download only new offers";
+         this.cboxDownOnlyLast.UseVisualStyleBackColor = true;
+         // 
+         // tbLokalita
+         // 
+         this.tbLokalita.Location = new System.Drawing.Point(866, 33);
+         this.tbLokalita.Name = "tbLokalita";
+         this.tbLokalita.Size = new System.Drawing.Size(104, 23);
+         this.tbLokalita.TabIndex = 14;
+         // 
+         // lbQuickFilter
+         // 
+         this.lbQuickFilter.AutoSize = true;
+         this.lbQuickFilter.Location = new System.Drawing.Point(20, 38);
+         this.lbQuickFilter.Name = "lbQuickFilter";
+         this.lbQuickFilter.Size = new System.Drawing.Size(66, 15);
+         this.lbQuickFilter.TabIndex = 13;
+         this.lbQuickFilter.Text = "quick filter:";
+         // 
+         // tbQuickFilter
+         // 
+         this.tbQuickFilter.Location = new System.Drawing.Point(95, 32);
+         this.tbQuickFilter.Name = "tbQuickFilter";
+         this.tbQuickFilter.Size = new System.Drawing.Size(315, 23);
+         this.tbQuickFilter.TabIndex = 11;
+         this.tbQuickFilter.TextChanged += new System.EventHandler(this.tbQuickFilter_TextChanged);
+         // 
+         // cmbSelectOffersType
+         // 
+         this.cmbSelectOffersType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cmbSelectOffersType.FormattingEnabled = true;
+         this.cmbSelectOffersType.Location = new System.Drawing.Point(496, 65);
+         this.cmbSelectOffersType.Name = "cmbSelectOffersType";
+         this.cmbSelectOffersType.Size = new System.Drawing.Size(159, 23);
+         this.cmbSelectOffersType.TabIndex = 10;
+         this.cmbSelectOffersType.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffersType_SelectedIndexChanged);
+         // 
+         // cmbSelectOffers
+         // 
+         this.cmbSelectOffers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+         this.cmbSelectOffers.FormattingEnabled = true;
+         this.cmbSelectOffers.Location = new System.Drawing.Point(670, 65);
+         this.cmbSelectOffers.Name = "cmbSelectOffers";
+         this.cmbSelectOffers.Size = new System.Drawing.Size(300, 23);
+         this.cmbSelectOffers.TabIndex = 9;
+         this.cmbSelectOffers.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffers_SelectedIndexChanged);
+         this.cmbSelectOffers.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectOffers_KeyDown);
+         // 
+         // textBox9
+         // 
+         this.textBox9.Location = new System.Drawing.Point(223, -22);
+         this.textBox9.Name = "textBox9";
+         this.textBox9.Size = new System.Drawing.Size(187, 23);
+         this.textBox9.TabIndex = 3;
          // 
          // panelAutoBot
          // 
@@ -189,9 +434,9 @@ namespace BazosBot
          this.panelAutoBot.Controls.Add(this.tbBotQuickFilter);
          this.panelAutoBot.Controls.Add(this.tbBotName);
          this.panelAutoBot.Controls.Add(this.btnAddQuickFilterBot);
-         this.panelAutoBot.Location = new System.Drawing.Point(55, 387);
+         this.panelAutoBot.Location = new System.Drawing.Point(1014, 48);
          this.panelAutoBot.Name = "panelAutoBot";
-         this.panelAutoBot.Size = new System.Drawing.Size(168, 132);
+         this.panelAutoBot.Size = new System.Drawing.Size(153, 321);
          this.panelAutoBot.TabIndex = 15;
          // 
          // cboxMultiCategory
@@ -446,152 +691,6 @@ namespace BazosBot
          this.btnAddQuickFilterBot.UseVisualStyleBackColor = true;
          this.btnAddQuickFilterBot.Click += new System.EventHandler(this.btnAddQuickFilterBot_Click);
          // 
-         // btnHelpYouTube
-         // 
-         this.btnHelpYouTube.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.btnHelpYouTube.Location = new System.Drawing.Point(9, 217);
-         this.btnHelpYouTube.Name = "btnHelpYouTube";
-         this.btnHelpYouTube.Size = new System.Drawing.Size(75, 50);
-         this.btnHelpYouTube.TabIndex = 25;
-         this.btnHelpYouTube.Text = "HELP YouTube";
-         this.btnHelpYouTube.UseVisualStyleBackColor = true;
-         this.btnHelpYouTube.Visible = false;
-         this.btnHelpYouTube.Click += new System.EventHandler(this.btnHelpYouTube_Click);
-         // 
-         // btnHelpQuickFilter
-         // 
-         this.btnHelpQuickFilter.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.btnHelpQuickFilter.Location = new System.Drawing.Point(9, 154);
-         this.btnHelpQuickFilter.Name = "btnHelpQuickFilter";
-         this.btnHelpQuickFilter.Size = new System.Drawing.Size(75, 50);
-         this.btnHelpQuickFilter.TabIndex = 22;
-         this.btnHelpQuickFilter.Text = "HELP quickfilter";
-         this.btnHelpQuickFilter.UseVisualStyleBackColor = true;
-         this.btnHelpQuickFilter.Click += new System.EventHandler(this.btnHelpQuickFilter_Click);
-         // 
-         // cboxNotUpdateViewedAndLastChecked
-         // 
-         this.cboxNotUpdateViewedAndLastChecked.AutoSize = true;
-         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(435, 7);
-         this.cboxNotUpdateViewedAndLastChecked.Name = "cboxNotUpdateViewedAndLastChecked";
-         this.cboxNotUpdateViewedAndLastChecked.Size = new System.Drawing.Size(301, 19);
-         this.cboxNotUpdateViewedAndLastChecked.TabIndex = 21;
-         this.cboxNotUpdateViewedAndLastChecked.Text = "dont update viewed and lastchecked to DB (quicker)";
-         this.cboxNotUpdateViewedAndLastChecked.UseVisualStyleBackColor = true;
-         // 
-         // btnApplyQuickFilter
-         // 
-         this.btnApplyQuickFilter.Location = new System.Drawing.Point(416, 32);
-         this.btnApplyQuickFilter.Name = "btnApplyQuickFilter";
-         this.btnApplyQuickFilter.Size = new System.Drawing.Size(69, 23);
-         this.btnApplyQuickFilter.TabIndex = 20;
-         this.btnApplyQuickFilter.Text = "apply";
-         this.btnApplyQuickFilter.UseVisualStyleBackColor = true;
-         this.btnApplyQuickFilter.Click += new System.EventHandler(this.btnApplyQuickFilter_Click);
-         // 
-         // cbDisableQuickFilterPrice
-         // 
-         this.cbDisableQuickFilterPrice.AutoSize = true;
-         this.cbDisableQuickFilterPrice.Location = new System.Drawing.Point(263, 7);
-         this.cbDisableQuickFilterPrice.Name = "cbDisableQuickFilterPrice";
-         this.cbDisableQuickFilterPrice.Size = new System.Drawing.Size(164, 19);
-         this.cbDisableQuickFilterPrice.TabIndex = 19;
-         this.cbDisableQuickFilterPrice.Text = "disable price in quick filter";
-         this.cbDisableQuickFilterPrice.UseVisualStyleBackColor = true;
-         // 
-         // cmbSelectQuickFilter
-         // 
-         this.cmbSelectQuickFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cmbSelectQuickFilter.FormattingEnabled = true;
-         this.cmbSelectQuickFilter.Location = new System.Drawing.Point(572, 33);
-         this.cmbSelectQuickFilter.Name = "cmbSelectQuickFilter";
-         this.cmbSelectQuickFilter.Size = new System.Drawing.Size(225, 23);
-         this.cmbSelectQuickFilter.TabIndex = 18;
-         this.cmbSelectQuickFilter.SelectedIndexChanged += new System.EventHandler(this.cmbSelectQuickFilter_SelectedIndexChanged);
-         this.cmbSelectQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectQuickFilter_KeyDown);
-         // 
-         // lbLokace
-         // 
-         this.lbLokace.AutoSize = true;
-         this.lbLokace.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.lbLokace.Location = new System.Drawing.Point(803, 33);
-         this.lbLokace.Name = "lbLokace";
-         this.lbLokace.Size = new System.Drawing.Size(57, 21);
-         this.lbLokace.TabIndex = 17;
-         this.lbLokace.Text = "lokace:";
-         // 
-         // btnCreateQuickFilter
-         // 
-         this.btnCreateQuickFilter.Location = new System.Drawing.Point(491, 32);
-         this.btnCreateQuickFilter.Name = "btnCreateQuickFilter";
-         this.btnCreateQuickFilter.Size = new System.Drawing.Size(75, 23);
-         this.btnCreateQuickFilter.TabIndex = 16;
-         this.btnCreateQuickFilter.Text = "create";
-         this.btnCreateQuickFilter.UseVisualStyleBackColor = true;
-         this.btnCreateQuickFilter.Click += new System.EventHandler(this.btnCreateQuickFilter_Click);
-         // 
-         // cboxDownOnlyLast
-         // 
-         this.cboxDownOnlyLast.AutoSize = true;
-         this.cboxDownOnlyLast.Location = new System.Drawing.Point(94, 7);
-         this.cboxDownOnlyLast.Name = "cboxDownOnlyLast";
-         this.cboxDownOnlyLast.Size = new System.Drawing.Size(163, 19);
-         this.cboxDownOnlyLast.TabIndex = 15;
-         this.cboxDownOnlyLast.Text = "download only new offers";
-         this.cboxDownOnlyLast.UseVisualStyleBackColor = true;
-         // 
-         // tbLokalita
-         // 
-         this.tbLokalita.Location = new System.Drawing.Point(866, 33);
-         this.tbLokalita.Name = "tbLokalita";
-         this.tbLokalita.Size = new System.Drawing.Size(104, 23);
-         this.tbLokalita.TabIndex = 14;
-         // 
-         // lbQuickFilter
-         // 
-         this.lbQuickFilter.AutoSize = true;
-         this.lbQuickFilter.Location = new System.Drawing.Point(20, 38);
-         this.lbQuickFilter.Name = "lbQuickFilter";
-         this.lbQuickFilter.Size = new System.Drawing.Size(66, 15);
-         this.lbQuickFilter.TabIndex = 13;
-         this.lbQuickFilter.Text = "quick filter:";
-         // 
-         // tbQuickFilter
-         // 
-         this.tbQuickFilter.Location = new System.Drawing.Point(95, 32);
-         this.tbQuickFilter.Name = "tbQuickFilter";
-         this.tbQuickFilter.Size = new System.Drawing.Size(315, 23);
-         this.tbQuickFilter.TabIndex = 11;
-         this.tbQuickFilter.TextChanged += new System.EventHandler(this.tbQuickFilter_TextChanged);
-         // 
-         // cmbSelectOffersType
-         // 
-         this.cmbSelectOffersType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cmbSelectOffersType.FormattingEnabled = true;
-         this.cmbSelectOffersType.Location = new System.Drawing.Point(496, 65);
-         this.cmbSelectOffersType.Name = "cmbSelectOffersType";
-         this.cmbSelectOffersType.Size = new System.Drawing.Size(159, 23);
-         this.cmbSelectOffersType.TabIndex = 10;
-         this.cmbSelectOffersType.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffersType_SelectedIndexChanged);
-         // 
-         // cmbSelectOffers
-         // 
-         this.cmbSelectOffers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-         this.cmbSelectOffers.FormattingEnabled = true;
-         this.cmbSelectOffers.Location = new System.Drawing.Point(670, 65);
-         this.cmbSelectOffers.Name = "cmbSelectOffers";
-         this.cmbSelectOffers.Size = new System.Drawing.Size(300, 23);
-         this.cmbSelectOffers.TabIndex = 9;
-         this.cmbSelectOffers.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffers_SelectedIndexChanged);
-         this.cmbSelectOffers.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectOffers_KeyDown);
-         // 
-         // textBox9
-         // 
-         this.textBox9.Location = new System.Drawing.Point(223, -22);
-         this.textBox9.Name = "textBox9";
-         this.textBox9.Size = new System.Drawing.Size(187, 23);
-         this.textBox9.TabIndex = 3;
-         // 
          // btnSelectPanel
          // 
          this.btnSelectPanel.Location = new System.Drawing.Point(21, 5);
@@ -692,6 +791,8 @@ namespace BazosBot
          this.Load += new System.EventHandler(this.Form1_Load);
          this.panelMain.ResumeLayout(false);
          this.panelMain.PerformLayout();
+         this.updatesPanel.ResumeLayout(false);
+         this.updatesPanel.PerformLayout();
          this.panelAutoBot.ResumeLayout(false);
          this.panelAutoBot.PerformLayout();
          ((System.ComponentModel.ISupportInitialize)(this.BotFullTime)).EndInit();
@@ -758,6 +859,13 @@ namespace BazosBot
       private System.Windows.Forms.Button btnAddItemsToBot;
       private System.Windows.Forms.ListBox lboxBotCategory;
       private System.Windows.Forms.CheckBox cboxMultiCategory;
+      private System.Windows.Forms.CheckBox cboxUpdateDate;
+      private System.Windows.Forms.CheckBox cboxUpdatePopis;
+      private System.Windows.Forms.CheckBox cboxUpdateCena;
+      private System.Windows.Forms.CheckBox cboxUpdateNadpis;
+      private System.Windows.Forms.CheckBox cboxUpdateLocation;
+      private System.Windows.Forms.Label lbShowUpdates;
+      private System.Windows.Forms.Panel updatesPanel;
    }
 }
 

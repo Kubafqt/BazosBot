@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
+//+updated text adjust
 
 namespace BazosBot
 {
@@ -23,8 +24,12 @@ namespace BazosBot
          "popis",
          "lokace"
       };
+      public static List<string> showUpdateChanges = new List<string>()
+      {
 
-      /// <summary>
+      };
+
+      /// <summary> 
       /// Insert new offers to offers DB, update updated offers in DB, then delete deleted offers from DB and add it to deleted offers table.
       /// </summary>
       /// <param name="urlNameID"></param>
@@ -40,7 +45,7 @@ namespace BazosBot
          foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList()) //aktual downloaded
          {
             i++;
-            if (i > 520)
+            if (i > 1080)
             {
                Console.WriteLine("breakpoint");
             }
@@ -79,8 +84,8 @@ namespace BazosBot
                         updatedList.Add(item);
                      }
                      item.changed = item.changed == string.Empty ?
-                        $"\n{changedType}: {DictBeforeUpdateChange[changedType]} \n->\n {DictAfterUpdateChange[changedType]}" :
-                        item.changed + $",\n {changedType}: {DictBeforeUpdateChange[changedType]} \n->\n {DictAfterUpdateChange[changedType]}";
+                        $"\n{changedType}:\n{DictBeforeUpdateChange[changedType]}\n->\n{DictAfterUpdateChange[changedType]}" :
+                        item.changed + $",\n\n{Enumerable.Repeat(".", 50)}\n\n{changedType}:\n{DictBeforeUpdateChange[changedType]}\n->\n{DictAfterUpdateChange[changedType]}";
                   }
                }
             }
@@ -134,7 +139,7 @@ namespace BazosBot
 
       /// <summary>
       /// Get list of actual offer names in DB.
-      /// </summary>
+      /// </summaryTe
       /// <returns></returns>
       public static List<string> ListActualOffersCategoryURLInDB()
       {

@@ -13,6 +13,7 @@ namespace BazosBot
       public static List<QuickFilter> QuickFilterList = new List<QuickFilter>(); //more quickfilters in line
       public static List<string> QuickFilterTextList = new List<string>(); //list of all quickfilter text in combobox
       public static List<string> Blacklist = new List<string>();
+      public static Dictionary<string, List<string>> DictActualQuickFilters = DictActualQuickFiltersInDB();
       public static int selectedIndex = 0;
       public string name;
       public string nadpis { get; set; }
@@ -107,15 +108,12 @@ namespace BazosBot
       public static void SaveQuickFilterToDB(string quickfilterTextboxText, string categoryURL, out string name)
       {
          string[] filterSplit = quickfilterTextboxText.Split(";");
-         name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
-         if (string.IsNullOrEmpty(name))
-         {
-            name = $"qf{FreeID(categoryURL)}";
-         }
-         else
+         name = filterSplit[0].Contains(":") ? $"{filterSplit[0].Split(":")[0]}" : $"qf{FreeID(categoryURL)}";
+         if (filterSplit[0].Contains(":"))
          {
             quickfilterTextboxText = quickfilterTextboxText.Split(":")[1].Trim();
          }
+         DictActualQuickFilters[categoryURL].Add($"{name}: {quickfilterTextboxText}");
          string cmd = !QuickFilterNameInCategoryExist(name, categoryURL) ?
                $"INSERT INTO BazosQuickFilter (FilterName, FilterString, CategoryNameUrlID) VALUES ('{name}', '{quickfilterTextboxText}', '{categoryURL}');" : $"UPDATE BazosQuickFilter SET FilterString = '{quickfilterTextboxText}' WHERE FilterName = '{name}' AND CategoryNameUrlID = '{categoryURL}';";
          DB_Access.ExecuteNonQuery(cmd);
@@ -197,7 +195,7 @@ namespace BazosBot
          int maxValue = IDlist.Count > 0 && IDlist.Max() >= 1 ? IDlist.Max() : 1;
          if (maxValue >= 1)
          {
-            for (int i = 2; i <= maxValue + 1; i++)
+            for (int i = 1; i <= maxValue + 1; i++)
             {
                if (!IDlist.Contains(i))
                {
@@ -233,6 +231,32 @@ namespace BazosBot
          return false;
       }
 
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <returns></returns>
+      public static Dictionary<string, List<string>> DictActualQuickFiltersInDB()
+      {
+         Dictionary<string, List<string>> DictActualQFilters = new Dictionary<string, List<string>>();
+         List<string> urlCategory = new List<string>();
+         SqlConnection conn = new SqlConnection(Settings.DBconnString);
+         string cmdText = $"SELECT DISTINCT CategoryNameUrlID FROM BazosOffers;";
+         SqlCommand cmd = new SqlCommand(cmdText, conn);
+         conn.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+            urlCategory.Add((string)reader["CategoryNameUrlID"]);
+         }
+         conn.Close();
+         foreach (string url in urlCategory)
+         {
+            DictActualQFilters.Add(url, ListActualQuickFiltersInDB(url));
+         }
+         return DictActualQFilters;
+      }
+
       /// <summary>
       /// 
       /// </summary>
@@ -262,15 +286,17 @@ namespace BazosBot
       /// 
       /// </summary>
       /// <param name="index">Selected index from combobox.</param>
-      public static void DeleteQuickFilterFromDB(string itemText)
+      public static void DeleteQuickFilterFromDB(string itemText, string categoryURL)
       {
          QuickFilterTextList.Remove(itemText);
+         DictActualQuickFilters[categoryURL].Remove(itemText);
          string[] filterSplit = itemText.Split(";");
          string name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
          SqlConnection connection = new SqlConnection(Settings.DBconnString);
-         string cmdText = $"DELETE FROM BazosQuickFilter WHERE FilterName = @filterName";
+         string cmdText = $"DELETE FROM BazosQuickFilter WHERE FilterName = @filterName AND CategoryNameUrlID = @categoryURL;";
          SqlCommand cmd = new SqlCommand(cmdText, connection);
          cmd.Parameters.AddWithValue("@filterName", name);
+         cmd.Parameters.AddWithValue("@categoryURL", categoryURL);
          connection.Open();
          cmd.ExecuteNonQuery();
          connection.Close();

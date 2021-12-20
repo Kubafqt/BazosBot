@@ -1,19 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
 //.net maui
 //corona filter program - respirator
 //idea - sort by - price, name (select order to sort)
+//you are my sunshine - beat south
 
 namespace BazosBot
 {
@@ -24,6 +21,7 @@ namespace BazosBot
       System.Windows.Forms.Timer autoTimer; //Bot timer
       Stopwatch sw = new Stopwatch(); //measurement get offers seconds elapsed
       Stopwatch waitingSw = new Stopwatch(); //to not overload the server when downloading
+      string updatedCheckChange;
 
       public Form1()
       {
@@ -37,17 +35,7 @@ namespace BazosBot
       /// </summary>
       private void Form1_Load(object sender, EventArgs e)
       {
-         cmbSelectOffers.Items.AddRange(DB_Access.ListActualOffersCategoryURLInDB().ToArray());
-         //cmbSelectOffers.Items.AddRange(AutoBot.ListActualMultiCategoryInDB().ToArray());
-         cmbBotCategoryUrl.Items.AddRange(cmbSelectOffers.Items.Cast<object>().ToArray());
-         cmbSelectQuickFilter.Items.Add("none");
-         cmbSelectQuickFilter.SelectedIndex = 0;
-         //cmbSelectQuickFilter.Sorted = true;
-         cmbBotName.Items.Add("none");
-         cmbBotName.Items.AddRange(AutoBot.GetBotNamesFromDB().ToArray());
-         //SortBotNames();
-         cmbBotName.SelectedIndex = 0;
-         cmbSelectOffers.Sorted = true;
+
       }
 
       #region timers
@@ -70,7 +58,7 @@ namespace BazosBot
          {
             switchtimer();
             Download.downloadDone = false;
-            AddOffersToResultLbox(BazosOffers.ListBazosOffers); //result lisbox
+            AddOffersToResultLbox(BazosOffers.ListBazosOffers, cmbSelectOffersType.SelectedItem.ToString()); //result lisbox
             elapsedTime = sw.Elapsed.Milliseconds >= 50 ? elapsedTime + 1 : elapsedTime;
             //labels
             string allOffers = Download.getOnlyNewOffers ? $"{Download.fullCount}" : $"{BazosOffers.ListBazosOffers.Count}";
@@ -195,7 +183,7 @@ namespace BazosBot
          autoTimer.Tick += new EventHandler(auto_timer_tick);
          autoTimer.Interval = 500;
       }
-
+         
       #endregion
 
       #region Main Panel
@@ -206,7 +194,8 @@ namespace BazosBot
       {
          try
          {
-            if (!Download.isRunning)
+            bool connection = Download.IsConnectedToInternet();
+            if (!Download.isRunning && connection)
             {
                BazosOffers.actualCategoryURL = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text; //actual category url id
                if (BazosOffers.actualCategoryURL.Contains("bazos.cz/") || BazosOffers.actualCategoryURL.Contains("bazos.sk/")) //+more contains in one command ?
@@ -230,6 +219,10 @@ namespace BazosBot
                   MessageBox.Show("Zadej URL pro bazoš!");
                }
             }
+            else if (!connection)
+            {
+               MessageBox.Show("Check internet connection!");
+            }
          }
          catch (Exception exeption)
          {
@@ -244,12 +237,34 @@ namespace BazosBot
          resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
       }
 
-      private void AddOffersToResultLbox(List<BazosOffers> itemList, int itemCount = 1)
+      private void AddOffersToResultLbox(List<BazosOffers> itemList, string offerType, int itemCount = 1)
       {
          foreach (BazosOffers item in itemList.ToList())
          {
-            resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
-            itemCount++;
+            if (offerType == "updated" && DB_Access.showUpdateChanges.Any(p => item.changed.Contains(p)))
+            {
+               resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
+               itemCount++;
+            }
+            else if (offerType != "updated")
+            {
+               resultLbox.Items.Add($"{itemCount}) {item.nadpis} for {item.cena} - {item.lokace} / {item.psc} - {item.datum} - {item.viewed} x - {item.url}");
+               itemCount++;
+            }
+         }
+      }
+      
+      /// <summary>
+      /// 
+      /// </summary>  
+      /// <param name="show"></param>
+      private void showUpdates(bool show = true)
+      {
+         offerLbox.Size = show ? new Size(244, 274) : new Size(244, 469);
+         updatesPanel.Visible = show;
+         foreach (Control control in updatesPanel.Controls.OfType<CheckBox>())
+         {
+            (control as CheckBox).Checked = true;
          }
       }
 
@@ -347,36 +362,44 @@ namespace BazosBot
       //   { "deleted" , DB_Access.deletedList }
       //};
 
+      string lastSelectedOfferType;
       private void cmbSelectOffersType_SelectedIndexChanged(object sender, EventArgs e)
       {
          if (DB_Access.downloaded)
          {
             resultLbox.Items.Clear();
+
             switch (cmbSelectOffersType.Text)
             {
                case "all offers":
                   {
-                     AddOffersToResultLbox(BazosOffers.ListBazosOffers);
+                     AddOffersToResultLbox(BazosOffers.ListBazosOffers, cmbSelectOffersType.SelectedItem.ToString());
                      break;
                   }
                case "new offers":
                   {
-                     AddOffersToResultLbox(DB_Access.newOffersList);
+                     AddOffersToResultLbox(DB_Access.newOffersList, cmbSelectOffersType.SelectedItem.ToString());
                      break;
                   }
                case "updated":
                   {
-                     AddOffersToResultLbox(DB_Access.updatedList);
+                     AddOffersToResultLbox(DB_Access.updatedList, cmbSelectOffersType.SelectedItem.ToString());
                      break;
                   }
                case "deleted":
                   {
-                     AddOffersToResultLbox(DB_Access.deletedList);
+                     AddOffersToResultLbox(DB_Access.deletedList, cmbSelectOffersType.SelectedItem.ToString());
                      break;
                   }
                default:
                   break;
             }
+            if (lastSelectedOfferType == "updated" || cmbSelectOffersType.Text == "updated")
+            {
+               bool show = cmbSelectOffersType.Text == "updated" ? true : false;
+               showUpdates(show);
+            }
+            lastSelectedOfferType = cmbSelectOffersType.Text;
             //Dictionary<string, List<BazosOffers>> innerDictionary = DictNameOffersList;
             //if (cmbSelectOffersType.Text != "updated")
             //{
@@ -399,7 +422,7 @@ namespace BazosBot
                tbSearchUrl.Clear();
                resultLbox.Items.Clear();
                BazosOffers.ListBazosOffers = DB_Access.ListActualOffersInDB(cmbSelectOffers.Text);
-               AddOffersToResultLbox(BazosOffers.ListBazosOffers);
+               AddOffersToResultLbox(BazosOffers.ListBazosOffers, cmbSelectOffersType.SelectedItem.ToString());
                lastSelectedItem = cmbSelectOffers.Text;
                changedCategory = true;
                ChangeCmbSelectQuickFilter(cmbSelectOffers.Text);
@@ -460,20 +483,23 @@ namespace BazosBot
       /// <summary>
       /// 
       /// </summary>
-      private void btnCreateQuickFilter_Click(object sender, EventArgs e)
+      private void btnCreateQuickFilter_Click(object sender, EventArgs e) //
       {
          if (!string.IsNullOrEmpty(tbQuickFilter.Text) && !string.IsNullOrEmpty(tbSearchUrl.Text) || !string.IsNullOrEmpty(cmbSelectOffers.Text))
          {
             //QuickFilter.GetQuickFiltersFromTextbox(tbQuickFilter.Text);
             //string[] filterSplit = tbQuickFilter.Text.Split(";");
             //QuickFilter.Name = filterSplit[0].Contains(":") ? filterSplit[0].Split(":")[0] : string.Empty;
+            quickFilterChanged = false;
             string categoryUrl = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text;
             string name;
             QuickFilter.SaveQuickFilterToDB(tbQuickFilter.Text, categoryUrl, out name);
             if (btnCreateQuickFilter.Text != "edit") //create (button name on tbQuickFilter textchanged event)
             {
-               cmbSelectQuickFilter.Items.Add($"{name}: {tbQuickFilter.Text}");
-               cmbSelectQuickFilter.SelectedItem = tbQuickFilter.Text;
+               string quickFilterText = $"{name}: {tbQuickFilter.Text.Replace($"{name}:", string.Empty).Trim()}";
+               cmbSelectQuickFilter.Items.Add(quickFilterText);
+               cmbSelectQuickFilter.SelectedIndex = cmbSelectQuickFilter.Items.Count - 1;
+               tbQuickFilter.Text = cmbSelectQuickFilter.Text;
             }
             else //edit
             {
@@ -483,6 +509,7 @@ namespace BazosBot
       }
 
       bool changedCategory = false; //not apply quick filter changes when changed category
+      bool quickFilterChanged = false;
       /// <summary>
       /// 
       /// </summary>
@@ -490,13 +517,13 @@ namespace BazosBot
       {
          //tbQuickFilter.Text = cmbSelectQuickFilter.SelectedText;
          //btnApplyQuickFilter.PerformClick();
-         if (cmbSelectQuickFilter.SelectedItem.ToString() != "none")
+         if (cmbSelectQuickFilter.SelectedItem.ToString() != "none" && (!quickFilterChanged || MessageBox.Show("Opravdu přemazat rozdělaný quickfilter?", "přemazat quickfilter", MessageBoxButtons.YesNo) == DialogResult.Yes))
          {
             QuickFilter.GetQuickFiltersFromTextbox(cmbSelectQuickFilter.SelectedItem.ToString());
             tbQuickFilter.Text = cmbSelectQuickFilter.SelectedItem.ToString();
             ApplyQuickFilterChanges();
          }
-         else if (!changedCategory)
+         else if (!changedCategory && (!quickFilterChanged || MessageBox.Show("Opravdu přemazat rozdělaný quickfilter?", "přemazat quickfilter", MessageBoxButtons.YesNo) == DialogResult.Yes))
          {
             QuickFilter.QuickFilterList.Clear();
             tbQuickFilter.Clear();
@@ -517,8 +544,19 @@ namespace BazosBot
          if (!actualCategoryUrl.Contains("multicategory", StringComparison.OrdinalIgnoreCase))
          {
             cmbSelectQuickFilter.Items.Add("none");
-            cmbSelectQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(actualCategoryUrl).ToArray());
+            cmbSelectQuickFilter.Items.AddRange(QuickFilter.DictActualQuickFilters[actualCategoryUrl].ToArray());
             cmbSelectQuickFilter.SelectedIndex = 0;
+            string quickFilterName = tbQuickFilter.Text.Contains(":") ? tbQuickFilter.Text.Split(new[] { ':' }, 2)[0] : string.Empty;
+            List<string> selectQuickFilterList = new List<string>();
+            //selectQuickFilterList.AddRange(cmbSelectQuickFilter.Items);
+            foreach (string item in cmbSelectQuickFilter.Items)
+            {
+               if (item != "none")
+               {
+                  selectQuickFilterList.Add(item);
+               }
+            }
+            btnCreateQuickFilter.Text = selectQuickFilterList.Count > 0 && selectQuickFilterList.Any(p => p.Split(":")[0] == quickFilterName) ? "edit" : "create";
          }
          else
          {
@@ -531,12 +569,17 @@ namespace BazosBot
       /// </summary>
       private void cmbSelectQuickFilter_KeyDown(object sender, KeyEventArgs e)
       {
-         if (e.KeyCode == Keys.Delete && cmbSelectQuickFilter.Text != "none" && MessageBox.Show("Opravdu smazat quick filter z výběru (comboboxu)?", "smazat quickfilter z comboboxu", MessageBoxButtons.YesNo) == DialogResult.Yes)
+         if (e.KeyCode == Keys.Delete && cmbSelectQuickFilter.Text != "none")
          {
-            tbQuickFilter.Text = tbQuickFilter.Text.Equals(cmbSelectQuickFilter.SelectedItem.ToString()) ? string.Empty : tbQuickFilter.Text;
-            QuickFilter.DeleteQuickFilterFromDB(cmbSelectQuickFilter.SelectedItem.ToString());
-            cmbSelectQuickFilter.Items.Remove(cmbSelectQuickFilter.SelectedItem);
-            cmbSelectQuickFilter.SelectedIndex = 0;
+            string deleteItem = cmbSelectQuickFilter.Text;
+            if (MessageBox.Show("Opravdu smazat quick filter z výběru (comboboxu)?", "smazat quickfilter z comboboxu", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+               tbQuickFilter.Text = tbQuickFilter.Text.Equals(cmbSelectQuickFilter.SelectedItem.ToString()) ? string.Empty : tbQuickFilter.Text;
+
+               QuickFilter.DeleteQuickFilterFromDB(deleteItem, cmbSelectOffers.SelectedItem.ToString());
+               cmbSelectQuickFilter.Items.Remove(deleteItem);
+               cmbSelectQuickFilter.SelectedIndex = 0;
+            }
          }
       }
 
@@ -583,7 +626,7 @@ namespace BazosBot
          }
          else //everything - without filter
          {
-            AddOffersToResultLbox(BazosOffers.ListBazosOffers);
+            AddOffersToResultLbox(BazosOffers.ListBazosOffers, cmbSelectOffersType.SelectedItem.ToString());
          }
       }
 
@@ -602,6 +645,7 @@ namespace BazosBot
             }
          }
          btnCreateQuickFilter.Text = quickFilterName != string.Empty && selectQuickFilterList.Count > 0 && selectQuickFilterList.Any(p => p.Split(":")[0] == quickFilterName) ? "edit" : "create";
+         quickFilterChanged = !selectQuickFilterList.Contains(tbQuickFilter.Text) && !string.IsNullOrWhiteSpace(tbQuickFilter.Text);
       }
 
       #endregion
@@ -805,8 +849,11 @@ namespace BazosBot
             QuickFilter.SaveQuickFilterToDB(tbBotQuickFilter.Text, categoryUrl, out name);
             if (btnAddQuickFilterBot.Text != "edit") //create (button name on tbQuickFilter textchanged event)
             {
-               cmbBotQuickFilter.Items.Add($"{name}: {tbBotQuickFilter.Text}");
-               cmbBotQuickFilter.SelectedItem = tbBotQuickFilter.Text;
+               string quickFilterText = $"{name}: {tbBotQuickFilter.Text.Replace($"{name}:", string.Empty).Trim()}";
+               cmbBotQuickFilter.Items.Add(quickFilterText);
+               botCategoryChanged = true; //not ask if přemazat rozdělaný filter
+               cmbBotQuickFilter.SelectedIndex = cmbBotQuickFilter.Items.Count - 1;
+               tbBotQuickFilter.Text = cmbBotQuickFilter.SelectedItem.ToString();
                btnAddQuickFilterBot.Text = "edit";
             }
             else //edit
@@ -896,7 +943,8 @@ namespace BazosBot
       {
          cmbBotQuickFilter.Items.Clear();
          cmbBotQuickFilter.Items.Add("none");
-         cmbBotQuickFilter.Items.AddRange(QuickFilter.ListActualQuickFiltersInDB(actualCategoryUrl).ToArray());
+         //if (QuickFilter.ListActualQuickFilter = ) 
+         cmbBotQuickFilter.Items.AddRange(QuickFilter.DictActualQuickFilters[actualCategoryUrl].ToArray());    
          if (cmbBotQuickFilter.Items.Count > 0)
          {
             cmbBotQuickFilter.SelectedIndex = 0;
@@ -908,12 +956,16 @@ namespace BazosBot
       /// </summary>
       private void cmbBotQuickFilter_KeyDown(object sender, KeyEventArgs e)
       {
-         if (e.KeyCode == Keys.Delete && cmbBotQuickFilter.Text != "none" && MessageBox.Show("Opravdu smazat quick filter?", "smazat quickfilter", MessageBoxButtons.YesNo) == DialogResult.Yes)
+         if (e.KeyCode == Keys.Delete && cmbBotQuickFilter.SelectedItem.ToString() != "none")
          {
-            tbBotQuickFilter.Text = tbBotQuickFilter.Text.Equals(cmbBotQuickFilter.SelectedItem.ToString()) ? string.Empty : tbBotQuickFilter.Text;
-            QuickFilter.DeleteQuickFilterFromDB(cmbBotQuickFilter.SelectedItem.ToString());
-            cmbBotQuickFilter.Items.Remove(cmbBotQuickFilter.SelectedItem);
-            cmbBotQuickFilter.SelectedIndex = 0;
+            string deleteItem = cmbBotQuickFilter.SelectedItem.ToString();
+            if (MessageBox.Show("Opravdu smazat quick filter?", "smazat quickfilter", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+               tbBotQuickFilter.Text = tbBotQuickFilter.Text.Equals(cmbBotQuickFilter.SelectedItem.ToString()) ? string.Empty : tbBotQuickFilter.Text;
+               QuickFilter.DeleteQuickFilterFromDB(deleteItem, cmbBotCategoryUrl.SelectedItem.ToString());
+               cmbBotQuickFilter.Items.Remove(deleteItem);
+               cmbBotQuickFilter.SelectedIndex = 0;
+            }
          }
       }
 
@@ -1201,6 +1253,7 @@ namespace BazosBot
          activePanel = "main";
          resultLbox.HorizontalScrollbar = true;
          offerLbox.HorizontalScrollbar = true;
+         offerLbox.Size = new Size(244, 469);
          PrepareComboboxes();
       }
 
@@ -1224,6 +1277,18 @@ namespace BazosBot
             control.Location = Settings.defaultPanelLocation;
          }
          cmbSelectPanel.SelectedItem = "main panel";
+
+         cmbSelectOffers.Items.AddRange(DB_Access.ListActualOffersCategoryURLInDB().ToArray());
+         //cmbSelectOffers.Items.AddRange(AutoBot.ListActualMultiCategoryInDB().ToArray());
+         cmbBotCategoryUrl.Items.AddRange(cmbSelectOffers.Items.Cast<object>().ToArray());
+         cmbSelectQuickFilter.Items.Add("none");
+         cmbSelectQuickFilter.SelectedIndex = 0;
+         //cmbSelectQuickFilter.Sorted = true;
+         cmbBotName.Items.Add("none");
+         cmbBotName.Items.AddRange(AutoBot.GetBotNamesFromDB().ToArray());
+         //SortBotNames();
+         cmbBotName.SelectedIndex = 0;
+         cmbSelectOffers.Sorted = true;
       }
 
       private void btnSelectPanel_Click(object sender, EventArgs e)
@@ -1231,7 +1296,78 @@ namespace BazosBot
          //ChangePanel(Settings.DictPanelNameValue[cmbSelectPanel.SelectedItem.ToString()]);
          //DB_Access.InsertNewOffers("test");
       }
+      #endregion
 
+      #region updates
+      private void cboxUpdateNadpis_CheckedChanged(object sender, EventArgs e)
+      {
+         if (cboxUpdateNadpis.Checked)
+         {
+            DB_Access.showUpdateChanges.Add("nadpis");
+         }
+         else
+         {
+            DB_Access.showUpdateChanges.Remove("nadpis");
+         }
+         resultLbox.Items.Clear();
+         AddOffersToResultLbox(DB_Access.updatedList, cmbSelectOffersType.SelectedItem.ToString());
+      }
+
+      private void cboxUpdateCena_CheckedChanged(object sender, EventArgs e)
+      {
+         if (cboxUpdateCena.Checked)
+         {
+            DB_Access.showUpdateChanges.Add("cena");
+         }
+         else
+         {
+            DB_Access.showUpdateChanges.Remove("cena");
+         }
+         resultLbox.Items.Clear();
+         AddOffersToResultLbox(DB_Access.updatedList, cmbSelectOffersType.SelectedItem.ToString());
+      }
+
+      private void cboxUpdatePopis_CheckedChanged(object sender, EventArgs e)
+      {
+         if (cboxUpdatePopis.Checked)
+         {
+            DB_Access.showUpdateChanges.Add("popis");
+         }
+         else
+         {
+            DB_Access.showUpdateChanges.Remove("popis");
+         }
+         resultLbox.Items.Clear();
+         AddOffersToResultLbox(DB_Access.updatedList, cmbSelectOffersType.SelectedItem.ToString());
+      }
+
+      private void cboxUpdateDate_CheckedChanged(object sender, EventArgs e)
+      {
+         if (cboxUpdateDate.Checked)
+         {
+            DB_Access.showUpdateChanges.Add("datum");
+         }
+         else
+         {
+            DB_Access.showUpdateChanges.Remove("datum");
+         }
+         resultLbox.Items.Clear();
+         AddOffersToResultLbox(DB_Access.updatedList, cmbSelectOffersType.SelectedItem.ToString());
+      }
+
+      private void cboxUpdateLocation_CheckedChanged(object sender, EventArgs e)
+      {
+         if (cboxUpdateLocation.Checked)
+         {
+            DB_Access.showUpdateChanges.Add("lokace");
+         }
+         else
+         {
+            DB_Access.showUpdateChanges.Remove("lokace");
+         }
+         resultLbox.Items.Clear();
+         AddOffersToResultLbox(DB_Access.updatedList, cmbSelectOffersType.SelectedItem.ToString());
+      }
       #endregion
 
    }

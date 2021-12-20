@@ -40,6 +40,38 @@ namespace BazosBot
       /// </summary>
       /// <param name="text"></param>
       /// <returns></returns>
+      public static string RemoveSpecialCharacters(string text)
+      {
+         if (string.IsNullOrWhiteSpace(text))
+         {
+            return text;
+         }
+         //+more characters, ... ;
+         text = text.Replace("'", string.Empty);
+         return text;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
+      public static string PrepareToCommand(string text)
+      {
+         if (string.IsNullOrWhiteSpace(text))
+         {
+            return text;
+         }
+         text = RemoveSemicolons(text);
+         text = RemoveSpecialCharacters(text);
+         return text;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
       public static string RemoveSemicolonsAndDiacritics(string text)
       {
          if (string.IsNullOrWhiteSpace(text))

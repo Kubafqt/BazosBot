@@ -12,8 +12,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Data.SqlClient;
-//massive social - typek vlak  [app] - programuji & lide top
-//Jim Carrey - snažit se a nyní jsem tu - SC 30.11., ... ; - top, programming, lide, zmena, ... ;
+
 
 namespace BazosBot
 {
@@ -246,39 +245,39 @@ namespace BazosBot
 		/// <returns></returns>
 		public static List<string> ListActualMultiCategoryInDB(string categoryUrl)
       {
-			//List<string> listOfferCategoryURL = new List<string>();
-			//string cmdText = $"SELECT DISTINCT CategoryNameUrlID FROM BazosOffers;";
-			//SqlCommand cmd = new SqlCommand(cmdText, conn);
-			//conn.Open();
-			//SqlDataReader reader = cmd.ExecuteReader();
-			//while (reader.Read())
-			//{
-			//	listOfferCategoryURL.Add((string)reader["CategoryNameUrlID"]);
-			//}
-			//conn.Close();
-			//return listOfferCategoryURL;
+         //List<string> listOfferCategoryURL = new List<string>();
+         //string cmdText = $"SELECT DISTINCT CategoryNameUrlID FROM BazosOffers;";
+         //SqlCommand cmd = new SqlCommand(cmdText, conn);
+         //conn.Open();
+         //SqlDataReader reader = cmd.ExecuteReader();
+         //while (reader.Read())
+         //{
+         //   listOfferCategoryURL.Add((string)reader["CategoryNameUrlID"]);
+         //}
+         //conn.Close();
+         //return listOfferCategoryURL;
 
-			//SavedBotList.Clear();
-			//List<string> listSavedBotNames = new List<string>();
-			//SqlConnection conn = new SqlConnection(Settings.DBconnString);
-			//string cmdText = $"SELECT * FROM BazosAutobot;";
-			//SqlCommand cmd = new SqlCommand(cmdText, conn);
-			//conn.Open();
-			//SqlDataReader reader = cmd.ExecuteReader();
-			//while (reader.Read())
-			//{
-			//	string test = (string)reader["QuickFilterList"];
-			//	List<string> quickFilterTextList = test.Split(",").ToList();
-			//	quickFilterTextList.Remove("");
-			//	string name = (string)reader["Name"];
-			//	SavedBotList.Add(new AutoBot(name, (string)reader["CategoryURL"], quickFilterTextList, (int)reader["Interval"], (bool)reader["MultiCategory"], (int)reader["FullInterval"]));
-			//	if (!listSavedBotNames.Contains(name))
-			//	{
-			//		listSavedBotNames.Add(name);
-			//	}
-			//}
-			//conn.Close();
-			return new List<string>(); 
+         SavedBotList.Clear();
+         List<string> listSavedBotNames = new List<string>();
+         SqlConnection conn = new SqlConnection(Settings.DBconnString);
+         string cmdText = $"SELECT * FROM BazosAutobot;";
+         SqlCommand cmd = new SqlCommand(cmdText, conn);
+         conn.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+            string test = (string)reader["QuickFilterList"];
+            List<string> quickFilterTextList = test.Split(",").ToList();
+            quickFilterTextList.Remove("");
+            string name = (string)reader["Name"];
+            SavedBotList.Add(new AutoBot(name, (string)reader["CategoryURL"], quickFilterTextList, (int)reader["Interval"], (bool)reader["MultiCategory"], (int)reader["FullInterval"]));
+            if (!listSavedBotNames.Contains(name))
+            {
+               listSavedBotNames.Add(name);
+            }
+         }
+         conn.Close();
+         return new List<string>(); 
 		}
 
 	}
