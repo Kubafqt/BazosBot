@@ -57,6 +57,7 @@ namespace BazosBot
          this.cmbSelectOffersType = new System.Windows.Forms.ComboBox();
          this.cmbSelectOffers = new System.Windows.Forms.ComboBox();
          this.textBox9 = new System.Windows.Forms.TextBox();
+         this.lbBotRunning = new System.Windows.Forms.Label();
          this.panelAutoBot = new System.Windows.Forms.Panel();
          this.cboxMultiCategory = new System.Windows.Forms.CheckBox();
          this.lboxBotCategory = new System.Windows.Forms.ListBox();
@@ -169,7 +170,7 @@ namespace BazosBot
          this.panelMain.Controls.Add(this.btnGetBazos);
          this.panelMain.Location = new System.Drawing.Point(17, 48);
          this.panelMain.Name = "panelMain";
-         this.panelMain.Size = new System.Drawing.Size(1029, 586);
+         this.panelMain.Size = new System.Drawing.Size(1017, 586);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
          // 
@@ -409,6 +410,16 @@ namespace BazosBot
          this.textBox9.Size = new System.Drawing.Size(187, 23);
          this.textBox9.TabIndex = 3;
          // 
+         // lbBotRunning
+         // 
+         this.lbBotRunning.AutoSize = true;
+         this.lbBotRunning.Location = new System.Drawing.Point(433, 37);
+         this.lbBotRunning.Name = "lbBotRunning";
+         this.lbBotRunning.Size = new System.Drawing.Size(28, 15);
+         this.lbBotRunning.TabIndex = 16;
+         this.lbBotRunning.Text = "bot:";
+         this.lbBotRunning.Visible = false;
+         // 
          // panelAutoBot
          // 
          this.panelAutoBot.Controls.Add(this.cboxMultiCategory);
@@ -434,9 +445,9 @@ namespace BazosBot
          this.panelAutoBot.Controls.Add(this.tbBotQuickFilter);
          this.panelAutoBot.Controls.Add(this.tbBotName);
          this.panelAutoBot.Controls.Add(this.btnAddQuickFilterBot);
-         this.panelAutoBot.Location = new System.Drawing.Point(1014, 48);
+         this.panelAutoBot.Location = new System.Drawing.Point(589, 34);
          this.panelAutoBot.Name = "panelAutoBot";
-         this.panelAutoBot.Size = new System.Drawing.Size(153, 321);
+         this.panelAutoBot.Size = new System.Drawing.Size(416, 607);
          this.panelAutoBot.TabIndex = 15;
          // 
          // cboxMultiCategory
@@ -775,7 +786,8 @@ namespace BazosBot
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(1064, 646);
+         this.ClientSize = new System.Drawing.Size(1052, 646);
+         this.Controls.Add(this.lbBotRunning);
          this.Controls.Add(this.panelAutoBot);
          this.Controls.Add(this.lbProgress);
          this.Controls.Add(this.lbAllOffers);
@@ -788,7 +800,6 @@ namespace BazosBot
          this.MaximizeBox = false;
          this.Name = "Form1";
          this.Text = "Bazos bot";
-         this.Load += new System.EventHandler(this.Form1_Load);
          this.panelMain.ResumeLayout(false);
          this.panelMain.PerformLayout();
          this.updatesPanel.ResumeLayout(false);
@@ -866,6 +877,7 @@ namespace BazosBot
       private System.Windows.Forms.CheckBox cboxUpdateLocation;
       private System.Windows.Forms.Label lbShowUpdates;
       private System.Windows.Forms.Panel updatesPanel;
+      private System.Windows.Forms.Label lbBotRunning;
    }
 }
 

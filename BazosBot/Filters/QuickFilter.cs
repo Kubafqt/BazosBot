@@ -119,6 +119,19 @@ namespace BazosBot
          DB_Access.ExecuteNonQuery(cmd);
       }
 
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="quickfilterText"></param>
+      /// <param name="categoryURL"></param>
+      /// <returns></returns>
+      public static string GetQuickFilterName(string quickfilterText, string categoryURL)
+      {
+         string[] filterSplit = quickfilterText.Split(";");
+         return filterSplit[0].Contains(":") ? $"{filterSplit[0].Split(":")[0]}" : $"qf{FreeID(categoryURL)}";
+      }
+
       /// <summary>
       /// Quick filter name exist in database table.
       /// </summary>

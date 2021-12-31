@@ -35,6 +35,7 @@ namespace BazosBot
       /// <param name="urlNameID"></param>
       public static void InsertNewOffers(string urlNameID, bool onlyNewOffers = false)
       {
+         downloaded = false;
          SqlConnection connection = new SqlConnection(connString);
          List<BazosOffers> actualDBList = ListActualOffersInDB(urlNameID);
          newOffersList = new List<BazosOffers>();
@@ -45,11 +46,7 @@ namespace BazosBot
          foreach (BazosOffers item in BazosOffers.ListBazosOffers.ToList()) //aktual downloaded
          {
             i++;
-            if (i > 1080)
-            {
-               Console.WriteLine("breakpoint");
-            }
-            if (actualDBList.Count > 0 && actualDBList.ToList().Any(p => p.url == item.url) && !onlyNewOffers) //offer is contained in db - check to update
+            if (actualDBList.Count > 0 && actualDBList.ToList().Any(p => p.url == item.url)) //offer is contained in db - check to update
             {
                //BazosOffers dbOffer;
                //GetItemFromDbByURL(out offer, item.url); //perfomance test - DB vs object get
@@ -84,8 +81,8 @@ namespace BazosBot
                         updatedList.Add(item);
                      }
                      item.changed = item.changed == string.Empty ?
-                        $"\n{changedType}:\n{DictBeforeUpdateChange[changedType]}\n->\n{DictAfterUpdateChange[changedType]}" :
-                        item.changed + $",\n\n{Enumerable.Repeat(".", 50)}\n\n{changedType}:\n{DictBeforeUpdateChange[changedType]}\n->\n{DictAfterUpdateChange[changedType]}";
+                        $"\n{changedType}: \n{DictBeforeUpdateChange[changedType]}\n->\n{DictAfterUpdateChange[changedType]}" :
+                        item.changed + $"\n\n\n{changedType}: \n{DictBeforeUpdateChange[changedType]}\n->\n{DictAfterUpdateChange[changedType]}";
                   }
                }
             }
@@ -108,12 +105,13 @@ namespace BazosBot
                command.ExecuteNonQuery();
                connection.Close();
                newOffersList.Add(item);
-            }     
+            }
          }
-         if (!onlyNewOffers) //when not get only new offers
+         if (!onlyNewOffers && !Download.stopped) //when not get only new offers
          {
             CheckDeletedOffers(connection);
          }
+         Download.stopped = false;
          downloaded = true;
       }
 
@@ -163,16 +161,30 @@ namespace BazosBot
       /// <param name="url"></param>
       /// <param name="categoryUrl"></param>
       /// <returns></returns>
-      public static bool DBContainsUrl(string url, string datum, string categoryUrl)
+      public static bool DBContainsUrl(string url, string categoryUrl, out bool urlNewDate, out string nabCena)
       {
+         urlNewDate = false;
+         nabCena = string.Empty;
+
          SqlConnection connection = new SqlConnection(connString);
-         string selectCmdText = $"SELECT * FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
+         string selectCmdText = $"SELECT Cena FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
          SqlCommand cmd = new SqlCommand(selectCmdText, connection);
          connection.Open();
          SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+            urlNewDate = true;
+            nabCena = (string)reader["Cena"];
+         }
+         connection.Close();
+
+         selectCmdText = $"SELECT Nadpis FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
+         cmd = new SqlCommand(selectCmdText, connection);
+         connection.Open();
+         reader = cmd.ExecuteReader();
          while (reader.Read()) //load level info
          {
-            //string u = (string)reader["URL"];
+            string test = (string)reader["nadpis"];
             connection.Close();
             return true;
          }

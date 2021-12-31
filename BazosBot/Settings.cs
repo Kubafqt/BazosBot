@@ -17,6 +17,23 @@ namespace BazosBot
       public static readonly string DBconnString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}BazosDb.mdf;Integrated Security = True; Connect Timeout = 30";
       public static bool selectBotAfterCreateOrEdit = true;
 
+      public static Dictionary<string, Size> FormSize = new Dictionary<string, Size>()
+      {
+         { "default", new Size(1050, 685) },
+         { "botted", new Size(1050, 725) }
+      };
+      public static Dictionary<string, Point> panelLocation = new Dictionary<string, Point>()
+      {
+         { "default", new Point(17, 48) },
+         { "botted", new Point(17, 88) },
+      };
+      public static void MainPanelLocation(string type, Control.ControlCollection Controls)
+      {
+         foreach (Control item in Controls.OfType<Panel>().Where(p => p.Tag == "mainPanels"))
+         {
+            item.Location = panelLocation[type];
+         }
+      }
       public static Size defaultPanelSize = new Size(1003, 593);//(1000, 549);
       public static Point defaultPanelLocation = new Point(12, 34);
       public static Dictionary<string, string> DictMainPanelsNameValue = new Dictionary<string, string>()

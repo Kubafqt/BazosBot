@@ -25,6 +25,8 @@ namespace BazosBot
 		public static Queue<AutoBot> BotQueue = new Queue<AutoBot>();
 		public static List<AutoBot> SavedBotList = new List<AutoBot>(); //getted from DB - for each category = 1 bot object, for each bot = united name
 		public static List<AutoBot> tempBotList = new List<AutoBot>(); //actual creating bots - each for 1 category
+		public static bool botRunning = false;
+		public static string runningBotName = string.Empty;
 		//public static string lastBotName;
 		//public static Dictionary<string, List<string>> DictCategoryQuickFilterText = new Dictionary<string, List<string>>();
 		//public static Dictionary<string, List<object>> DictNameBotDicts = new Dictionary<string, List<object>>();
@@ -35,8 +37,9 @@ namespace BazosBot
 		public int interval; //seconds
 		public int? fullInterval; //every x times full download from section - expensive work
 		public int timesUsed;
-		public Stopwatch sw;
+		public Stopwatch sw = new Stopwatch();
 		public bool isRunning;
+		public bool stoppedRunning;
 		public bool multicategory;
 
 		//random test variables:
@@ -117,10 +120,11 @@ namespace BazosBot
 				{
 					quickFilterTextsToSplit = quickFilterTextsToSplit == string.Empty ? qfText : $"{quickFilterTextsToSplit},{qfText}";
 				}
+				int mCategory = multicategory ? 1 : 0;
 				botName = botName == string.Empty ? bot.botName : botName;
 				lastBotName = lastBotName == string.Empty ? botName : lastBotName;
 				bool botNameCategoryExist = BotNameAndCategoryExistInDB(botName, bot.category); //update saved bot with new bot
-				string cmd = !botListDB.Any(p => p.category == bot.category) && !botNameCategoryExist /*update bot category*/ ? $"INSERT INTO BazosAutobot VALUES('{botName}', '{bot.category}', '{quickFilterTextsToSplit}', '{bot.interval}', '{bot.fullInterval}');" : !botNameCategoryExist ?
+				string cmd = !botListDB.Any(p => p.category == bot.category) && !botNameCategoryExist /*update bot category*/ ? $"INSERT INTO BazosAutobot VALUES('{botName}', '{bot.category}', '{quickFilterTextsToSplit}', '{bot.interval}', '{bot.fullInterval}', '{mCategory}');" : !botNameCategoryExist ?
 					$"UPDATE BazosAutobot SET Name = '{botName}', QuickFilterList = '{quickFilterTextsToSplit}', CategoryURL = '{bot.category}', Interval = '{bot.interval}', FullInterval = '{bot.fullInterval}' WHERE Name = '{lastBotName}' AND CategoryURL = '{bot.category}';" :
 					$"UPDATE BazosAutobot SET Name = '{botName}', QuickFilterList = '{quickFilterTextsToSplit}', CategoryURL = '{bot.category}', Interval = '{bot.interval}', FullInterval = '{bot.fullInterval}' WHERE Name = '{botName}' AND CategoryURL = '{bot.category}';";
 				cmd = botNameCategoryExist && lastBotName != botName ? $"{cmd} DELETE FROM BazosAutoBot WHERE Name = '{lastBotName}' AND CategoryURL = '{bot.category}';" : cmd;
