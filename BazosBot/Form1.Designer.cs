@@ -57,6 +57,7 @@ namespace BazosBot
          this.cmbSelectOffersType = new System.Windows.Forms.ComboBox();
          this.cmbSelectOffers = new System.Windows.Forms.ComboBox();
          this.textBox9 = new System.Windows.Forms.TextBox();
+         this.lbBotRunning = new System.Windows.Forms.Label();
          this.panelAutoBot = new System.Windows.Forms.Panel();
          this.cboxMultiCategory = new System.Windows.Forms.CheckBox();
          this.lboxBotCategory = new System.Windows.Forms.ListBox();
@@ -99,9 +100,9 @@ namespace BazosBot
          // 
          // btnGetBazos
          // 
-         this.btnGetBazos.Location = new System.Drawing.Point(9, 109);
+         this.btnGetBazos.Location = new System.Drawing.Point(3, 113);
          this.btnGetBazos.Name = "btnGetBazos";
-         this.btnGetBazos.Size = new System.Drawing.Size(75, 25);
+         this.btnGetBazos.Size = new System.Drawing.Size(88, 22);
          this.btnGetBazos.TabIndex = 2;
          this.btnGetBazos.Text = "get offers";
          this.btnGetBazos.UseVisualStyleBackColor = true;
@@ -110,10 +111,9 @@ namespace BazosBot
          // resultLbox
          // 
          this.resultLbox.FormattingEnabled = true;
-         this.resultLbox.ItemHeight = 15;
-         this.resultLbox.Location = new System.Drawing.Point(95, 103);
+         this.resultLbox.Location = new System.Drawing.Point(104, 103);
          this.resultLbox.Name = "resultLbox";
-         this.resultLbox.Size = new System.Drawing.Size(632, 469);
+         this.resultLbox.Size = new System.Drawing.Size(654, 511);
          this.resultLbox.TabIndex = 3;
          this.resultLbox.SelectedIndexChanged += new System.EventHandler(this.resultLbox_SelectedIndexChanged);
          this.resultLbox.DoubleClick += new System.EventHandler(this.resultLbox_DoubleClick);
@@ -121,27 +121,26 @@ namespace BazosBot
          // label1
          // 
          this.label1.AutoSize = true;
-         this.label1.Location = new System.Drawing.Point(38, 68);
+         this.label1.Location = new System.Drawing.Point(56, 73);
          this.label1.Name = "label1";
-         this.label1.Size = new System.Drawing.Size(51, 15);
+         this.label1.Size = new System.Drawing.Size(49, 13);
          this.label1.TabIndex = 1;
          this.label1.Text = "base url:";
          // 
          // offerLbox
          // 
          this.offerLbox.FormattingEnabled = true;
-         this.offerLbox.ItemHeight = 15;
-         this.offerLbox.Location = new System.Drawing.Point(747, 103);
+         this.offerLbox.Location = new System.Drawing.Point(774, 103);
          this.offerLbox.Name = "offerLbox";
-         this.offerLbox.Size = new System.Drawing.Size(244, 274);
+         this.offerLbox.Size = new System.Drawing.Size(235, 355);
          this.offerLbox.TabIndex = 4;
          this.offerLbox.DoubleClick += new System.EventHandler(this.offerLbox_DoubleClick);
          // 
          // tbSearchUrl
          // 
-         this.tbSearchUrl.Location = new System.Drawing.Point(95, 65);
+         this.tbSearchUrl.Location = new System.Drawing.Point(104, 70);
          this.tbSearchUrl.Name = "tbSearchUrl";
-         this.tbSearchUrl.Size = new System.Drawing.Size(390, 23);
+         this.tbSearchUrl.Size = new System.Drawing.Size(335, 21);
          this.tbSearchUrl.TabIndex = 0;
          // 
          // panelMain
@@ -167,9 +166,9 @@ namespace BazosBot
          this.panelMain.Controls.Add(this.resultLbox);
          this.panelMain.Controls.Add(this.label1);
          this.panelMain.Controls.Add(this.btnGetBazos);
-         this.panelMain.Location = new System.Drawing.Point(17, 48);
+         this.panelMain.Location = new System.Drawing.Point(12, 40);
          this.panelMain.Name = "panelMain";
-         this.panelMain.Size = new System.Drawing.Size(1029, 586);
+         this.panelMain.Size = new System.Drawing.Size(1020, 643);
          this.panelMain.TabIndex = 5;
          this.panelMain.Tag = "mainPanels";
          // 
@@ -181,9 +180,9 @@ namespace BazosBot
          this.updatesPanel.Controls.Add(this.cboxUpdateCena);
          this.updatesPanel.Controls.Add(this.cboxUpdateDate);
          this.updatesPanel.Controls.Add(this.cboxUpdatePopis);
-         this.updatesPanel.Location = new System.Drawing.Point(747, 396);
+         this.updatesPanel.Location = new System.Drawing.Point(774, 468);
          this.updatesPanel.Name = "updatesPanel";
-         this.updatesPanel.Size = new System.Drawing.Size(244, 170);
+         this.updatesPanel.Size = new System.Drawing.Size(209, 147);
          this.updatesPanel.TabIndex = 32;
          this.updatesPanel.Visible = false;
          // 
@@ -191,7 +190,7 @@ namespace BazosBot
          // 
          this.lbShowUpdates.AutoSize = true;
          this.lbShowUpdates.Font = new System.Drawing.Font("Segoe UI", 11.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
-         this.lbShowUpdates.Location = new System.Drawing.Point(16, 8);
+         this.lbShowUpdates.Location = new System.Drawing.Point(14, 7);
          this.lbShowUpdates.Name = "lbShowUpdates";
          this.lbShowUpdates.Size = new System.Drawing.Size(110, 20);
          this.lbShowUpdates.TabIndex = 31;
@@ -202,7 +201,7 @@ namespace BazosBot
          // 
          this.cboxUpdateNadpis.AutoSize = true;
          this.cboxUpdateNadpis.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.cboxUpdateNadpis.Location = new System.Drawing.Point(32, 37);
+         this.cboxUpdateNadpis.Location = new System.Drawing.Point(27, 32);
          this.cboxUpdateNadpis.Name = "cboxUpdateNadpis";
          this.cboxUpdateNadpis.Size = new System.Drawing.Size(68, 21);
          this.cboxUpdateNadpis.TabIndex = 26;
@@ -215,7 +214,7 @@ namespace BazosBot
          // 
          this.cboxUpdateLocation.AutoSize = true;
          this.cboxUpdateLocation.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.cboxUpdateLocation.Location = new System.Drawing.Point(32, 140);
+         this.cboxUpdateLocation.Location = new System.Drawing.Point(27, 121);
          this.cboxUpdateLocation.Name = "cboxUpdateLocation";
          this.cboxUpdateLocation.Size = new System.Drawing.Size(66, 21);
          this.cboxUpdateLocation.TabIndex = 30;
@@ -228,7 +227,7 @@ namespace BazosBot
          // 
          this.cboxUpdateCena.AutoSize = true;
          this.cboxUpdateCena.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.cboxUpdateCena.Location = new System.Drawing.Point(32, 65);
+         this.cboxUpdateCena.Location = new System.Drawing.Point(27, 56);
          this.cboxUpdateCena.Name = "cboxUpdateCena";
          this.cboxUpdateCena.Size = new System.Drawing.Size(55, 21);
          this.cboxUpdateCena.TabIndex = 27;
@@ -241,7 +240,7 @@ namespace BazosBot
          // 
          this.cboxUpdateDate.AutoSize = true;
          this.cboxUpdateDate.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.cboxUpdateDate.Location = new System.Drawing.Point(32, 115);
+         this.cboxUpdateDate.Location = new System.Drawing.Point(27, 100);
          this.cboxUpdateDate.Name = "cboxUpdateDate";
          this.cboxUpdateDate.Size = new System.Drawing.Size(67, 21);
          this.cboxUpdateDate.TabIndex = 29;
@@ -254,7 +253,7 @@ namespace BazosBot
          // 
          this.cboxUpdatePopis.AutoSize = true;
          this.cboxUpdatePopis.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.cboxUpdatePopis.Location = new System.Drawing.Point(32, 90);
+         this.cboxUpdatePopis.Location = new System.Drawing.Point(27, 78);
          this.cboxUpdatePopis.Name = "cboxUpdatePopis";
          this.cboxUpdatePopis.Size = new System.Drawing.Size(61, 21);
          this.cboxUpdatePopis.TabIndex = 28;
@@ -266,9 +265,9 @@ namespace BazosBot
          // btnHelpYouTube
          // 
          this.btnHelpYouTube.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.btnHelpYouTube.Location = new System.Drawing.Point(9, 217);
+         this.btnHelpYouTube.Location = new System.Drawing.Point(3, 207);
          this.btnHelpYouTube.Name = "btnHelpYouTube";
-         this.btnHelpYouTube.Size = new System.Drawing.Size(75, 50);
+         this.btnHelpYouTube.Size = new System.Drawing.Size(88, 43);
          this.btnHelpYouTube.TabIndex = 25;
          this.btnHelpYouTube.Text = "HELP YouTube";
          this.btnHelpYouTube.UseVisualStyleBackColor = true;
@@ -278,9 +277,9 @@ namespace BazosBot
          // btnHelpQuickFilter
          // 
          this.btnHelpQuickFilter.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.btnHelpQuickFilter.Location = new System.Drawing.Point(9, 154);
+         this.btnHelpQuickFilter.Location = new System.Drawing.Point(3, 152);
          this.btnHelpQuickFilter.Name = "btnHelpQuickFilter";
-         this.btnHelpQuickFilter.Size = new System.Drawing.Size(75, 50);
+         this.btnHelpQuickFilter.Size = new System.Drawing.Size(88, 43);
          this.btnHelpQuickFilter.TabIndex = 22;
          this.btnHelpQuickFilter.Text = "HELP quickfilter";
          this.btnHelpQuickFilter.UseVisualStyleBackColor = true;
@@ -289,18 +288,18 @@ namespace BazosBot
          // cboxNotUpdateViewedAndLastChecked
          // 
          this.cboxNotUpdateViewedAndLastChecked.AutoSize = true;
-         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(435, 7);
+         this.cboxNotUpdateViewedAndLastChecked.Location = new System.Drawing.Point(458, 20);
          this.cboxNotUpdateViewedAndLastChecked.Name = "cboxNotUpdateViewedAndLastChecked";
-         this.cboxNotUpdateViewedAndLastChecked.Size = new System.Drawing.Size(301, 19);
+         this.cboxNotUpdateViewedAndLastChecked.Size = new System.Drawing.Size(276, 17);
          this.cboxNotUpdateViewedAndLastChecked.TabIndex = 21;
          this.cboxNotUpdateViewedAndLastChecked.Text = "dont update viewed and lastchecked to DB (quicker)";
          this.cboxNotUpdateViewedAndLastChecked.UseVisualStyleBackColor = true;
          // 
          // btnApplyQuickFilter
          // 
-         this.btnApplyQuickFilter.Location = new System.Drawing.Point(416, 32);
+         this.btnApplyQuickFilter.Location = new System.Drawing.Point(380, 42);
          this.btnApplyQuickFilter.Name = "btnApplyQuickFilter";
-         this.btnApplyQuickFilter.Size = new System.Drawing.Size(69, 23);
+         this.btnApplyQuickFilter.Size = new System.Drawing.Size(59, 20);
          this.btnApplyQuickFilter.TabIndex = 20;
          this.btnApplyQuickFilter.Text = "apply";
          this.btnApplyQuickFilter.UseVisualStyleBackColor = true;
@@ -309,9 +308,9 @@ namespace BazosBot
          // cbDisableQuickFilterPrice
          // 
          this.cbDisableQuickFilterPrice.AutoSize = true;
-         this.cbDisableQuickFilterPrice.Location = new System.Drawing.Point(263, 7);
+         this.cbDisableQuickFilterPrice.Location = new System.Drawing.Point(281, 20);
          this.cbDisableQuickFilterPrice.Name = "cbDisableQuickFilterPrice";
-         this.cbDisableQuickFilterPrice.Size = new System.Drawing.Size(164, 19);
+         this.cbDisableQuickFilterPrice.Size = new System.Drawing.Size(148, 17);
          this.cbDisableQuickFilterPrice.TabIndex = 19;
          this.cbDisableQuickFilterPrice.Text = "disable price in quick filter";
          this.cbDisableQuickFilterPrice.UseVisualStyleBackColor = true;
@@ -320,9 +319,9 @@ namespace BazosBot
          // 
          this.cmbSelectQuickFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbSelectQuickFilter.FormattingEnabled = true;
-         this.cmbSelectQuickFilter.Location = new System.Drawing.Point(572, 33);
+         this.cmbSelectQuickFilter.Location = new System.Drawing.Point(513, 43);
          this.cmbSelectQuickFilter.Name = "cmbSelectQuickFilter";
-         this.cmbSelectQuickFilter.Size = new System.Drawing.Size(225, 23);
+         this.cmbSelectQuickFilter.Size = new System.Drawing.Size(245, 21);
          this.cmbSelectQuickFilter.TabIndex = 18;
          this.cmbSelectQuickFilter.SelectedIndexChanged += new System.EventHandler(this.cmbSelectQuickFilter_SelectedIndexChanged);
          this.cmbSelectQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectQuickFilter_KeyDown);
@@ -331,7 +330,7 @@ namespace BazosBot
          // 
          this.lbLokace.AutoSize = true;
          this.lbLokace.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.lbLokace.Location = new System.Drawing.Point(803, 33);
+         this.lbLokace.Location = new System.Drawing.Point(771, 42);
          this.lbLokace.Name = "lbLokace";
          this.lbLokace.Size = new System.Drawing.Size(57, 21);
          this.lbLokace.TabIndex = 17;
@@ -339,9 +338,9 @@ namespace BazosBot
          // 
          // btnCreateQuickFilter
          // 
-         this.btnCreateQuickFilter.Location = new System.Drawing.Point(491, 32);
+         this.btnCreateQuickFilter.Location = new System.Drawing.Point(444, 42);
          this.btnCreateQuickFilter.Name = "btnCreateQuickFilter";
-         this.btnCreateQuickFilter.Size = new System.Drawing.Size(75, 23);
+         this.btnCreateQuickFilter.Size = new System.Drawing.Size(64, 20);
          this.btnCreateQuickFilter.TabIndex = 16;
          this.btnCreateQuickFilter.Text = "create";
          this.btnCreateQuickFilter.UseVisualStyleBackColor = true;
@@ -350,34 +349,34 @@ namespace BazosBot
          // cboxDownOnlyLast
          // 
          this.cboxDownOnlyLast.AutoSize = true;
-         this.cboxDownOnlyLast.Location = new System.Drawing.Point(94, 7);
+         this.cboxDownOnlyLast.Location = new System.Drawing.Point(104, 20);
          this.cboxDownOnlyLast.Name = "cboxDownOnlyLast";
-         this.cboxDownOnlyLast.Size = new System.Drawing.Size(163, 19);
+         this.cboxDownOnlyLast.Size = new System.Drawing.Size(150, 17);
          this.cboxDownOnlyLast.TabIndex = 15;
          this.cboxDownOnlyLast.Text = "download only new offers";
          this.cboxDownOnlyLast.UseVisualStyleBackColor = true;
          // 
          // tbLokalita
          // 
-         this.tbLokalita.Location = new System.Drawing.Point(866, 33);
+         this.tbLokalita.Location = new System.Drawing.Point(834, 43);
          this.tbLokalita.Name = "tbLokalita";
-         this.tbLokalita.Size = new System.Drawing.Size(104, 23);
+         this.tbLokalita.Size = new System.Drawing.Size(175, 21);
          this.tbLokalita.TabIndex = 14;
          // 
          // lbQuickFilter
          // 
          this.lbQuickFilter.AutoSize = true;
-         this.lbQuickFilter.Location = new System.Drawing.Point(20, 38);
+         this.lbQuickFilter.Location = new System.Drawing.Point(40, 47);
          this.lbQuickFilter.Name = "lbQuickFilter";
-         this.lbQuickFilter.Size = new System.Drawing.Size(66, 15);
+         this.lbQuickFilter.Size = new System.Drawing.Size(60, 13);
          this.lbQuickFilter.TabIndex = 13;
          this.lbQuickFilter.Text = "quick filter:";
          // 
          // tbQuickFilter
          // 
-         this.tbQuickFilter.Location = new System.Drawing.Point(95, 32);
+         this.tbQuickFilter.Location = new System.Drawing.Point(104, 42);
          this.tbQuickFilter.Name = "tbQuickFilter";
-         this.tbQuickFilter.Size = new System.Drawing.Size(315, 23);
+         this.tbQuickFilter.Size = new System.Drawing.Size(271, 21);
          this.tbQuickFilter.TabIndex = 11;
          this.tbQuickFilter.TextChanged += new System.EventHandler(this.tbQuickFilter_TextChanged);
          // 
@@ -385,9 +384,9 @@ namespace BazosBot
          // 
          this.cmbSelectOffersType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbSelectOffersType.FormattingEnabled = true;
-         this.cmbSelectOffersType.Location = new System.Drawing.Point(496, 65);
+         this.cmbSelectOffersType.Location = new System.Drawing.Point(448, 70);
          this.cmbSelectOffersType.Name = "cmbSelectOffersType";
-         this.cmbSelectOffersType.Size = new System.Drawing.Size(159, 23);
+         this.cmbSelectOffersType.Size = new System.Drawing.Size(137, 21);
          this.cmbSelectOffersType.TabIndex = 10;
          this.cmbSelectOffersType.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffersType_SelectedIndexChanged);
          // 
@@ -395,19 +394,29 @@ namespace BazosBot
          // 
          this.cmbSelectOffers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbSelectOffers.FormattingEnabled = true;
-         this.cmbSelectOffers.Location = new System.Drawing.Point(670, 65);
+         this.cmbSelectOffers.Location = new System.Drawing.Point(591, 70);
          this.cmbSelectOffers.Name = "cmbSelectOffers";
-         this.cmbSelectOffers.Size = new System.Drawing.Size(300, 23);
+         this.cmbSelectOffers.Size = new System.Drawing.Size(418, 21);
          this.cmbSelectOffers.TabIndex = 9;
          this.cmbSelectOffers.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffers_SelectedIndexChanged);
          this.cmbSelectOffers.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectOffers_KeyDown);
          // 
          // textBox9
          // 
-         this.textBox9.Location = new System.Drawing.Point(223, -22);
+         this.textBox9.Location = new System.Drawing.Point(191, -19);
          this.textBox9.Name = "textBox9";
-         this.textBox9.Size = new System.Drawing.Size(187, 23);
+         this.textBox9.Size = new System.Drawing.Size(161, 21);
          this.textBox9.TabIndex = 3;
+         // 
+         // lbBotRunning
+         // 
+         this.lbBotRunning.AutoSize = true;
+         this.lbBotRunning.Location = new System.Drawing.Point(376, 42);
+         this.lbBotRunning.Name = "lbBotRunning";
+         this.lbBotRunning.Size = new System.Drawing.Size(27, 13);
+         this.lbBotRunning.TabIndex = 16;
+         this.lbBotRunning.Text = "bot:";
+         this.lbBotRunning.Visible = false;
          // 
          // panelAutoBot
          // 
@@ -434,18 +443,18 @@ namespace BazosBot
          this.panelAutoBot.Controls.Add(this.tbBotQuickFilter);
          this.panelAutoBot.Controls.Add(this.tbBotName);
          this.panelAutoBot.Controls.Add(this.btnAddQuickFilterBot);
-         this.panelAutoBot.Location = new System.Drawing.Point(1014, 48);
+         this.panelAutoBot.Location = new System.Drawing.Point(37, 37);
          this.panelAutoBot.Name = "panelAutoBot";
-         this.panelAutoBot.Size = new System.Drawing.Size(153, 321);
+         this.panelAutoBot.Size = new System.Drawing.Size(66, 40);
          this.panelAutoBot.TabIndex = 15;
          // 
          // cboxMultiCategory
          // 
          this.cboxMultiCategory.AutoSize = true;
          this.cboxMultiCategory.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.cboxMultiCategory.Location = new System.Drawing.Point(757, 373);
+         this.cboxMultiCategory.Location = new System.Drawing.Point(727, 307);
          this.cboxMultiCategory.Name = "cboxMultiCategory";
-         this.cboxMultiCategory.Size = new System.Drawing.Size(114, 21);
+         this.cboxMultiCategory.Size = new System.Drawing.Size(113, 21);
          this.cboxMultiCategory.TabIndex = 27;
          this.cboxMultiCategory.Text = "multicategory";
          this.cboxMultiCategory.UseVisualStyleBackColor = true;
@@ -456,9 +465,9 @@ namespace BazosBot
          this.lboxBotCategory.FormattingEnabled = true;
          this.lboxBotCategory.HorizontalScrollbar = true;
          this.lboxBotCategory.ItemHeight = 17;
-         this.lboxBotCategory.Location = new System.Drawing.Point(398, 222);
+         this.lboxBotCategory.Location = new System.Drawing.Point(384, 192);
          this.lboxBotCategory.Name = "lboxBotCategory";
-         this.lboxBotCategory.Size = new System.Drawing.Size(325, 344);
+         this.lboxBotCategory.Size = new System.Drawing.Size(316, 429);
          this.lboxBotCategory.TabIndex = 26;
          this.lboxBotCategory.SelectedIndexChanged += new System.EventHandler(this.lboxBotCategory_SelectedIndexChanged);
          this.lboxBotCategory.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lboxBotCategory_KeyDown);
@@ -466,9 +475,9 @@ namespace BazosBot
          // btnAddItemsToBot
          // 
          this.btnAddItemsToBot.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.btnAddItemsToBot.Location = new System.Drawing.Point(602, 170);
+         this.btnAddItemsToBot.Location = new System.Drawing.Point(626, 149);
          this.btnAddItemsToBot.Name = "btnAddItemsToBot";
-         this.btnAddItemsToBot.Size = new System.Drawing.Size(57, 23);
+         this.btnAddItemsToBot.Size = new System.Drawing.Size(91, 23);
          this.btnAddItemsToBot.TabIndex = 25;
          this.btnAddItemsToBot.Text = "to bot";
          this.btnAddItemsToBot.UseVisualStyleBackColor = true;
@@ -477,9 +486,9 @@ namespace BazosBot
          // btnStartBot
          // 
          this.btnStartBot.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.btnStartBot.Location = new System.Drawing.Point(757, 497);
+         this.btnStartBot.Location = new System.Drawing.Point(727, 415);
          this.btnStartBot.Name = "btnStartBot";
-         this.btnStartBot.Size = new System.Drawing.Size(137, 69);
+         this.btnStartBot.Size = new System.Drawing.Size(117, 60);
          this.btnStartBot.TabIndex = 24;
          this.btnStartBot.Text = "Start Bot";
          this.btnStartBot.UseVisualStyleBackColor = true;
@@ -489,7 +498,7 @@ namespace BazosBot
          // 
          this.lbBotInt.AutoSize = true;
          this.lbBotInt.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotInt.Location = new System.Drawing.Point(929, 291);
+         this.lbBotInt.Location = new System.Drawing.Point(883, 236);
          this.lbBotInt.Name = "lbBotInt";
          this.lbBotInt.Size = new System.Drawing.Size(57, 17);
          this.lbBotInt.TabIndex = 23;
@@ -499,7 +508,7 @@ namespace BazosBot
          // 
          this.lbBotFT.AutoSize = true;
          this.lbBotFT.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotFT.Location = new System.Drawing.Point(929, 333);
+         this.lbBotFT.Location = new System.Drawing.Point(883, 273);
          this.lbBotFT.Name = "lbBotFT";
          this.lbBotFT.Size = new System.Drawing.Size(75, 17);
          this.lbBotFT.TabIndex = 22;
@@ -509,7 +518,7 @@ namespace BazosBot
          // 
          this.lbBotHeading.AutoSize = true;
          this.lbBotHeading.Font = new System.Drawing.Font("Segoe UI", 20.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
-         this.lbBotHeading.Location = new System.Drawing.Point(334, 26);
+         this.lbBotHeading.Location = new System.Drawing.Point(286, 23);
          this.lbBotHeading.Name = "lbBotHeading";
          this.lbBotHeading.Size = new System.Drawing.Size(125, 37);
          this.lbBotHeading.TabIndex = 21;
@@ -519,7 +528,7 @@ namespace BazosBot
          // 
          this.lbBotFullTime.AutoSize = true;
          this.lbBotFullTime.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotFullTime.Location = new System.Drawing.Point(744, 333);
+         this.lbBotFullTime.Location = new System.Drawing.Point(716, 273);
          this.lbBotFullTime.Name = "lbBotFullTime";
          this.lbBotFullTime.Size = new System.Drawing.Size(66, 17);
          this.lbBotFullTime.TabIndex = 20;
@@ -529,28 +538,28 @@ namespace BazosBot
          // 
          this.lbBotInterval.AutoSize = true;
          this.lbBotInterval.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotInterval.Location = new System.Drawing.Point(744, 291);
+         this.lbBotInterval.Location = new System.Drawing.Point(716, 236);
          this.lbBotInterval.Name = "lbBotInterval";
-         this.lbBotInterval.Size = new System.Drawing.Size(60, 17);
+         this.lbBotInterval.Size = new System.Drawing.Size(59, 17);
          this.lbBotInterval.TabIndex = 19;
          this.lbBotInterval.Text = "Interval:";
          // 
          // BotFullTime
          // 
-         this.BotFullTime.Location = new System.Drawing.Point(818, 333);
+         this.BotFullTime.Location = new System.Drawing.Point(788, 273);
          this.BotFullTime.Maximum = new decimal(new int[] {
             100000,
             0,
             0,
             0});
          this.BotFullTime.Name = "BotFullTime";
-         this.BotFullTime.Size = new System.Drawing.Size(105, 23);
+         this.BotFullTime.Size = new System.Drawing.Size(91, 21);
          this.BotFullTime.TabIndex = 18;
          this.BotFullTime.ValueChanged += new System.EventHandler(this.BotFullTime_ValueChanged);
          // 
          // BotInterval
          // 
-         this.BotInterval.Location = new System.Drawing.Point(818, 291);
+         this.BotInterval.Location = new System.Drawing.Point(788, 236);
          this.BotInterval.Maximum = new decimal(new int[] {
             86400,
             0,
@@ -562,7 +571,7 @@ namespace BazosBot
             0,
             0});
          this.BotInterval.Name = "BotInterval";
-         this.BotInterval.Size = new System.Drawing.Size(105, 23);
+         this.BotInterval.Size = new System.Drawing.Size(91, 21);
          this.BotInterval.TabIndex = 17;
          this.BotInterval.Value = new decimal(new int[] {
             1,
@@ -577,9 +586,9 @@ namespace BazosBot
          this.lboxBotQuickFilter.FormattingEnabled = true;
          this.lboxBotQuickFilter.HorizontalScrollbar = true;
          this.lboxBotQuickFilter.ItemHeight = 17;
-         this.lboxBotQuickFilter.Location = new System.Drawing.Point(39, 222);
+         this.lboxBotQuickFilter.Location = new System.Drawing.Point(33, 192);
          this.lboxBotQuickFilter.Name = "lboxBotQuickFilter";
-         this.lboxBotQuickFilter.Size = new System.Drawing.Size(341, 344);
+         this.lboxBotQuickFilter.Size = new System.Drawing.Size(333, 429);
          this.lboxBotQuickFilter.TabIndex = 14;
          this.lboxBotQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lboxBotQuickFilter_KeyDown);
          this.lboxBotQuickFilter.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lboxBotQuickFilter_MouseDown);
@@ -587,9 +596,9 @@ namespace BazosBot
          // btnCreateBot
          // 
          this.btnCreateBot.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.btnCreateBot.Location = new System.Drawing.Point(757, 411);
+         this.btnCreateBot.Location = new System.Drawing.Point(727, 340);
          this.btnCreateBot.Name = "btnCreateBot";
-         this.btnCreateBot.Size = new System.Drawing.Size(137, 69);
+         this.btnCreateBot.Size = new System.Drawing.Size(117, 60);
          this.btnCreateBot.TabIndex = 13;
          this.btnCreateBot.Text = "Create Bot";
          this.btnCreateBot.UseVisualStyleBackColor = true;
@@ -599,9 +608,9 @@ namespace BazosBot
          // 
          this.lbBotQuickFilter.AutoSize = true;
          this.lbBotQuickFilter.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotQuickFilter.Location = new System.Drawing.Point(48, 168);
+         this.lbBotQuickFilter.Location = new System.Drawing.Point(41, 146);
          this.lbBotQuickFilter.Name = "lbBotQuickFilter";
-         this.lbBotQuickFilter.Size = new System.Drawing.Size(98, 21);
+         this.lbBotQuickFilter.Size = new System.Drawing.Size(97, 21);
          this.lbBotQuickFilter.TabIndex = 11;
          this.lbBotQuickFilter.Text = "quick filter:";
          // 
@@ -609,9 +618,9 @@ namespace BazosBot
          // 
          this.lbBotCategoryUrl.AutoSize = true;
          this.lbBotCategoryUrl.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotCategoryUrl.Location = new System.Drawing.Point(39, 128);
+         this.lbBotCategoryUrl.Location = new System.Drawing.Point(33, 111);
          this.lbBotCategoryUrl.Name = "lbBotCategoryUrl";
-         this.lbBotCategoryUrl.Size = new System.Drawing.Size(107, 21);
+         this.lbBotCategoryUrl.Size = new System.Drawing.Size(106, 21);
          this.lbBotCategoryUrl.TabIndex = 10;
          this.lbBotCategoryUrl.Text = "category url:";
          // 
@@ -619,7 +628,7 @@ namespace BazosBot
          // 
          this.lbBotName.AutoSize = true;
          this.lbBotName.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.lbBotName.Location = new System.Drawing.Point(38, 91);
+         this.lbBotName.Location = new System.Drawing.Point(33, 79);
          this.lbBotName.Name = "lbBotName";
          this.lbBotName.Size = new System.Drawing.Size(107, 21);
          this.lbBotName.TabIndex = 9;
@@ -629,9 +638,9 @@ namespace BazosBot
          // 
          this.cmbBotQuickFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbBotQuickFilter.FormattingEnabled = true;
-         this.cmbBotQuickFilter.Location = new System.Drawing.Point(665, 170);
+         this.cmbBotQuickFilter.Location = new System.Drawing.Point(723, 149);
          this.cmbBotQuickFilter.Name = "cmbBotQuickFilter";
-         this.cmbBotQuickFilter.Size = new System.Drawing.Size(284, 23);
+         this.cmbBotQuickFilter.Size = new System.Drawing.Size(222, 21);
          this.cmbBotQuickFilter.TabIndex = 8;
          this.cmbBotQuickFilter.SelectedIndexChanged += new System.EventHandler(this.cmbQuickFilterBot_SelectedIndexChanged);
          this.cmbBotQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbBotQuickFilter_KeyDown);
@@ -640,9 +649,9 @@ namespace BazosBot
          // 
          this.cmbBotCategoryUrl.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbBotCategoryUrl.FormattingEnabled = true;
-         this.cmbBotCategoryUrl.Location = new System.Drawing.Point(553, 130);
+         this.cmbBotCategoryUrl.Location = new System.Drawing.Point(534, 115);
          this.cmbBotCategoryUrl.Name = "cmbBotCategoryUrl";
-         this.cmbBotCategoryUrl.Size = new System.Drawing.Size(396, 23);
+         this.cmbBotCategoryUrl.Size = new System.Drawing.Size(411, 21);
          this.cmbBotCategoryUrl.Sorted = true;
          this.cmbBotCategoryUrl.TabIndex = 7;
          this.cmbBotCategoryUrl.SelectedIndexChanged += new System.EventHandler(this.cmbCategoryUrlBot_SelectedIndexChanged);
@@ -651,41 +660,41 @@ namespace BazosBot
          // 
          this.cmbBotName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbBotName.FormattingEnabled = true;
-         this.cmbBotName.Location = new System.Drawing.Point(551, 89);
+         this.cmbBotName.Location = new System.Drawing.Point(532, 79);
          this.cmbBotName.Name = "cmbBotName";
-         this.cmbBotName.Size = new System.Drawing.Size(398, 23);
+         this.cmbBotName.Size = new System.Drawing.Size(413, 21);
          this.cmbBotName.TabIndex = 6;
          this.cmbBotName.SelectedIndexChanged += new System.EventHandler(this.cmbBotName_SelectedIndexChanged);
          this.cmbBotName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbBotName_KeyDown);
          // 
          // tbBotCategoryUrl
          // 
-         this.tbBotCategoryUrl.Location = new System.Drawing.Point(152, 130);
+         this.tbBotCategoryUrl.Location = new System.Drawing.Point(144, 115);
          this.tbBotCategoryUrl.Name = "tbBotCategoryUrl";
-         this.tbBotCategoryUrl.Size = new System.Drawing.Size(383, 23);
+         this.tbBotCategoryUrl.Size = new System.Drawing.Size(377, 21);
          this.tbBotCategoryUrl.TabIndex = 5;
          // 
          // tbBotQuickFilter
          // 
-         this.tbBotQuickFilter.Location = new System.Drawing.Point(152, 170);
+         this.tbBotQuickFilter.Location = new System.Drawing.Point(144, 149);
          this.tbBotQuickFilter.Name = "tbBotQuickFilter";
-         this.tbBotQuickFilter.Size = new System.Drawing.Size(383, 23);
+         this.tbBotQuickFilter.Size = new System.Drawing.Size(377, 21);
          this.tbBotQuickFilter.TabIndex = 4;
          this.tbBotQuickFilter.TextChanged += new System.EventHandler(this.tbBotQuickFilter_TextChanged);
          // 
          // tbBotName
          // 
-         this.tbBotName.Location = new System.Drawing.Point(152, 89);
+         this.tbBotName.Location = new System.Drawing.Point(144, 79);
          this.tbBotName.Name = "tbBotName";
-         this.tbBotName.Size = new System.Drawing.Size(383, 23);
+         this.tbBotName.Size = new System.Drawing.Size(377, 21);
          this.tbBotName.TabIndex = 2;
          // 
          // btnAddQuickFilterBot
          // 
          this.btnAddQuickFilterBot.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-         this.btnAddQuickFilterBot.Location = new System.Drawing.Point(553, 170);
+         this.btnAddQuickFilterBot.Location = new System.Drawing.Point(534, 149);
          this.btnAddQuickFilterBot.Name = "btnAddQuickFilterBot";
-         this.btnAddQuickFilterBot.Size = new System.Drawing.Size(43, 23);
+         this.btnAddQuickFilterBot.Size = new System.Drawing.Size(86, 23);
          this.btnAddQuickFilterBot.TabIndex = 1;
          this.btnAddQuickFilterBot.Text = "add";
          this.btnAddQuickFilterBot.UseVisualStyleBackColor = true;
@@ -693,9 +702,9 @@ namespace BazosBot
          // 
          // btnSelectPanel
          // 
-         this.btnSelectPanel.Location = new System.Drawing.Point(21, 5);
+         this.btnSelectPanel.Location = new System.Drawing.Point(17, 10);
          this.btnSelectPanel.Name = "btnSelectPanel";
-         this.btnSelectPanel.Size = new System.Drawing.Size(75, 23);
+         this.btnSelectPanel.Size = new System.Drawing.Size(64, 20);
          this.btnSelectPanel.TabIndex = 6;
          this.btnSelectPanel.Text = "Select";
          this.btnSelectPanel.UseVisualStyleBackColor = true;
@@ -705,9 +714,9 @@ namespace BazosBot
          // 
          this.cmbSelectPanel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbSelectPanel.FormattingEnabled = true;
-         this.cmbSelectPanel.Location = new System.Drawing.Point(102, 5);
+         this.cmbSelectPanel.Location = new System.Drawing.Point(86, 10);
          this.cmbSelectPanel.Name = "cmbSelectPanel";
-         this.cmbSelectPanel.Size = new System.Drawing.Size(121, 23);
+         this.cmbSelectPanel.Size = new System.Drawing.Size(104, 21);
          this.cmbSelectPanel.TabIndex = 7;
          this.cmbSelectPanel.SelectedIndexChanged += new System.EventHandler(this.cmbSelectPanel_SelectedIndexChanged);
          // 
@@ -715,7 +724,7 @@ namespace BazosBot
          // 
          this.textBox2.Location = new System.Drawing.Point(0, 0);
          this.textBox2.Name = "textBox2";
-         this.textBox2.Size = new System.Drawing.Size(100, 23);
+         this.textBox2.Size = new System.Drawing.Size(100, 21);
          this.textBox2.TabIndex = 0;
          // 
          // lboxBlacklistSet
@@ -728,54 +737,55 @@ namespace BazosBot
          // lbUpdatedCount
          // 
          this.lbUpdatedCount.AutoSize = true;
-         this.lbUpdatedCount.Location = new System.Drawing.Point(487, 12);
+         this.lbUpdatedCount.Location = new System.Drawing.Point(490, 16);
          this.lbUpdatedCount.Name = "lbUpdatedCount";
-         this.lbUpdatedCount.Size = new System.Drawing.Size(54, 15);
+         this.lbUpdatedCount.Size = new System.Drawing.Size(51, 13);
          this.lbUpdatedCount.TabIndex = 9;
          this.lbUpdatedCount.Text = "updated:";
          // 
          // lbDeletedCount
          // 
          this.lbDeletedCount.AutoSize = true;
-         this.lbDeletedCount.Location = new System.Drawing.Point(617, 13);
+         this.lbDeletedCount.Location = new System.Drawing.Point(629, 16);
          this.lbDeletedCount.Name = "lbDeletedCount";
-         this.lbDeletedCount.Size = new System.Drawing.Size(49, 15);
+         this.lbDeletedCount.Size = new System.Drawing.Size(47, 13);
          this.lbDeletedCount.TabIndex = 10;
          this.lbDeletedCount.Text = "deleted:";
          // 
          // lbNewOffers
          // 
          this.lbNewOffers.AutoSize = true;
-         this.lbNewOffers.Location = new System.Drawing.Point(355, 12);
+         this.lbNewOffers.Location = new System.Drawing.Point(340, 16);
          this.lbNewOffers.Name = "lbNewOffers";
-         this.lbNewOffers.Size = new System.Drawing.Size(65, 15);
+         this.lbNewOffers.Size = new System.Drawing.Size(63, 13);
          this.lbNewOffers.TabIndex = 11;
          this.lbNewOffers.Text = "new offers:";
          // 
          // lbAllOffers
          // 
          this.lbAllOffers.AutoSize = true;
-         this.lbAllOffers.Location = new System.Drawing.Point(243, 12);
+         this.lbAllOffers.Location = new System.Drawing.Point(213, 15);
          this.lbAllOffers.Name = "lbAllOffers";
-         this.lbAllOffers.Size = new System.Drawing.Size(55, 15);
+         this.lbAllOffers.Size = new System.Drawing.Size(53, 13);
          this.lbAllOffers.TabIndex = 13;
          this.lbAllOffers.Text = "all offers:";
          // 
          // lbProgress
          // 
          this.lbProgress.AutoSize = true;
-         this.lbProgress.Location = new System.Drawing.Point(768, 11);
+         this.lbProgress.Location = new System.Drawing.Point(775, 16);
          this.lbProgress.Name = "lbProgress";
-         this.lbProgress.Size = new System.Drawing.Size(55, 15);
+         this.lbProgress.Size = new System.Drawing.Size(53, 13);
          this.lbProgress.TabIndex = 14;
          this.lbProgress.Text = "progress:";
          this.lbProgress.Visible = false;
          // 
          // Form1
          // 
-         this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+         this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(1064, 646);
+         this.ClientSize = new System.Drawing.Size(1056, 695);
+         this.Controls.Add(this.lbBotRunning);
          this.Controls.Add(this.panelAutoBot);
          this.Controls.Add(this.lbProgress);
          this.Controls.Add(this.lbAllOffers);
@@ -788,7 +798,6 @@ namespace BazosBot
          this.MaximizeBox = false;
          this.Name = "Form1";
          this.Text = "Bazos bot";
-         this.Load += new System.EventHandler(this.Form1_Load);
          this.panelMain.ResumeLayout(false);
          this.panelMain.PerformLayout();
          this.updatesPanel.ResumeLayout(false);
@@ -866,6 +875,7 @@ namespace BazosBot
       private System.Windows.Forms.CheckBox cboxUpdateLocation;
       private System.Windows.Forms.Label lbShowUpdates;
       private System.Windows.Forms.Panel updatesPanel;
+      private System.Windows.Forms.Label lbBotRunning;
    }
 }
 
