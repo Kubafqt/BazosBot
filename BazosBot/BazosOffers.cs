@@ -54,7 +54,7 @@ namespace BazosBot
       };
 
       /// <summary>
-      /// Main method to get all offers.
+      /// Main method to get all offers from bazos section.
       /// </summary>
       public static bool GetOffersFromPage(string html, string defUrl, int containerLineNumber, bool getOnlyNewOffers)
       {
@@ -67,12 +67,7 @@ namespace BazosBot
          bool top = false;
          foreach (string line in htmlSplit)
          {
-            //if (topSkip > 0)
-            //{
-            //   topSkip--;
-            //   continue;
-            //}
-            if (line.Contains("class=nadpis")) //nadpis, url, datum
+            if(line.Contains("class=nadpis")) //nadpis, url, datum
             {
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
                DictNameValue["nadpis"] = GetNadpis(line, out top);
@@ -104,6 +99,7 @@ namespace BazosBot
                //continue;
             }
             if (line.Contains("class=\"inzeratylok\"")) //lokace, psč
+
             {
                int startIndex = line.IndexOf("\">") + 2;
                string[] subStrSplit = line.Substring(startIndex).Split("<");
