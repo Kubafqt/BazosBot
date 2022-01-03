@@ -300,7 +300,7 @@ namespace BazosBot
       /// <param name="show"></param>
       private void showUpdates(bool show = true)
       {
-         offerLbox.Size = show ? new Size(244, 274) : new Size(244, 469);
+         offerLbox.Size = show ? new Size(235, 355) : new Size(235, 511);
          updatesPanel.Visible = show;
          if (show)
          {
@@ -1361,7 +1361,7 @@ namespace BazosBot
          activePanel = "main";
          resultLbox.HorizontalScrollbar = true;
          offerLbox.HorizontalScrollbar = true;
-         offerLbox.Size = new Size(244, 469);
+         offerLbox.Size = new Size(235, 511);
          PrepareComboboxes();
       }
 

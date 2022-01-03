@@ -217,17 +217,6 @@ namespace BazosBot
       private static List<string> GetUpdateCmdTextList(BazosOffers item, BazosOffers dbItem, string urlNameID)
       {
          List<string> updateCmdTextList = new List<string>();
-         //Dictionary<int, string> updateNames = new Dictionary<int, string>()
-         //{
-         //   { 0, "nadpis" },
-         //   { 1, "cena" },
-         //   { 2, "popis" },
-         //   { 3, "datum" },
-         //   { 4, "lokace" },
-         //};
-         //foreach (string updateCmdText in updateCmdTexts)
-         //{
-         //}
          string[] updateCmdTexts = new string[]
                {  // optimalize - create view of table or object comparison (?)
                $"UPDATE BazosOffers SET Nadpis = '{item.nadpis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Nadpis != '{item.nadpis}'",
@@ -374,6 +363,7 @@ namespace BazosBot
       #endregion
 
       #region Filter
+
       //used in clickable UI
       ///// <summary>
       ///// 
@@ -432,6 +422,7 @@ namespace BazosBot
       #endregion
 
       #region FilterSet
+
       //used in clickable UI
       ///// <summary>
       ///// 
