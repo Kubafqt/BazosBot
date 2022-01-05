@@ -54,7 +54,7 @@ namespace BazosBot
       };
 
       /// <summary>
-      /// Main method to get all offers.
+      /// Main method to get all offers from bazos section.
       /// </summary>
       public static bool GetOffersFromPage(string html, string defUrl, int containerLineNumber, bool getOnlyNewOffers)
       {
@@ -116,6 +116,7 @@ namespace BazosBot
                   continue;
                }
                OfferDictionaryToObjectList(); //last line - viewed count
+               ResetStaticVariables();
             }
             lineNumber++;
          }
@@ -250,7 +251,7 @@ namespace BazosBot
             DictNameValue[kvp.Key] = TextAdjust.PrepareToCommand(kvp.Value);
          }
          ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"], DateTime.Now.ToString()));
-         ResetStaticVariables();
+         //ResetStaticVariables();
       }
 
       /// <summary>

@@ -34,7 +34,7 @@ namespace BazosBot
 		public string botName { get; set; }
 		public string category;
 		public List<string> quickFilterTextList = new List<string>();
-		public int interval; //seconds
+		public double interval; //seconds
 		public int? fullInterval; //every x times full download from section - expensive work
 		public int timesUsed;
 		public Stopwatch sw = new Stopwatch();
@@ -93,12 +93,10 @@ namespace BazosBot
 				{
 					if (!speedUpList.Any(p => Convert.ToInt32(Regex.Match(p.botName.Substring(0, p.botName.Length), @"\d+").ToString()) == i))
 					{
-						return $"{botName}{i}"; //can be faster than line bellow
-						//return botName + i;
+						return $"{botName}{i}";
 					}
 				}
-				return $"{botName}{maxBotNumber + 1}"; //can be faster than line bellow
-				//return botName + (maxBotNumber + 1);
+				return $"{botName}{maxBotNumber + 1}";
 			}
 			return $"{botName}1";
 		}
@@ -231,15 +229,6 @@ namespace BazosBot
             }
 			}
 			conn.Close();
-			//cmdText = $"SELECT DISTINCT Name FROM BazosAutobot;";
-			//cmd = new SqlCommand(cmdText, conn);
-			//conn.Open();
-			//reader = cmd.ExecuteReader();
-			//while (reader.Read())
-			//{
-			//	listSavedBotNames.Add((string)reader["Name"];
-			//}
-			//conn.Close();
 			return listSavedBotNames;
 		}
 

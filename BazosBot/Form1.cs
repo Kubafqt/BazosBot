@@ -33,6 +33,49 @@ namespace BazosBot
 
       #region timers
       /// <summary>
+      /// initialize timers
+      /// </summary>
+      private void InitTimers()
+      {
+         timer = new System.Windows.Forms.Timer();
+         timer.Tick += new EventHandler(timer_tick);
+         timer.Interval = 20;
+         autoTimer = new System.Windows.Forms.Timer();
+         autoTimer.Tick += new EventHandler(auto_timer_tick);
+         autoTimer.Interval = 250;
+      }
+
+      /// <summary>
+      /// timer switch
+      /// </summary> 
+      private bool switchBot = false; //Bot get full offers - start stopwatch after getted
+      private void switchtimer(bool exception = false)
+      {
+         if (!timer.Enabled)
+         {
+            timer.Start();
+            lbProgress.Show();
+            sw.Start();
+         }
+         else
+         {
+            timer.Stop();
+            sw.Stop();
+            sw.Reset();
+            if (switchBot)
+            {
+               switchBot = false;
+               AutoBot.LastBot.sw.Start();
+            }
+            if (exception)
+            {
+               lbProgress.Text = string.Empty;
+               lbProgress.Hide();
+            }
+         }
+      }
+
+      /// <summary>
       /// showing timer
       /// </summary>
       private void timer_tick(object s, EventArgs a)
@@ -85,36 +128,6 @@ namespace BazosBot
       }
 
       /// <summary>
-      /// timer switch
-      /// </summary> 
-      private bool switchBot = false; //Bot get full offers - start stopwatch after getted
-      private void switchtimer(bool exception = false)
-		 {
-			if (!timer.Enabled)
-			{
-				timer.Start();
-				lbProgress.Show();
-            sw.Start();
-			}
-			else
-			{
-				timer.Stop();
-            sw.Stop();
-            sw.Reset();
-            if (switchBot)
-            {
-               switchBot = false;
-               AutoBot.LastBot.sw.Start();
-            }
-            if (exception)
-            {
-               lbProgress.Text = string.Empty;
-               lbProgress.Hide();
-            }
-			}
-		 }
-
-      /// <summary>
       /// autobot timer
       /// </summary>
       #nullable enable
@@ -144,6 +157,7 @@ namespace BazosBot
             if (AutoBot.LastBot == null) //first Bot run
             {
                AutoBot.LastBot = AutoBot.BotQueue.Dequeue();
+               AutoBot.BotList.Add(AutoBot.LastBot);
                RunBot();
             }
             else if (!AutoBot.LastBot.isRunning) //after lastBot finished run
@@ -155,9 +169,17 @@ namespace BazosBot
          }
          else if (AutoBot.BotList.Count > 0 && !AutoBot.LastBot.isRunning) //report upcoming download
          {
-            nextBot = nextBot != null ? nextBot : AutoBot.BotList.Where(p => p.interval - (int)Math.Round(p.sw.Elapsed.TotalSeconds, 0) >= 0).Min();
-            timeToRun = nextBot != null ? nextBot.interval - (int)Math.Round(nextBot.sw.Elapsed.TotalSeconds, 0) : 420;
+            Dictionary<string, double> NextBotTimeToLeft = new Dictionary<string, double>();
+            foreach (var item in AutoBot.BotList)
+            {
+               double timeLeft = item.interval - Math.Round(item.sw.Elapsed.TotalSeconds, 0);
+               NextBotTimeToLeft.Add(item.category, timeLeft);
+            }
+            string category = NextBotTimeToLeft.Min().Key; //test more minimum value?
+            nextBot = AutoBot.BotList.First(p => p.category == category);
             lbBotRunning.Text = $"Bot running: {AutoBot.runningBotName}\nNext downloading category: {nextBot.category} in {timeToRun} sec.";
+            //nextBot = nextBot != null ? nextBot : AutoBot.BotList.First(x => x.interval == AutoBot.BotList.Select(p => p.interval - (int)Math.Round(p.sw.Elapsed.TotalSeconds, 0)).Min());
+            //timeToRun = nextBot != null ? nextBot.interval - (int)Math.Round(nextBot.sw.Elapsed.TotalSeconds, 0) : 420;
             //AutoBot nextBot = timeToRun.Select(p => p.) //timeToRun.RemoveAll(t => t < 1); //int nextBot = timeToRun.Min();
          }
       }
@@ -165,7 +187,7 @@ namespace BazosBot
       /// <summary>
       /// 
       /// </summary>
-      private void RunBot() 
+      private void RunBot()
       {
          if (Download.IsConnectedToInternet())
          {
@@ -183,7 +205,7 @@ namespace BazosBot
             }
             else //+ošetřit - neběží nic jiného (start bot nebo start downloading)
             {
-               switchBot = true;
+               switchBot = true; //start timing stopwatch after finished full downloading
                switchtimer();
             }
             Thread thread = new Thread(() => Download.DownloadAllFromCategory(AutoBot.LastBot.category, getOnlyNewOffers, true));
@@ -194,19 +216,6 @@ namespace BazosBot
             autoTimer.Stop();
             MessageBox.Show("Check internet connection! - bot stopped");
          }
-      }
-
-      /// <summary>
-      /// initialize timers
-      /// </summary>
-      private void InitTimers()
-      {
-         timer = new System.Windows.Forms.Timer();
-         timer.Tick += new EventHandler(timer_tick);
-         timer.Interval = 20;
-         autoTimer = new System.Windows.Forms.Timer();
-         autoTimer.Tick += new EventHandler(auto_timer_tick);
-         autoTimer.Interval = 250;
       }
          
       #endregion
@@ -691,6 +700,41 @@ namespace BazosBot
 
       #endregion
 
+      #region blacklistSet
+      private void btnAddBlacklistSetToQuickFilter_Click(object sender, EventArgs e)
+      {
+         if (!string.IsNullOrEmpty(tbQuickFilter.Text) && !string.IsNullOrEmpty(tbSearchUrl.Text) || !string.IsNullOrEmpty(cmbSelectOffers.Text))
+         {
+            quickFilterChanged = false;
+            string categoryUrl = tbSearchUrl.Text != string.Empty ? tbSearchUrl.Text : cmbSelectOffers.Text;
+            string name;
+            QuickFilter.SaveBlacklistSetToDB(tbBlackListSet.Text, categoryUrl, out name);
+            if (btnCreateQuickFilter.Text != "edit") //create (button name on tbQuickFilter textchanged event)
+            {
+               string blacklistSetText = $"{name}: {tbQuickFilter.Text.Replace($"{name}:", string.Empty).Trim()}";
+               cmbSelectBlacklistSet.Items.Add(blacklistSetText);
+               cmbSelectBlacklistSet.SelectedIndex = cmbSelectBlacklistSet.Items.Count - 1;
+               tbQuickFilter.Text = cmbSelectQuickFilter.Text;
+            }
+            else //edit
+            {
+               cmbSelectQuickFilter.Items[cmbSelectQuickFilter.SelectedIndex] = tbQuickFilter.Text;
+            }
+         }
+      }
+
+      private void btnCreateBlacklistSet_Click(object sender, EventArgs e)
+      {
+
+      }
+
+      private void cmbSelectBlacklistSet_SelectedIndexChanged(object sender, EventArgs e)
+      {
+
+      }
+
+      #endregion
+
       /// <summary>
       /// Help buttons
       /// </summary>
@@ -1041,7 +1085,7 @@ namespace BazosBot
             if (!botCategoryItemDeleted) //cuz string? and string.IsNullOrEmpty() not working to get null - check stack overflow
             {
                AutoBot bot = AutoBot.tempBotList.First(p => p.category == lboxBotCategory.SelectedItem.ToString());
-               BotInterval.Value = bot.interval;
+               BotInterval.Value = (int)bot.interval;
                BotFullTime.Value = (decimal)bot.fullInterval;
                #nullable enable
                string? test = lboxBotCategory.SelectedItem.ToString();

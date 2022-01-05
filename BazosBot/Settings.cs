@@ -40,6 +40,7 @@ namespace BazosBot
       {
          { "main panel", "panelMain" },
          { "auto bot", "panelAutoBot" },
+         { "settings", "settingsPanel" }
          //{ "settings", "settingsPanel" },
       };
 
