@@ -67,7 +67,7 @@ namespace BazosBot
          bool top = false;
          foreach (string line in htmlSplit)
          {
-            if(line.Contains("class=nadpis")) //nadpis, url, datum
+            if (line.Contains("class=nadpis")) //nadpis, url, datum
             {
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
                DictNameValue["nadpis"] = GetNadpis(line, out top);
@@ -197,7 +197,7 @@ namespace BazosBot
             int dateStartIndex = line.LastIndexOf("[") + 1;
             int dateEndIndex = line.LastIndexOf("]</span>");
             return line.Substring(dateStartIndex, line.Length - dateStartIndex - (line.Length - dateEndIndex)).Replace(" ", string.Empty);
-          }
+         }
          else
          {
             line = GetUrlClosingLine(index, htmlSplit);

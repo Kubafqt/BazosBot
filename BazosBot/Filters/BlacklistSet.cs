@@ -4,11 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using System.Text.RegularExpressions;
 
 namespace BazosBot
 {
    class BlacklistSet
    {
+
+      //public static List<QuickFilter> QuickFilterList = new List<QuickFilter>();
+      public static List<string> BlacklistSetTextList = new List<string>(); 
       public static Dictionary<string, List<string>> DictActualBlacklistSet = DictActualBlacklistSetInDB();
 
       public string name { get; set; }
@@ -19,18 +23,23 @@ namespace BazosBot
          this.blacklistString = blacklistString;
       }
 
-
-      public static void SaveBlackListSetToDB(string blacklistSetText, string categoryURL, out string name)
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="blacklistSetText"></param>
+      /// <param name="categoryURL"></param>
+      /// <param name="name"></param>
+      public static void SaveBlacklistSetToDB(string blacklistSetText, string categoryURL, out string name)
       {
          string[] filterSplit = blacklistSetText.Split(";");
-         name = filterSplit[0].Contains(":") ? $"{filterSplit[0].Split(":")[0]}" : $"qf{FreeID(categoryURL)}";
+         name = filterSplit[0].Contains(":") ? $"{filterSplit[0].Split(":")[0]}" : $"blSet{DB_Access.FreeID(categoryURL, "BazosQuickFilter", "blSet", "Name")}";
          if (filterSplit[0].Contains(":"))
          {
             blacklistSetText = blacklistSetText.Split(":")[1].Trim();
          }
          DictActualBlacklistSet[categoryURL].Add($"{name}: {blacklistSetText}");
          string cmd = !BlacklistSetNameInCategoryExist(name, categoryURL) ?
-               $"INSERT INTO BazosQuickFilter (FilterName, FilterString, CategoryNameUrlID) VALUES ('{name}', '{blacklistSetText}', '{categoryURL}');" : $"UPDATE BazosQuickFilter SET FilterString = '{blacklistSetText}' WHERE FilterName = '{name}' AND CategoryNameUrlID = '{categoryURL}';";
+               $"INSERT INTO BazosBlackListSet (Name, FilterString, CategoryURL) VALUES ('{name}', '{blacklistSetText}', '{categoryURL}');" : $"UPDATE BazosQuickFilter SET FilterString = '{blacklistSetText}' WHERE Name = '{name}' AND CategoryURL = '{categoryURL}';";
          DB_Access.ExecuteNonQuery(cmd);
       }
 
@@ -43,69 +52,22 @@ namespace BazosBot
          Dictionary<string, List<string>> DictActualQFilters = new Dictionary<string, List<string>>();
          List<string> urlCategory = new List<string>();
          SqlConnection conn = new SqlConnection(Settings.DBconnString);
-         string cmdText = $"SELECT DISTINCT CategoryNameUrlID FROM BazosOffers;";
+         string cmdText = $"SELECT DISTINCT CategoryURL FROM BazosBlackListSet;";
          SqlCommand cmd = new SqlCommand(cmdText, conn);
          conn.Open();
          SqlDataReader reader = cmd.ExecuteReader();
          while (reader.Read())
          {
-            urlCategory.Add((string)reader["CategoryNameUrlID"]);
+            urlCategory.Add((string)reader["CategoryURL"]);
          }
          conn.Close();
          foreach (string url in urlCategory)
          {
-            DictActualQFilters.Add(url, ListActualQuickFiltersInDB(url));
+           // DictActualQFilters.Add(url, ListActuaBlackListSetInDB(url));
          }
          return DictActualQFilters;
       }
-
-      /// <summary>
-      /// Return highest ID from table.
-      /// </summary>
-      /// <returns></returns>
-      private static int FreeID(string categoryUrl)
-      {
-         List<int> IDlist = new List<int>();
-         if (DbContainsItem())
-         {
-            SqlConnection connection = new SqlConnection(Settings.DBconnString);
-            string cmdText = $"SELECT FilterName FROM BazosQuickFilter Where CategoryNameUrlID = '{categoryUrl}';";
-            SqlCommand cmd = new SqlCommand(cmdText, connection);
-            connection.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-               string filterName = (string)reader["FilterName"];
-               if (filterName.Substring(0, 2).Contains("qf"))
-               {
-                  IDlist.Add(Convert.ToInt32(Regex.Match(filterName, @"\d+").ToString()));
-               }
-            }
-            connection.Close();
-         }
-         return PossibleFreeID(IDlist);
-      }
-
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <returns></returns>
-      private static int PossibleFreeID(List<int> IDlist)
-      {
-         int maxValue = IDlist.Count > 0 && IDlist.Max() >= 1 ? IDlist.Max() : 1;
-         if (maxValue >= 1)
-         {
-            for (int i = 1; i <= maxValue + 1; i++)
-            {
-               if (!IDlist.Contains(i))
-               {
-                  return i;
-               }
-            }
-         }
-         return maxValue;
-      }
-
+      
       /// <summary>
       /// Quick filter name exist in database table.
       /// </summary>
@@ -113,7 +75,7 @@ namespace BazosBot
       private static bool BlacklistSetNameInCategoryExist(string name, string categoryURL)
       {
          SqlConnection connection = new SqlConnection(Settings.DBconnString);
-         string cmdText = $"SELECT * FROM BazosBlackListSet WHERE FilterName = '{name}' AND CategoryNameUrl = '{categoryURL}';";
+         string cmdText = $"SELECT * FROM BazosBlackListSet WHERE FilterName = '{name}' AND CategoryURL = '{categoryURL}';";
          SqlCommand cmd = new SqlCommand(cmdText, connection);
          connection.Open();
          SqlDataReader reader = cmd.ExecuteReader();
@@ -126,6 +88,36 @@ namespace BazosBot
          return false;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="actualCategoryUrl"></param>
+      //public static List<string> ListActualBlacklistSetInDB(string categoryURL)
+      //{
+      //   List<string> listBlacklistSet = new List<string>();
+      //   SqlConnection conn = new SqlConnection(Settings.DBconnString);
+      //   string cmdText = $"SELECT Name, FilterString FROM BazosBlacklistSet WHERE CategoryURL = '{categoryURL}';";
+      //   SqlCommand cmd = new SqlCommand(cmdText, conn);
+      //   conn.Open();
+      //   SqlDataReader reader = cmd.ExecuteReader();
+      //   while (reader.Read())
+      //   {
+      //      string filterName = (string)reader["FilterName"];
+      //      string filterString = (string)reader["FilterString"];
+      //      //QuickFilter qf;
+      //      GetBlacklistSetFromTextbox(filterString);//, out qf); //and add it to list
+      //      listQuickFilters.Add($"{filterName}: {filterString}");
+      //   }
+      //   conn.Close();
+      //   QuickFilterTextList = listQuickFilters;
+      //   return listQuickFilters;
+      //}
+
+
+      private static void GetBlacklistSetFromTextbox(string tbBlacklistSetText)
+      {
+
+      }
 
    }
 }

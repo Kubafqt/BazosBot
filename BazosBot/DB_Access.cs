@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
+using System.Text.RegularExpressions;
 //+updated text adjust
 
 namespace BazosBot
@@ -86,10 +87,10 @@ namespace BazosBot
                   }
                }
             }
-            if (!actualDBList.Any(p => p.url == item.url)) //insert new offer, exception: category goes from Another CategoryNameUrl - now url set to not unique;
+            if (!actualDBList.Any(p => p.url == item.url)) //insert new offer, exception: category goes from Another CategoryURL - now url set to not unique;
             {
                string cmd = $"INSERT INTO BazosOffers " +
-                  $"(Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, URL, CategoryNameUrlID, LastChecked) VALUES " +
+                  $"(Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, URL, CategoryURL, LastChecked) VALUES " +
                   $"(@nadpis, @popis, @datum, @cena, @lokace, @psc, @viewed, @url, @urlNameID, '{DateTime.Now}');"; //WHERE NOT EXISTS (SELECT Nadpis FROM BazosOffers WHERE URL = @url);";
                SqlCommand command = new SqlCommand(cmd, connection);
                command.Parameters.AddWithValue("@nadpis", item.nadpis);
@@ -123,7 +124,7 @@ namespace BazosBot
       {
          List<BazosOffers> listOffers = new List<BazosOffers>();
          SqlConnection conn = new SqlConnection(connString);
-         string cmdText = $"SELECT * FROM BazosOffers WHERE CategoryNameUrlID = '{urlNameID}';";
+         string cmdText = $"SELECT * FROM BazosOffers WHERE CategoryURL = '{urlNameID}';";
          SqlCommand cmd = new SqlCommand(cmdText, conn);
          conn.Open();
          SqlDataReader reader = cmd.ExecuteReader();
@@ -143,13 +144,13 @@ namespace BazosBot
       {
          List<string> listOfferCategoryURL = new List<string>();
          SqlConnection conn = new SqlConnection(connString);
-         string cmdText = $"SELECT DISTINCT CategoryNameUrlID FROM BazosOffers;";
+         string cmdText = $"SELECT DISTINCT CategoryURL FROM BazosOffers;";
          SqlCommand cmd = new SqlCommand(cmdText, conn);
          conn.Open();
          SqlDataReader reader = cmd.ExecuteReader();
          while (reader.Read())
          {
-            listOfferCategoryURL.Add((string)reader["CategoryNameUrlID"]);
+            listOfferCategoryURL.Add((string)reader["CategoryURL"]);
          }
          conn.Close();
          return listOfferCategoryURL;
@@ -167,7 +168,7 @@ namespace BazosBot
          nabCena = string.Empty;
 
          SqlConnection connection = new SqlConnection(connString);
-         string selectCmdText = $"SELECT Cena FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
+         string selectCmdText = $"SELECT Cena FROM BazosOffers WHERE CategoryURL = '{categoryUrl}' AND URL = '{url}';";
          SqlCommand cmd = new SqlCommand(selectCmdText, connection);
          connection.Open();
          SqlDataReader reader = cmd.ExecuteReader();
@@ -178,7 +179,7 @@ namespace BazosBot
          }
          connection.Close();
 
-         selectCmdText = $"SELECT Nadpis FROM BazosOffers WHERE CategoryNameUrlID = '{categoryUrl}' AND URL = '{url}';";
+         selectCmdText = $"SELECT Nadpis FROM BazosOffers WHERE CategoryURL = '{categoryUrl}' AND URL = '{url}';";
          cmd = new SqlCommand(selectCmdText, connection);
          connection.Open();
          reader = cmd.ExecuteReader();
@@ -221,13 +222,13 @@ namespace BazosBot
          List<string> updateCmdTextList = new List<string>();
          string[] updateCmdTexts = new string[]
                {  // optimalize - create view of table or object comparison (?)
-               $"UPDATE BazosOffers SET Nadpis = '{item.nadpis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Nadpis != '{item.nadpis}'",
-               $"UPDATE BazosOffers SET Cena = '{item.cena}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Cena != '{item.cena}'",
-               $"UPDATE BazosOffers SET Popis = '{item.popis}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Popis != '{item.popis}'",
-               $"UPDATE BazosOffers SET Datum = '{item.datum}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Datum != '{item.datum}'",
+               $"UPDATE BazosOffers SET Nadpis = '{item.nadpis}' WHERE CategoryURL = '{urlNameID}' AND URL = '{item.url}' AND Nadpis != '{item.nadpis}'",
+               $"UPDATE BazosOffers SET Cena = '{item.cena}' WHERE CategoryURL = '{urlNameID}' AND URL = '{item.url}' AND Cena != '{item.cena}'",
+               $"UPDATE BazosOffers SET Popis = '{item.popis}' WHERE CategoryURL = '{urlNameID}' AND URL = '{item.url}' AND Popis != '{item.popis}'",
+               $"UPDATE BazosOffers SET Datum = '{item.datum}' WHERE CategoryURL = '{urlNameID}' AND URL = '{item.url}' AND Datum != '{item.datum}'",
                $"UPDATE BazosOffers SET Lokace = '{item.lokace}', PSC = '{item.psc}' WHERE URL = '{item.url}' AND Lokace != '{item.lokace}'",
-               $"UPDATE BazosOffers SET Viewed = '{item.viewed}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND Viewed != '{item.viewed}'",
-               $"UPDATE BazosOffers SET LastChecked = '{DateTime.Now}' WHERE CategoryNameUrlID = '{urlNameID}' AND URL = '{item.url}' AND LastChecked != '{item.lastChecked}'",
+               $"UPDATE BazosOffers SET Viewed = '{item.viewed}' WHERE CategoryURL = '{urlNameID}' AND URL = '{item.url}' AND Viewed != '{item.viewed}'",
+               $"UPDATE BazosOffers SET LastChecked = '{DateTime.Now}' WHERE CategoryURL = '{urlNameID}' AND URL = '{item.url}' AND LastChecked != '{item.lastChecked}'",
                };
          string updateCmdTextToSplit = !notUpdateViewedAndLastChecked ? $"{updateCmdTexts[6]};" : string.Empty;
          updateCmdTextToSplit = dbItem.nadpis != item.nadpis ? $"nadpis:{TextAdjust.RemoveSemicolons(updateCmdTexts[0])};{updateCmdTextToSplit}" : updateCmdTextToSplit;
@@ -244,6 +245,56 @@ namespace BazosBot
          return updateCmdTextList;
       }
 
+      /// <summary>
+      /// Return true when some item is in table.
+      /// </summary>
+      public static bool DbTableContainsItem(string tableName)
+      {
+         SqlConnection connection = new SqlConnection(Settings.DBconnString);
+         string cmdText = $"SELECT * FROM {tableName}";
+         SqlCommand cmd = new SqlCommand(cmdText, connection);
+         connection.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+            connection.Close();
+            return true;
+         }
+         connection.Close();
+         return false;
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static void LoadSettings(out bool quickfilterHelp)
+      {
+         SqlConnection connection = new SqlConnection(Settings.DBconnString);
+         string cmdText = $"SELECT * FROM Settings;";
+         SqlCommand cmd = new SqlCommand(cmdText, connection);
+         connection.Open();
+         SqlDataReader reader = cmd.ExecuteReader();
+         while (reader.Read())
+         {
+            quickfilterHelp = (bool)reader["QuickFilterHelpButton"];
+            connection.Close();
+            return;
+         }
+         quickfilterHelp = true;
+         connection.Close();
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      public static void SaveSettings(bool quickfilterHelpButton)
+      {
+         bool notEmptyTable = DbTableContainsItem("Settings");
+         int quickfilterHelpBtn = quickfilterHelpButton ? 1 : 0;
+         string cmd = notEmptyTable ? $"UPDATE Settings SET QuickFilterHelpButton = '{quickfilterHelpBtn}';" : $"INSERT INTO Settings VALUES ('{quickfilterHelpBtn}');";
+         ExecuteNonQuery(cmd);
+      }
+
       #region Deleted offers
       /// <summary>
       /// Check if offer is deleted from offers category.
@@ -251,7 +302,7 @@ namespace BazosBot
       /// <param name="connection"></param>
       private static void CheckDeletedOffers(SqlConnection connection)
       {
-         string selectCmdText = $"SELECT * FROM BazosOffers WHERE CategoryNameUrlID = '{BazosOffers.actualCategoryURL}';";
+         string selectCmdText = $"SELECT * FROM BazosOffers WHERE CategoryURL = '{BazosOffers.actualCategoryURL}';";
          SqlCommand selectCommand = new SqlCommand(selectCmdText, connection);
          connection.Open();
          //List<BazosOffers> actualList = BazosOffers.ListBazosOffers;
@@ -274,14 +325,14 @@ namespace BazosBot
       /// </summary>
       /// <param name="url"></param>
       /// <param name="connection"></param>
-      private static void UpdateDeletedOffers(List<string> urls, SqlConnection connection, string categoryNameURL)
+      private static void UpdateDeletedOffers(List<string> urls, SqlConnection connection, string CategoryURL)
       {
-         List<BazosOffers> DBlist = ListActualOffersInDB(categoryNameURL);
+         List<BazosOffers> DBlist = ListActualOffersInDB(CategoryURL);
          foreach (string url in urls)
          {
             string insertCmdText = $"INSERT INTO BazosDeletedOffers " +
-            $"(Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, LastViewed, CategoryNameUrlID, EndedDateTimeGetted) SELECT " +
-            $"Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, LastChecked, CategoryNameUrlID, '{DateTime.Now}' FROM BazosOffers WHERE URL='{url}';";
+            $"(Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, LastViewed, CategoryURL, EndedDateTimeGetted) SELECT " +
+            $"Nadpis, Popis, Datum, Cena, Lokace, PSC, Viewed, LastChecked, CategoryURL, '{DateTime.Now}' FROM BazosOffers WHERE URL='{url}';";
             string deleteCmdText = $"DELETE FROM BazosOffers WHERE URL='{url}'";
             SqlCommand cmdInsertToEnded = new SqlCommand(insertCmdText, connection);
             SqlCommand cmdDeleteFromOffers = new SqlCommand(deleteCmdText, connection);
@@ -312,8 +363,8 @@ namespace BazosBot
       /// <param name="categoryUrlID"></param>
       public static void DeleteOffersCategoryFromDB(string categoryUrlID)
       {
-         string deleteOffers = $"DELETE FROM BazosOffers WHERE CategoryNameUrlID='{categoryUrlID}'";
-         string deleteQuickFilters = $"DELETE FROM BazosQuickFilter WHERE CategoryNameUrlID='{categoryUrlID}'";
+         string deleteOffers = $"DELETE FROM BazosOffers WHERE CategoryURL='{categoryUrlID}'";
+         string deleteQuickFilters = $"DELETE FROM BazosQuickFilter WHERE CategoryURL='{categoryUrlID}'";
          ExecuteNonQuery(deleteOffers);
          ExecuteNonQuery(deleteQuickFilters);
       }
@@ -363,6 +414,54 @@ namespace BazosBot
       //}
 
       #endregion
+
+      /// <summary>
+      /// Return highest ID from table.
+      /// </summary>
+      /// <returns></returns>
+      public static int FreeID(string categoryUrl, string tableName, string name, string tableFilterName = "FilterName")
+      {
+         List<int> IDlist = new List<int>();
+         if (DbTableContainsItem(tableName))
+         {
+            SqlConnection connection = new SqlConnection(Settings.DBconnString);
+            string cmdText = $"SELECT FilterName FROM {tableName} WHERE CategoryURL = '{categoryUrl}';";
+            SqlCommand cmd = new SqlCommand(cmdText, connection);
+            connection.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+               string filterName = (string)reader[tableFilterName];
+               if (filterName.Substring(0, 2).Contains(name))
+               {
+                  IDlist.Add(Convert.ToInt32(Regex.Match(filterName, @"\d+").ToString()));
+               }
+            }
+            connection.Close();
+         }
+         return PossibleFreeID(IDlist);
+      }
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <returns></returns>
+      private static int PossibleFreeID(List<int> IDlist)
+      {
+         int maxValue = IDlist.Count > 0 && IDlist.Max() >= 1 ? IDlist.Max() : 1;
+         if (maxValue >= 1)
+         {
+            for (int i = 1; i <= maxValue + 1; i++)
+            {
+               if (!IDlist.Contains(i))
+               {
+                  return i;
+               }
+            }
+         }
+         return maxValue;
+      }
+
 
       #region Filter
       //used in clickable UI
