@@ -19,13 +19,15 @@ namespace BazosBot
       public string nadpis { get; set; }
       public string popis { get; set; }
       public int maxCena { get; set; }
+      public int minCena { get; set; }
       public bool FullNadpisName { get; set; }
-      public QuickFilter(string name, string nadpis, string popis, int maxCena, bool fullNadpisName)
+      public QuickFilter(string name, string nadpis, string popis, int minCena, int maxCena, bool fullNadpisName)
       {
          this.name = name;
          this.nadpis = nadpis;
          this.popis = popis;
          this.maxCena = maxCena;
+         this.minCena = minCena;
          this.FullNadpisName = fullNadpisName;
          //QuickFilterList.Add(this);
       }
@@ -43,6 +45,10 @@ namespace BazosBot
          filterSplit[0] = filterSplit[0].Replace($"{name}:", string.Empty);
          foreach (string item in filterSplit)
          {
+            if (string.IsNullOrEmpty(item))
+            {
+               continue;
+            }
             //split name from max price:
             string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0];
             //nadpis:
@@ -50,6 +56,7 @@ namespace BazosBot
             nadpis = TextAdjust.RemoveDiacritics(nadpis);
             string popis = string.Empty;
             int maxCena = 0;
+            int minCena = 0;
             //full nadpis name:
             bool fullNadpisName = item.Contains("!") ? true : false;
             //blacklist:
@@ -57,6 +64,24 @@ namespace BazosBot
             {
                string it = TextAdjust.RemoveDiacritics(item.Replace(".", string.Empty));
                blackListNadpisList.Add(it);
+            }
+            if (item.Substring(0, 1).Contains("/"))
+            {
+               string blacklistSet = BlacklistSet.DictActualBlacklistSet[BazosOffers.actualCategoryURL].FirstOrDefault(p => p.Split(":")[0] == item.Remove(0, 1));
+               if (string.IsNullOrEmpty(blacklistSet))
+               {
+                  continue;
+               }
+               string[] blacklistSetSplit = blacklistSet.Split(":")[1].Split(";");
+               foreach (string i in blacklistSetSplit)
+               { 
+                  if (string.IsNullOrWhiteSpace(i) || i == string.Empty)
+                  {
+                     continue;
+                  }
+                  string it = TextAdjust.RemoveDiacritics(i.Replace(".", string.Empty)).Trim();
+                  blackListNadpisList.Add(it);
+               }
             }
             //popis:
             if (item.Contains("?"))
@@ -68,11 +93,16 @@ namespace BazosBot
             //maxcena:
             if (item.Contains("<"))
             {
-               //mincena later, ... ;
                int cena = int.Parse(Regex.Match(item.Split("<")[1], @"\d+").ToString());
                maxCena = item.Contains("=") ? cena : cena - 1;
             }
-            QuickFilter qf = new QuickFilter(name, nadpis, popis, maxCena, fullNadpisName);
+            //mincena:
+            if (item.Contains(">"))
+            {
+               int cena = int.Parse(Regex.Match(item.Split(">")[1], @"\d+").ToString());
+               minCena = item.Contains("=") ? cena : cena + 1;
+            }
+            QuickFilter qf = new QuickFilter(name, nadpis, popis, minCena, maxCena, fullNadpisName);
             if (nadpis != string.Empty && !blackListNadpisList.Contains(nadpis) && !QuickFilterList.Contains(qf)) //add quick filter to list
             {
                QuickFilterList.Add(qf);
@@ -213,7 +243,7 @@ namespace BazosBot
             string filterName = (string)reader["FilterName"];
             string filterString = (string)reader["FilterString"];
             //QuickFilter qf;
-            GetQuickFiltersFromTextbox(filterString);//, out qf); //and add it to list
+            //GetQuickFiltersFromTextbox(filterString);//, out qf); //and add it to list
             listQuickFilters.Add($"{filterName}: {filterString}");
          }
          conn.Close();

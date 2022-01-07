@@ -33,7 +33,7 @@ namespace BazosBot
          System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
          this.btnGetBazos = new System.Windows.Forms.Button();
          this.resultLbox = new System.Windows.Forms.ListBox();
-         this.label1 = new System.Windows.Forms.Label();
+         this.lbBaseUrl = new System.Windows.Forms.Label();
          this.offerLbox = new System.Windows.Forms.ListBox();
          this.tbSearchUrl = new System.Windows.Forms.TextBox();
          this.panelMain = new System.Windows.Forms.Panel();
@@ -63,7 +63,6 @@ namespace BazosBot
          this.tbQuickFilter = new System.Windows.Forms.TextBox();
          this.cmbSelectOffersType = new System.Windows.Forms.ComboBox();
          this.cmbSelectOffers = new System.Windows.Forms.ComboBox();
-         this.textBox9 = new System.Windows.Forms.TextBox();
          this.lbBotRunning = new System.Windows.Forms.Label();
          this.panelAutoBot = new System.Windows.Forms.Panel();
          this.cboxHideToTray = new System.Windows.Forms.CheckBox();
@@ -92,7 +91,6 @@ namespace BazosBot
          this.btnAddQuickFilterBot = new System.Windows.Forms.Button();
          this.btnSelectPanel = new System.Windows.Forms.Button();
          this.cmbSelectPanel = new System.Windows.Forms.ComboBox();
-         this.textBox2 = new System.Windows.Forms.TextBox();
          this.lboxBlacklistSet = new System.Windows.Forms.ListBox();
          this.lbUpdatedCount = new System.Windows.Forms.Label();
          this.lbDeletedCount = new System.Windows.Forms.Label();
@@ -131,14 +129,14 @@ namespace BazosBot
          this.resultLbox.SelectedIndexChanged += new System.EventHandler(this.resultLbox_SelectedIndexChanged);
          this.resultLbox.DoubleClick += new System.EventHandler(this.resultLbox_DoubleClick);
          // 
-         // label1
+         // lbBaseUrl
          // 
-         this.label1.AutoSize = true;
-         this.label1.Location = new System.Drawing.Point(38, 95);
-         this.label1.Name = "label1";
-         this.label1.Size = new System.Drawing.Size(51, 15);
-         this.label1.TabIndex = 1;
-         this.label1.Text = "base url:";
+         this.lbBaseUrl.AutoSize = true;
+         this.lbBaseUrl.Location = new System.Drawing.Point(38, 95);
+         this.lbBaseUrl.Name = "lbBaseUrl";
+         this.lbBaseUrl.Size = new System.Drawing.Size(51, 15);
+         this.lbBaseUrl.TabIndex = 1;
+         this.lbBaseUrl.Text = "base url:";
          // 
          // offerLbox
          // 
@@ -179,11 +177,10 @@ namespace BazosBot
          this.panelMain.Controls.Add(this.tbQuickFilter);
          this.panelMain.Controls.Add(this.cmbSelectOffersType);
          this.panelMain.Controls.Add(this.cmbSelectOffers);
-         this.panelMain.Controls.Add(this.textBox9);
          this.panelMain.Controls.Add(this.tbSearchUrl);
          this.panelMain.Controls.Add(this.offerLbox);
          this.panelMain.Controls.Add(this.resultLbox);
-         this.panelMain.Controls.Add(this.label1);
+         this.panelMain.Controls.Add(this.lbBaseUrl);
          this.panelMain.Controls.Add(this.btnGetBazos);
          this.panelMain.Location = new System.Drawing.Point(17, 48);
          this.panelMain.Name = "panelMain";
@@ -207,9 +204,10 @@ namespace BazosBot
          this.cmbSelectBlacklistSet.FormattingEnabled = true;
          this.cmbSelectBlacklistSet.Location = new System.Drawing.Point(572, 62);
          this.cmbSelectBlacklistSet.Name = "cmbSelectBlacklistSet";
-         this.cmbSelectBlacklistSet.Size = new System.Drawing.Size(419, 23);
+         this.cmbSelectBlacklistSet.Size = new System.Drawing.Size(225, 23);
          this.cmbSelectBlacklistSet.TabIndex = 36;
          this.cmbSelectBlacklistSet.SelectedIndexChanged += new System.EventHandler(this.cmbSelectBlacklistSet_SelectedIndexChanged);
+         this.cmbSelectBlacklistSet.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectBlacklistSet_KeyDown);
          // 
          // btnCreateBlacklistSet
          // 
@@ -236,6 +234,7 @@ namespace BazosBot
          this.tbBlackListSet.Name = "tbBlackListSet";
          this.tbBlackListSet.Size = new System.Drawing.Size(315, 23);
          this.tbBlackListSet.TabIndex = 33;
+         this.tbBlackListSet.TextChanged += new System.EventHandler(this.tbBlackListSet_TextChanged);
          // 
          // updatesPanel
          // 
@@ -386,7 +385,7 @@ namespace BazosBot
          this.cmbSelectQuickFilter.FormattingEnabled = true;
          this.cmbSelectQuickFilter.Location = new System.Drawing.Point(572, 33);
          this.cmbSelectQuickFilter.Name = "cmbSelectQuickFilter";
-         this.cmbSelectQuickFilter.Size = new System.Drawing.Size(225, 23);
+         this.cmbSelectQuickFilter.Size = new System.Drawing.Size(419, 23);
          this.cmbSelectQuickFilter.TabIndex = 18;
          this.cmbSelectQuickFilter.SelectedIndexChanged += new System.EventHandler(this.cmbSelectQuickFilter_SelectedIndexChanged);
          this.cmbSelectQuickFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectQuickFilter_KeyDown);
@@ -395,7 +394,7 @@ namespace BazosBot
          // 
          this.lbLokace.AutoSize = true;
          this.lbLokace.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-         this.lbLokace.Location = new System.Drawing.Point(803, 33);
+         this.lbLokace.Location = new System.Drawing.Point(803, 62);
          this.lbLokace.Name = "lbLokace";
          this.lbLokace.Size = new System.Drawing.Size(57, 21);
          this.lbLokace.TabIndex = 17;
@@ -423,7 +422,7 @@ namespace BazosBot
          // 
          // tbLokalita
          // 
-         this.tbLokalita.Location = new System.Drawing.Point(866, 33);
+         this.tbLokalita.Location = new System.Drawing.Point(866, 62);
          this.tbLokalita.Name = "tbLokalita";
          this.tbLokalita.Size = new System.Drawing.Size(125, 23);
          this.tbLokalita.TabIndex = 14;
@@ -449,9 +448,9 @@ namespace BazosBot
          // 
          this.cmbSelectOffersType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbSelectOffersType.FormattingEnabled = true;
-         this.cmbSelectOffersType.Location = new System.Drawing.Point(496, 92);
+         this.cmbSelectOffersType.Location = new System.Drawing.Point(491, 92);
          this.cmbSelectOffersType.Name = "cmbSelectOffersType";
-         this.cmbSelectOffersType.Size = new System.Drawing.Size(159, 23);
+         this.cmbSelectOffersType.Size = new System.Drawing.Size(164, 23);
          this.cmbSelectOffersType.TabIndex = 10;
          this.cmbSelectOffersType.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffersType_SelectedIndexChanged);
          // 
@@ -459,19 +458,12 @@ namespace BazosBot
          // 
          this.cmbSelectOffers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
          this.cmbSelectOffers.FormattingEnabled = true;
-         this.cmbSelectOffers.Location = new System.Drawing.Point(670, 92);
+         this.cmbSelectOffers.Location = new System.Drawing.Point(661, 92);
          this.cmbSelectOffers.Name = "cmbSelectOffers";
-         this.cmbSelectOffers.Size = new System.Drawing.Size(321, 23);
+         this.cmbSelectOffers.Size = new System.Drawing.Size(330, 23);
          this.cmbSelectOffers.TabIndex = 9;
          this.cmbSelectOffers.SelectedIndexChanged += new System.EventHandler(this.cmbSelectOffers_SelectedIndexChanged);
          this.cmbSelectOffers.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbSelectOffers_KeyDown);
-         // 
-         // textBox9
-         // 
-         this.textBox9.Location = new System.Drawing.Point(223, -22);
-         this.textBox9.Name = "textBox9";
-         this.textBox9.Size = new System.Drawing.Size(187, 23);
-         this.textBox9.TabIndex = 3;
          // 
          // lbBotRunning
          // 
@@ -797,13 +789,6 @@ namespace BazosBot
          this.cmbSelectPanel.TabIndex = 7;
          this.cmbSelectPanel.SelectedIndexChanged += new System.EventHandler(this.cmbSelectPanel_SelectedIndexChanged);
          // 
-         // textBox2
-         // 
-         this.textBox2.Location = new System.Drawing.Point(0, 0);
-         this.textBox2.Name = "textBox2";
-         this.textBox2.Size = new System.Drawing.Size(100, 23);
-         this.textBox2.TabIndex = 0;
-         // 
          // lboxBlacklistSet
          // 
          this.lboxBlacklistSet.Location = new System.Drawing.Point(0, 0);
@@ -924,16 +909,15 @@ namespace BazosBot
 
       private System.Windows.Forms.Button btnGetBazos;
       private System.Windows.Forms.ListBox resultLbox;
-      private System.Windows.Forms.Label label1;
+      private System.Windows.Forms.Label lbBaseUrl;
       private System.Windows.Forms.ListBox offerLbox;
       private System.Windows.Forms.TextBox tbSearchUrl;
       private System.Windows.Forms.Panel panelMain;
       private System.Windows.Forms.Button btnSelectPanel;
       private System.Windows.Forms.ComboBox cmbSelectPanel;
-      private System.Windows.Forms.TextBox tbMaxCena;
-      private System.Windows.Forms.TextBox textBox2;
+      //private System.Windows.Forms.TextBox textBox2;
       private System.Windows.Forms.ComboBox cmbSelectOffers;
-      private System.Windows.Forms.TextBox textBox9;
+      //private System.Windows.Forms.TextBox textBox9;
       private System.Windows.Forms.ListBox lboxBlacklistSet;
       private System.Windows.Forms.ComboBox cmbSelectOffersType;
       private System.Windows.Forms.Label lbUpdatedCount;

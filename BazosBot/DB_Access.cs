@@ -425,14 +425,15 @@ namespace BazosBot
          if (DbTableContainsItem(tableName))
          {
             SqlConnection connection = new SqlConnection(Settings.DBconnString);
-            string cmdText = $"SELECT FilterName FROM {tableName} WHERE CategoryURL = '{categoryUrl}';";
+            string cmdText = $"SELECT {tableFilterName} FROM {tableName} WHERE CategoryURL = '{categoryUrl}';";
             SqlCommand cmd = new SqlCommand(cmdText, connection);
             connection.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                string filterName = (string)reader[tableFilterName];
-               if (filterName.Substring(0, 2).Contains(name))
+               int lenght = filterName.Length < 10 ? filterName.Length : 10;
+               if (filterName.Substring(0, lenght).Contains(name))
                {
                   IDlist.Add(Convert.ToInt32(Regex.Match(filterName, @"\d+").ToString()));
                }
