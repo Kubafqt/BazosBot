@@ -54,7 +54,7 @@ namespace BazosBot
       };
 
       /// <summary>
-      /// Main method to get all offers.
+      /// Main method to get all offers from bazos section.
       /// </summary>
       public static bool GetOffersFromPage(string html, string defUrl, int containerLineNumber, bool getOnlyNewOffers)
       {
@@ -62,37 +62,61 @@ namespace BazosBot
          htmlSplit.RemoveRange(0, containerLineNumber);
          defUrl = defUrl.Substring(0, defUrl.LastIndexOf(".") + 3); //.cz, .sk
          int lineNumber = 0;
+         bool urlNewDate = false;
+         string nabCena = string.Empty;
+         bool top = false;
          foreach (string line in htmlSplit)
          {
-            if(line.Contains("class=nadpis")) //nadpis, url, datum
-            {   
+            if (line.Contains("class=nadpis")) //nadpis, url, datum
+            {
                DictNameValue["url"] = GetOfferUrl(line, defUrl);
-               DictNameValue["nadpis"] = GetNadpis(line);
+               DictNameValue["nadpis"] = GetNadpis(line, out top);
                DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
-               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], DictNameValue["datum"], actualCategoryURL))
+               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryURL, out urlNewDate, out nabCena) && !top)
                {
                   return true; //only new offers
                }
+               //continue;
             }
             if (line.Contains("class=popis")) //popis
             {
                DictNameValue["popis"] = GetOfferPopis(htmlSplit, line, lineNumber);
+               //continue;
             }
             if (line.Contains("class=\"inzeratycena\"")) //cena - kč, dohodou, nabídněte, v textu, ...
             {
-               DictNameValue["cena"] = GetCena(line); 
+               DictNameValue["cena"] = GetCena(line);
+               if (urlNewDate) //not get new offer is same price on only new date on existing url
+               {
+                  urlNewDate = false;
+                  if (nabCena == DictNameValue["cena"]) //new date, but same price - not new offer
+                  {
+                     nabCena = string.Empty;
+                     continue;
+                  }
+                  nabCena = string.Empty;
+               }
+               //continue;
             }
             if (line.Contains("class=\"inzeratylok\"")) //lokace, psč
+
             {
                int startIndex = line.IndexOf("\">") + 2;
                string[] subStrSplit = line.Substring(startIndex).Split("<");
                DictNameValue["lokace"] = subStrSplit[0];
                DictNameValue["psc"] = subStrSplit[1].Replace("br>", string.Empty);
+               //continue;
             }
             if (line.Contains("class=\"inzeratyview\"")) //viewed count
             {
                DictNameValue["viewed"] = Regex.Match(line, @"\d+").ToString();
+               if (getOnlyNewOffers && top)
+               {
+                  ResetStaticVariables();
+                  continue;
+               }
                OfferDictionaryToObjectList(); //last line - viewed count
+               ResetStaticVariables();
             }
             lineNumber++;
          }
@@ -128,10 +152,10 @@ namespace BazosBot
                {
                   popis += "\n" + htmlSplit[i].Split("<")[0];
                   return popis;
-               }                     
+               }
             }
          }
-         return string.Empty;
+         //return string.Empty;
       }
 
       /// <summary>
@@ -139,10 +163,11 @@ namespace BazosBot
       /// </summary>
       /// <param name="line"></param>
       /// <returns></returns>
-      private static string GetNadpis(string line)
+      private static string GetNadpis(string line, out bool top)
       {
          int startIndex = line.IndexOf("\">") + 2;
          int endIndex = line.Contains("</a>") ? line.IndexOf("</a>") : line.Length; //GetUrlClosingLine(index, htmlSplit);
+         top = line.Contains("class=\"ztop\"") ? true : false;
          return line.Substring(startIndex, endIndex - startIndex);
       }
 
@@ -172,7 +197,7 @@ namespace BazosBot
             int dateStartIndex = line.LastIndexOf("[") + 1;
             int dateEndIndex = line.LastIndexOf("]</span>");
             return line.Substring(dateStartIndex, line.Length - dateStartIndex - (line.Length - dateEndIndex)).Replace(" ", string.Empty);
-          }
+         }
          else
          {
             line = GetUrlClosingLine(index, htmlSplit);
@@ -226,7 +251,7 @@ namespace BazosBot
             DictNameValue[kvp.Key] = TextAdjust.PrepareToCommand(kvp.Value);
          }
          ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"], DateTime.Now.ToString()));
-         ResetStaticVariables();
+         //ResetStaticVariables();
       }
 
       /// <summary>
