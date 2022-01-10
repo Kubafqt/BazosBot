@@ -364,26 +364,21 @@ namespace BazosBot
 
       private void resultLbox_DoubleClick(object sender, EventArgs e)
       {
-         openResultLboxUrl();
-      }
-
-      private void resultLbox_KeyDown(object sender, KeyEventArgs e)
-      {
-         if (e.KeyCode == Keys.Enter)
-         {
-            openResultLboxUrl();
-         }
-      }
-
-      private void openResultLboxUrl()
-      {
          if (resultLbox.SelectedIndex >= 0)
          {
             List<BazosOffers> actualList = !Regex.IsMatch(cmbSelectOffersType.Text, "deleted", RegexOptions.IgnoreCase) ? BazosOffers.ListBazosOffers : DB_Access.deletedList;
             BazosOffers item = actualList.FirstOrDefault(of => of.nadpis == Regex.Replace(resultLbox.SelectedItem.ToString().Split(')', 2)[1], @"\sfor\s", ";").Split(";")[0].Trim());
-            Browsers.StartBrowser(item.url);
+            string url = item.url;
+            Process process = new Process();
+            process.StartInfo = new ProcessStartInfo()
+            {
+               FileName = Environment.GetEnvironmentVariable("ProgramFiles") + @"\Google\Chrome\Application\chrome.exe",
+               Arguments = url
+            };
+            process.Start();
          }
       }
+
       #endregion
 
       #region offers control
@@ -392,24 +387,16 @@ namespace BazosBot
       /// </summary>
       private void offerLbox_DoubleClick(object sender, EventArgs e)
       {
-         openOfferLboxUrl();
-      }
-
-      private void offerLbox_KeyDown(object sender, KeyEventArgs e)
-      {
-         if (e.KeyCode == Keys.Enter)
+         if (offerLbox.SelectedIndex >= 0 && offerLbox.SelectedItem.ToString().Contains("url:"))
          {
-            openOfferLboxUrl();
-         }
-      }
-
-      private void openOfferLboxUrl()
-      {
-         if (offerLbox.Items.Count >= 0)
-         {
-            List<string> items = new List<string>(offerLbox.Items.Cast<string>());
-            string url = items.First(p => p.Contains("url:")).Replace("url:", string.Empty).Trim();
-            Browsers.StartBrowser(url);
+            string url = offerLbox.SelectedItem.ToString().Replace("url:", string.Empty).Trim();
+            Process process = new Process();
+            process.StartInfo = new ProcessStartInfo()
+            {
+               FileName = Environment.GetEnvironmentVariable("ProgramFiles") + @"\Google\Chrome\Application\chrome.exe",
+               Arguments = url
+            };
+            process.Start();
          }
       }
 
@@ -423,6 +410,7 @@ namespace BazosBot
       //   { "updated" , DB_Access.updatedList },
       //   { "deleted" , DB_Access.deletedList }
       //};
+
       string lastSelectedOfferType;
       private void cmbSelectOffersType_SelectedIndexChanged(object sender, EventArgs e)
       {
@@ -609,12 +597,9 @@ namespace BazosBot
          cmbSelectQuickFilter.Items.Clear();
          cmbSelectBlacklistSet.Items.Clear();
          if (!actualCategoryUrl.Contains("multicategory", StringComparison.OrdinalIgnoreCase))
-         {
+         { 
             cmbSelectQuickFilter.Items.Add("none");
-            if (QuickFilter.DictActualQuickFilters.ContainsKey(actualCategoryUrl))
-            {
-               cmbSelectQuickFilter.Items.AddRange(QuickFilter.DictActualQuickFilters[actualCategoryUrl].ToArray());
-            }
+            cmbSelectQuickFilter.Items.AddRange(QuickFilter.DictActualQuickFilters[actualCategoryUrl].ToArray());
             cmbSelectQuickFilter.SelectedIndex = 0;
             string quickFilterName = tbQuickFilter.Text.Contains(":") ? tbQuickFilter.Text.Split(new[] { ':' }, 2)[0] : string.Empty;
             List<string> selectQuickFilterList = new List<string>();
@@ -629,10 +614,7 @@ namespace BazosBot
             btnCreateQuickFilter.Text = selectQuickFilterList.Count > 0 && selectQuickFilterList.Any(p => p.Split(":")[0] == quickFilterName) ? "edit" : "create";
             //blacklist set:
             cmbSelectBlacklistSet.Items.Add("none");
-            if (BlacklistSet.DictActualBlacklistSet.ContainsKey(actualCategoryUrl))
-            {
-               cmbSelectBlacklistSet.Items.AddRange(BlacklistSet.DictActualBlacklistSet[actualCategoryUrl].ToArray());
-            }
+            cmbSelectBlacklistSet.Items.AddRange(BlacklistSet.DictActualBlacklistSet[actualCategoryUrl].ToArray());
             cmbSelectBlacklistSet.SelectedIndex = 0;
             string blacklistSetName = tbQuickFilter.Text.Contains(":") ? tbQuickFilter.Text.Split(new[] { ':' }, 2)[0] : string.Empty;
             List<string> selectBlacklistSetList = new List<string>();
