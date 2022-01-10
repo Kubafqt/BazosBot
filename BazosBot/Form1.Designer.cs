@@ -128,6 +128,7 @@ namespace BazosBot
          this.resultLbox.TabIndex = 3;
          this.resultLbox.SelectedIndexChanged += new System.EventHandler(this.resultLbox_SelectedIndexChanged);
          this.resultLbox.DoubleClick += new System.EventHandler(this.resultLbox_DoubleClick);
+         this.resultLbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.resultLbox_KeyDown);
          // 
          // lbBaseUrl
          // 
@@ -147,6 +148,7 @@ namespace BazosBot
          this.offerLbox.Size = new System.Drawing.Size(244, 274);
          this.offerLbox.TabIndex = 4;
          this.offerLbox.DoubleClick += new System.EventHandler(this.offerLbox_DoubleClick);
+         this.offerLbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.offerLbox_KeyDown);
          // 
          // tbSearchUrl
          // 

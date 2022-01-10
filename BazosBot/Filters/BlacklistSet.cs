@@ -11,8 +11,6 @@ namespace BazosBot
    class BlacklistSet
    {
 
-      //public static List<QuickFilter> QuickFilterList = new List<QuickFilter>();
-      //public static List<string> BlacklistSetTextList = new List<string>(); 
       public static Dictionary<string, List<string>> DictActualBlacklistSet = DictActualBlacklistSetInDB();
 
       public string name { get; set; }
