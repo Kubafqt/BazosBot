@@ -50,7 +50,7 @@ namespace BazosBot
                continue;
             }
             //split name from max price:
-            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>' }, StringSplitOptions.RemoveEmptyEntries) : new string[0];
+            string[] ndpsSplit = item.Contains("<") || item.Contains(">") ? item.Split(new char[] { '<', '>', '/', '.' }, StringSplitOptions.RemoveEmptyEntries) : new string[0];
             //nadpis:
             string nadpis = ndpsSplit.Length == 0 ? Regex.Match(item, @"[0-9]+|[A-Z]+", RegexOptions.IgnoreCase).ToString() : Regex.Match(ndpsSplit[0], @"[0-9]+|[A-Z]+").ToString();
             nadpis = TextAdjust.RemoveDiacritics(nadpis);
