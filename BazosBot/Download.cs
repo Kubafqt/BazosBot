@@ -105,7 +105,7 @@ namespace BazosBot
             AutoBot.LastBot.stoppedRunning = true;
          }
       }
-      
+
       /// <summary>
       /// Prepare next bazos page.
       /// </summary>
