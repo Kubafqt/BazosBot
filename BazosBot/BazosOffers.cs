@@ -4,11 +4,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace BazosBot
 {
-   class BazosOffers
+   class BazosOffers : IDisposable
    {
+      #region dispose
+      private readonly IntPtr unmanagedResource;
+      private readonly SafeHandle managedResource;
+
+      public void Dispose()
+      {
+         this.Dispose(true);
+         GC.SuppressFinalize(this);
+      }
+
+      protected virtual void Dispose(bool isManualDisposing)
+      {
+         ReleaseUnmanagedResource(unmanagedResource);
+         if (isManualDisposing)
+         {
+            ReleaseManagedResources(managedResource);
+         }
+      }
+
+      private void ReleaseManagedResources(SafeHandle safeHandle)
+      {
+         if (safeHandle != null)
+         {
+            safeHandle.Dispose();
+         }
+      }
+
+      private void ReleaseUnmanagedResource(IntPtr intPtr)
+      {
+         Marshal.FreeHGlobal(intPtr);
+      }
+      #endregion
+
       public static List<BazosOffers> ListBazosOffers = new List<BazosOffers>();
       public static string actualCategoryURL;
       public string nadpis { get; set; }
@@ -22,6 +56,12 @@ namespace BazosBot
       public string lastChecked { get; set; }
       public string changed { get; set; }
       public string endedDateTimeGetted { get; set; }
+      public BazosOffers()
+      {
+         this.changed = string.Empty;
+         this.endedDateTimeGetted = string.Empty;
+      }
+
       public BazosOffers(string nadpis, string popis, string datum, string url, string cena, int viewed, string lokace, string psc, string lastChecked)
       {
          this.nadpis = nadpis;
@@ -41,17 +81,17 @@ namespace BazosBot
       /// <summary>
       /// 
       /// </summary>
-      private static Dictionary<string, string> DictNameValue = new Dictionary<string, string>()
-      {
-         { "nadpis" , "" },
-         { "popis" , "" },
-         { "datum" , "" },
-         { "url" , "" },
-         { "cena" , "" },
-         { "viewed" , "" },
-         { "lokace" , "" },
-         { "psc" , "" }
-      };
+      //private static Dictionary<string, string> DictNameValue = new Dictionary<string, string>()
+      //{
+      //   { "nadpis" , "" },
+      //   { "popis" , "" },
+      //   { "datum" , "" },
+      //   { "url" , "" },
+      //   { "cena" , "" },
+      //   { "viewed" , "" },
+      //   { "lokace" , "" },
+      //   { "psc" , "" }
+      //};
 
       /// <summary>
       /// Main method to get all offers from bazos section.
@@ -65,58 +105,60 @@ namespace BazosBot
          bool urlNewDate = false;
          string nabCena = string.Empty;
          bool top = false;
+         BazosOffers offer = new BazosOffers();
          foreach (string line in htmlSplit)
          {
             if (line.Contains("class=nadpis")) //nadpis, url, datum
             {
-               DictNameValue["url"] = GetOfferUrl(line, defUrl);
-               DictNameValue["nadpis"] = GetNadpis(line, out top);
-               DictNameValue["datum"] = GetDate(line, lineNumber, htmlSplit);
-               if (getOnlyNewOffers && DB_Access.DBContainsUrl(DictNameValue["url"], actualCategoryURL, out urlNewDate, out nabCena) && !top)
+               /*DictNameValue["url"]*/ offer.url = GetOfferUrl(line, defUrl);
+               /*DictNameValue["nadpis"]*/ offer.nadpis = GetNadpis(line, out top);
+               /*DictNameValue["datum"]*/ offer.datum = GetDate(line, lineNumber, htmlSplit);
+               if (getOnlyNewOffers && DB_Access.DBContainsUrl(offer.url/*DictNameValue["url"]*/, actualCategoryURL, out urlNewDate, out nabCena) && !top)
                {
                   return true; //only new offers
                }
-               //continue;
             }
             if (line.Contains("class=popis")) //popis
             {
-               DictNameValue["popis"] = GetOfferPopis(htmlSplit, line, lineNumber);
-               //continue;
+               /*DictNameValue["popis"]*/ offer.popis = GetOfferPopis(htmlSplit, line, lineNumber);
             }
             if (line.Contains("class=\"inzeratycena\"")) //cena - kč, dohodou, nabídněte, v textu, ...
             {
-               DictNameValue["cena"] = GetCena(line);
+               /*DictNameValue["cena"]*/ offer.cena = GetCena(line);
                if (urlNewDate) //not get new offer is same price on only new date on existing url
                {
                   urlNewDate = false;
-                  if (nabCena == DictNameValue["cena"]) //new date, but same price - not new offer
+                  if (nabCena == offer.cena)//DictNameValue["cena"]) //new date, but same price - not new offer
                   {
                      nabCena = string.Empty;
                      continue;
                   }
                   nabCena = string.Empty;
                }
-               //continue;
             }
             if (line.Contains("class=\"inzeratylok\"")) //lokace, psč
 
             {
                int startIndex = line.IndexOf("\">") + 2;
                string[] subStrSplit = line.Substring(startIndex).Split("<");
-               DictNameValue["lokace"] = subStrSplit[0];
-               DictNameValue["psc"] = subStrSplit[1].Replace("br>", string.Empty);
-               //continue;
+               /*DictNameValue["lokace"]*/ offer.lokace = subStrSplit[0];
+               /*DictNameValue["psc"]*/ offer.psc = subStrSplit[1].Replace("br>", string.Empty);
             }
             if (line.Contains("class=\"inzeratyview\"")) //viewed count
             {
-               DictNameValue["viewed"] = Regex.Match(line, @"\d+").ToString();
+               /*DictNameValue["viewed"]*/ offer.viewed = int.Parse(Regex.Match(line, @"\d+").ToString());
                if (getOnlyNewOffers && top)
                {
-                  ResetStaticVariables();
+                  offer = new BazosOffers();
+                  //ResetStaticVariables();
                   continue;
                }
-               OfferDictionaryToObjectList(); //last line - viewed count
-               ResetStaticVariables();
+               offer.lastChecked = DateTime.Now.ToString();
+               ListBazosOffers.Add(offer);
+               offer.Dispose();
+               offer = new BazosOffers();
+               //OfferDictionaryToObjectList(); //last line - viewed count
+               //ResetStaticVariables();
             }
             lineNumber++;
          }
@@ -246,11 +288,11 @@ namespace BazosBot
       /// </summary>
       private static void OfferDictionaryToObjectList()
       {
-         foreach (var kvp in DictNameValue)
-         {
-            DictNameValue[kvp.Key] = TextAdjust.PrepareToCommand(kvp.Value);
-         }
-         ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"], DateTime.Now.ToString()));
+         //foreach (var kvp in DictNameValue)
+         //{
+         //   DictNameValue[kvp.Key] = TextAdjust.PrepareToCommand(kvp.Value);
+         //}
+         //ListBazosOffers.Add(new BazosOffers(DictNameValue["nadpis"], DictNameValue["popis"], DictNameValue["datum"], DictNameValue["url"], DictNameValue["cena"], int.Parse(DictNameValue["viewed"]), DictNameValue["lokace"], DictNameValue["psc"], DateTime.Now.ToString()));
          //ResetStaticVariables();
       }
 
@@ -259,10 +301,10 @@ namespace BazosBot
       /// </summary>
       private static void ResetStaticVariables()
       {
-         foreach (string key in DictNameValue.Keys)
-         {
-            DictNameValue[key] = string.Empty;
-         }
+         //foreach (string key in DictNameValue.Keys)
+         //{
+         //   DictNameValue[key] = string.Empty;
+         //}
       }
 
       #endregion
