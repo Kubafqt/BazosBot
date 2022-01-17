@@ -149,6 +149,7 @@ namespace BazosBot
                /*DictNameValue["viewed"]*/ offer.viewed = int.Parse(Regex.Match(line, @"\d+").ToString());
                if (getOnlyNewOffers && top)
                {
+                  offer.Dispose();
                   offer = new BazosOffers();
                   //ResetStaticVariables();
                   continue;

@@ -106,8 +106,9 @@ namespace BazosBot
             switchtimer();
             Download.downloadDone = false;
             AddOffersToResultLbox(BazosOffers.ListBazosOffers, cmbSelectOffersType.SelectedItem.ToString()); //result lisbox
+            //elapsedTime:
             elapsedTime = sw.Elapsed.Milliseconds >= 500 ? elapsedTime + 1 : elapsedTime;
-            //labels
+            //labels:
             string allOffers = $"{Download.fullCount}";
             string newOffers = $"{DB_Access.newOffersList.Count}";
             string updatedOffers = DB_Access.updatedList.Count > 0 ? $"{DB_Access.updatedList.Count}" : "not found";
@@ -117,6 +118,18 @@ namespace BazosBot
             lbUpdatedCount.Text = $"updated: {updatedOffers}";
             lbDeletedCount.Text = $"deleted: {deletedOffers}";
             btnGetBazos.Text = "get offers";
+            //report bugs:
+            if (DB_Access.catchedCommands.Count > 0)
+            {
+               MessageBox.Show($"Catched commands: {DB_Access.catchedCommands.Count}");
+               if (MessageBox.Show("Show all catched commands?", "show catched commands", MessageBoxButtons.YesNo) == DialogResult.Yes)
+               {
+                  foreach (string commandText in DB_Access.catchedCommands)
+                  {
+                     MessageBox.Show(commandText);
+                  }
+               }
+            }
          }
          //report waiting time:
          if (!Download.waiting && waitingSw.IsRunning)
