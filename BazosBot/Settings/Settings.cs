@@ -19,8 +19,8 @@ namespace BazosBot
 
       public static Dictionary<string, Size> FormSize = new Dictionary<string, Size>()
       {
-         { "default", new Size(1068, 720) },
-         { "botted", new Size(1068, 770) }
+         { "default", new Size(916, 625) },
+         { "botted", new Size(1068, 675) }
       };
       public static Dictionary<string, Point> panelLocation = new Dictionary<string, Point>()
       {
@@ -29,7 +29,7 @@ namespace BazosBot
       };
       public static void MainPanelLocation(string type, Control.ControlCollection Controls)
       {
-         foreach (Control item in Controls.OfType<Panel>().Where(p => p.Tag == "mainPanels"))
+         foreach (Control item in Controls.OfType<Panel>().Where(p => Equals(p.Tag, "mainPanels")))
          {
             item.Location = panelLocation[type];
          }
