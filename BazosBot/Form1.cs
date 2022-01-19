@@ -106,8 +106,9 @@ namespace BazosBot
             switchtimer();
             Download.downloadDone = false;
             AddOffersToResultLbox(BazosOffers.ListBazosOffers, cmbSelectOffersType.SelectedItem.ToString()); //result lisbox
+            //elapsedTime:
             elapsedTime = sw.Elapsed.Milliseconds >= 500 ? elapsedTime + 1 : elapsedTime;
-            //labels
+            //labels:
             string allOffers = $"{Download.fullCount}";
             string newOffers = $"{DB_Access.newOffersList.Count}";
             string updatedOffers = DB_Access.updatedList.Count > 0 ? $"{DB_Access.updatedList.Count}" : "not found";
@@ -117,6 +118,19 @@ namespace BazosBot
             lbUpdatedCount.Text = $"updated: {updatedOffers}";
             lbDeletedCount.Text = $"deleted: {deletedOffers}";
             btnGetBazos.Text = "get offers";
+            //report bugs:
+            if (DB_Access.catchedCommands.Count > 0)
+            {
+               MessageBox.Show($"Catched commands: {DB_Access.catchedCommands.Count}");
+               if (MessageBox.Show("Show all catched commands?", "show catched commands", MessageBoxButtons.YesNo) == DialogResult.Yes)
+               {
+                  foreach (string commandText in DB_Access.catchedCommands)
+                  {
+                     MessageBox.Show(commandText);
+                  }
+               }
+            }
+            DB_Access.catchedCommands.Clear();
          }
          //report waiting time:
          if (!Download.waiting && waitingSw.IsRunning)
@@ -243,6 +257,14 @@ namespace BazosBot
                   Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
                   //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
                   thread.Start();
+                  if (!QuickFilter.DictActualQuickFilters.ContainsKey(BazosOffers.actualCategoryURL))
+                  {
+                     QuickFilter.DictActualQuickFilters.Add(BazosOffers.actualCategoryURL, new List<string>());
+                  }
+                  if (!BlacklistSet.DictActualBlacklistSet.ContainsKey(BazosOffers.actualCategoryURL))
+                  {
+                     BlacklistSet.DictActualBlacklistSet.Add(BazosOffers.actualCategoryURL, new List<string>());
+                  }
                   if (!cmbSelectOffers.Items.Contains(tbSearchUrl.Text) && tbSearchUrl.Text != string.Empty) //+check if it is right url
                   {
                      cmbSelectOffers.Items.Add(tbSearchUrl.Text);
@@ -303,10 +325,12 @@ namespace BazosBot
       /// <param name="show"></param>
       private void showUpdates(bool show = true)
       {
-         offerLbox.Size = show ? new Size(244, 274) : new Size(244, 469);
+         offerLbox.Size = show ? new Size(offerLbox.Width, resultLbox.Height - updatesPanel.Height - 20) : new Size(offerLbox.Width, resultLbox.Height);
+         MinimumSize = show ? new Size(MinimumSize.Width, 542) : new Size(MinimumSize.Width, 371);
          updatesPanel.Visible = show;
          if (show)
          {
+            updatesPanel.Location = new Point(offerLbox.Location.X, offerLbox.Location.Y + offerLbox.Height + 20);
             foreach (Control control in updatesPanel.Controls.OfType<CheckBox>())
             {
                (control as CheckBox).Checked = true;
@@ -405,7 +429,7 @@ namespace BazosBot
 
       private void openOfferLboxUrl()
       {
-         if (offerLbox.Items.Count >= 0)
+         if (offerLbox.Items.Count > 0)
          {
             List<string> items = new List<string>(offerLbox.Items.Cast<string>());
             string url = items.First(p => p.Contains("url:")).Replace("url:", string.Empty).Trim();
@@ -1517,8 +1541,24 @@ namespace BazosBot
          activePanel = "main";
          resultLbox.HorizontalScrollbar = true;
          offerLbox.HorizontalScrollbar = true;
-         offerLbox.Size = new Size(244, 469);
+
+         foreach (Control panel in Controls.OfType<Panel>().Where(p => Equals(p.Tag, "mainPanels")))
+         {
+            cmbSelectPanel.Items.Add(Settings.DictMainPanelsNameValue.FirstOrDefault(c => c.Value == panel.Name).Key); //by value
+            panel.Location = Settings.defaultPanelLocation;
+            panel.Width = Size.Width - panel.Location.X - 12;
+            panel.Height = Size.Height - panel.Location.Y - 42;
+         }
+
+
+         resultLbox.Width = (panelMain.Width - resultLbox.Location.X - 60) / 3 * 2;
+         resultLbox.Height = panelMain.Height - resultLbox.Location.Y - 40;
+         offerLbox.Location = new Point(resultLbox.Location.X + resultLbox.Width + 20, offerLbox.Location.Y);
+         offerLbox.Size = cmbSelectOffersType.Text == "updated" ? new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height - updatesPanel.Height - 20) : new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height);
+         updatesPanel.Location = cmbSelectOffersType.Text == "updated" ? new Point(offerLbox.Location.X, offerLbox.Location.Y + offerLbox.Height + 20) : updatesPanel.Location;
+
          PrepareComboboxes();
+
       }
 
       private void PrepareComboboxes()
@@ -1533,12 +1573,6 @@ namespace BazosBot
             {
                (cmb as ComboBox).SelectedIndex = 0;
             }
-         }
-         foreach (Control control in Controls.OfType<Panel>())
-         {
-            cmbSelectPanel.Items.Add(Settings.DictMainPanelsNameValue.FirstOrDefault(c => c.Value == control.Name).Key); //by value
-            control.Size = Settings.defaultPanelSize;
-            control.Location = Settings.defaultPanelLocation;
          }
          cmbSelectPanel.SelectedItem = "main panel";
 
@@ -1654,6 +1688,46 @@ namespace BazosBot
             Hide();
             notifyIcon.Visible = true;
          }
+
+         foreach (Control panel in Controls.OfType<Panel>().Where(p => Equals(p.Tag, "mainPanels")))
+         {
+            panel.Width = Size.Width - panel.Location.X - 10;
+            panel.Height = Size.Height - panel.Location.Y - 10;
+         }
+         //ef
+
+         //main panel:
+         resultLbox.Width = (panelMain.Width - resultLbox.Location.X - 60) / 3 * 2;
+         resultLbox.Height = panelMain.Height - resultLbox.Location.Y - 40;
+         offerLbox.Location = new Point(resultLbox.Location.X + resultLbox.Width + 20, offerLbox.Location.Y);
+         offerLbox.Size = cmbSelectOffersType.Text == "updated" ? new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height - updatesPanel.Height - 20) : new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height);
+         updatesPanel.Location = cmbSelectOffersType.Text == "updated" ? new Point(offerLbox.Location.X, offerLbox.Location.Y + offerLbox.Height + 20) : updatesPanel.Location;
+
+         tbSearchUrl.Width = (int)(panelMain.Width / 2.6) - 67;
+         tbBlackListSet.Width = tbSearchUrl.Width - btnAddBlacklistSetToQuickFilter.Width - 6;
+         tbQuickFilter.Width = tbBlackListSet.Width;
+         btnAddBlacklistSetToQuickFilter.Location = new Point(tbBlackListSet.Location.X + tbBlackListSet.Width + 6, btnAddBlacklistSetToQuickFilter.Location.Y);
+         btnApplyQuickFilter.Location = new Point(btnAddBlacklistSetToQuickFilter.Location.X, btnApplyQuickFilter.Location.Y);
+         btnCreateQuickFilter.Location = new Point(btnApplyQuickFilter.Location.X + btnApplyQuickFilter.Width + 6, btnCreateQuickFilter.Location.Y);
+         btnCreateBlacklistSet.Location = new Point(btnCreateQuickFilter.Location.X, btnCreateBlacklistSet.Location.Y);
+         cmbSelectQuickFilter.Location = new Point(btnCreateQuickFilter.Location.X + btnCreateQuickFilter.Width + 6, cmbSelectQuickFilter.Location.Y);
+         cmbSelectBlacklistSet.Location = new Point(cmbSelectQuickFilter.Location.X, cmbSelectBlacklistSet.Location.Y);
+         cmbSelectOffersType.Location = new Point(tbSearchUrl.Location.X + tbSearchUrl.Width + 6, cmbSelectOffersType.Location.Y);
+         cmbSelectOffers.Location = new Point(cmbSelectOffersType.Location.X + cmbSelectOffersType.Width + 6, cmbSelectOffersType.Location.Y);
+         cmbSelectQuickFilter.Width = offerLbox.Location.X + offerLbox.Width - cmbSelectQuickFilter.Location.X; //(int)(panelMain.Width / 2.42) - 7;
+         cmbSelectOffers.Width = offerLbox.Location.X + offerLbox.Width - cmbSelectOffers.Location.X; //(int)(panelMain.Width / 3.07) - 3;
+
+         tbLokalita.Width = (int)(panelMain.Width / 8.72);
+         cmbSelectBlacklistSet.Width = offerLbox.Location.X + offerLbox.Width - cmbSelectBlacklistSet.Location.X - lbLokace.Width - tbLokalita.Width - 12;
+         lbLokace.Location = new Point(cmbSelectBlacklistSet.Location.X + cmbSelectBlacklistSet.Width + 5, lbLokace.Location.Y);
+         tbLokalita.Location = new Point(lbLokace.Location.X + lbLokace.Width + 6, tbLokalita.Location.Y);
+
+         //autobot panel:
+         lboxBotQuickFilter.Height = panelAutoBot.Height - lboxBotQuickFilter.Location.Y - 32;
+         lboxBotCategory.Height = panelAutoBot.Height - lboxBotCategory.Location.Y - 32;
+
+
+
       }
 
 
