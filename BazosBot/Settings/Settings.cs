@@ -16,6 +16,7 @@ namespace BazosBot
       public static string[] proxyList = new string[] { "190.15.200.31:8080" };
       public static readonly string DBconnString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}BazosDb.mdf;Integrated Security = True; Connect Timeout = 30";
       public static bool selectBotAfterCreateOrEdit = true;
+      public static bool checkAllNotFullPopis = true;
 
       public static Dictionary<string, Size> FormSize = new Dictionary<string, Size>()
       {
@@ -29,7 +30,7 @@ namespace BazosBot
       };
       public static void MainPanelLocation(string type, Control.ControlCollection Controls)
       {
-         foreach (Control item in Controls.OfType<Panel>().Where(p => Equals(p.Tag, "mainPanels")))
+         foreach (Control item in Controls.OfType<Panel>().Where(p => p.Tag == "mainPanels"))
          {
             item.Location = panelLocation[type];
          }

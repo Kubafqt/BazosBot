@@ -11,7 +11,6 @@ namespace BazosBot
 {
    class DB_Access
    {
-      public static List<string> catchedCommands = new List<string>();
       public static List<BazosOffers> newOffersList;
       public static List<BazosOffers> updatedList;
       public static List<BazosOffers> deletedList;
@@ -392,20 +391,12 @@ namespace BazosBot
       /// <param name="cmdText">command text</param>
       public static int ExecuteNonQuery(string cmdText)
       {
-         try
-         {
-            SqlConnection connection = new SqlConnection(connString);
-            SqlCommand cmd = new SqlCommand(cmdText, connection);
-            connection.Open();
-            int recordsAffected = cmd.ExecuteNonQuery();
-            connection.Close();
-            return recordsAffected;
-         }
-         catch (Exception e)
-         {
-            catchedCommands.Add($"{cmdText} - {e.GetType()}");
-            return 0;
-         }
+         SqlConnection connection = new SqlConnection(connString);
+         SqlCommand cmd = new SqlCommand(cmdText, connection);
+         connection.Open();
+         int recordsAffected = cmd.ExecuteNonQuery();
+         connection.Close();
+         return recordsAffected;
       }
 
       //private static int ExecuteNonQuery(string cmdText, List<string> parameters)
@@ -441,7 +432,7 @@ namespace BazosBot
             while (reader.Read())
             {
                string filterName = (string)reader[tableFilterName];
-               int lenght = filterName.Length; //< 10 ? filterName.Length : 10;
+               int lenght = filterName.Length < 10 ? filterName.Length : 10;
                if (filterName.Substring(0, lenght).Contains(name))
                {
                   IDlist.Add(Convert.ToInt32(Regex.Match(filterName, @"\d+").ToString()));
@@ -459,11 +450,14 @@ namespace BazosBot
       private static int PossibleFreeID(List<int> IDlist)
       {
          int maxValue = IDlist.Count > 0 && IDlist.Max() >= 1 ? IDlist.Max() : 1;
-         for (int i = 1; i <= maxValue + 1; i++)
+         if (maxValue >= 1)
          {
-            if (!IDlist.Contains(i))
+            for (int i = 1; i <= maxValue + 1; i++)
             {
-               return i;
+               if (!IDlist.Contains(i))
+               {
+                  return i;
+               }
             }
          }
          return maxValue;
@@ -674,7 +668,6 @@ namespace BazosBot
       //}
 
       #endregion
-
 
    }
 }
