@@ -130,6 +130,7 @@ namespace BazosBot
                   }
                }
             }
+            DB_Access.catchedCommands.Clear();
          }
          //report waiting time:
          if (!Download.waiting && waitingSw.IsRunning)
