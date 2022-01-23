@@ -30,7 +30,7 @@ namespace BazosBot
       };
       public static void MainPanelLocation(string type, Control.ControlCollection Controls)
       {
-         foreach (Control item in Controls.OfType<Panel>().Where(p => p.Tag == "mainPanels"))
+         foreach (Control item in Controls.OfType<Panel>().Where(p => Equals(p.Tag, "mainPanels")))
          {
             item.Location = panelLocation[type];
          }
