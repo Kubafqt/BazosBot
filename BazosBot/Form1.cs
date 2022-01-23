@@ -117,7 +117,6 @@ namespace BazosBot
             lbUpdatedCount.Text = $"updated: {updatedOffers}";
             lbDeletedCount.Text = $"deleted: {deletedOffers}";
             btnGetBazos.Text = "get offers";
-
          }
          //report waiting time:
          if (!Download.waiting && waitingSw.IsRunning)

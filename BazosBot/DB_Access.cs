@@ -11,7 +11,6 @@ namespace BazosBot
 {
    class DB_Access
    {
-      public static List<string> catchedCommands = new List<string>();
       public static List<BazosOffers> newOffersList;
       public static List<BazosOffers> updatedList;
       public static List<BazosOffers> deletedList;
@@ -433,7 +432,7 @@ namespace BazosBot
             while (reader.Read())
             {
                string filterName = (string)reader[tableFilterName];
-               int lenght = filterName.Length;// < 10 ? filterName.Length : 10;
+               int lenght = filterName.Length < 10 ? filterName.Length : 10;
                if (filterName.Substring(0, lenght).Contains(name))
                {
                   IDlist.Add(Convert.ToInt32(Regex.Match(filterName, @"\d+").ToString()));
@@ -451,11 +450,14 @@ namespace BazosBot
       private static int PossibleFreeID(List<int> IDlist)
       {
          int maxValue = IDlist.Count > 0 && IDlist.Max() >= 1 ? IDlist.Max() : 1;
-         for (int i = 1; i <= maxValue + 1; i++)
+         if (maxValue >= 1)
          {
-            if (!IDlist.Contains(i))
+            for (int i = 1; i <= maxValue + 1; i++)
             {
-               return i;
+               if (!IDlist.Contains(i))
+               {
+                  return i;
+               }
             }
          }
          return maxValue;

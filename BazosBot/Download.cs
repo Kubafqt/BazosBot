@@ -90,6 +90,52 @@ namespace BazosBot
       }
 
       /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="urlForFullContent"></param>
+      public static void DownloadFullContent(List<string> urlsForFullContent)
+      {
+         int downLimit = Settings.downLimit;
+         int actualNumber = 0;
+         downloadDone = false;
+         isRunning = true;
+         getOnlyNewOffers = onlyNewOffers;
+         url = url[url.Length - 1] == '/' || url.Contains("?") ? url : url + "/";
+         BazosOffers.actualCategoryURL = url;
+         RestClient client = new RestClient();
+         //string proxySite = Settings.proxyList[random.Next(Settings.proxyList.Length)];
+         //client.Proxy = new WebProxy("169.57.1.84:8123"); //use proxy server - later not random, but choosed
+         int downCount = 0;
+         do
+         {
+            if (downCount >= downLimit && fullCount - count >= downLimit * 10) //500 offers - waiting to not overload the server
+            {
+               downCount = 0;
+               waiting = true; //add report to timer
+               Thread.Sleep(random.Next(Settings.downLimitMinMax.X, Settings.downLimitMinMax.Y));
+            }
+            downCount++;
+            waiting = false;
+            RestRequest request = new RestRequest(url);
+            string html = Encoding.Default.GetString(client.DownloadData(request));
+            string[] lineSplit = html.Split("\n");
+            int containerLineNumber = 0;
+            fullCount = GetFullCount(lineSplit, ref containerLineNumber);
+            if (BazosOffers.GetOffersFromPage(html, url, containerLineNumber, onlyNewOffers)) //download only new offers when condition met
+            {
+               DownloadFinished(botted, onlyNewOffers);
+               return;
+            }
+            PrepareNextPage(ref actualNumber, ref url);
+            count = actualNumber <= fullCount ? actualNumber : fullCount;
+         }
+         while (actualNumber <= fullCount && !stopped);
+         DownloadFinished(botted);
+
+
+      }
+
+      /// <summary>
       /// When download finished.
       /// </summary>
       /// <param name="botted"></param>
