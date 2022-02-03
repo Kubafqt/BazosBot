@@ -1122,7 +1122,7 @@ namespace BazosBot
                lboxBotQuickFilter.Items.Add(quickFilterText);
                botChanged = true;
             }
-            NoQuickFilter:
+         NoQuickFilter:
             //add quickfilter text to db:
             if (AutoBot.tempBotList.Any(p => p.category == addCategory))
             {
