@@ -107,7 +107,7 @@ namespace BazosBot
             Download.downloadDone = false;
             AddOffersToResultLbox(BazosOffers.ListBazosOffers, cmbSelectOffersType.SelectedItem.ToString()); //result lisbox
             elapsedTime = sw.Elapsed.Milliseconds >= 500 ? elapsedTime + 1 : elapsedTime;
-            //labels
+            //labels:
             string allOffers = $"{Download.fullCount}";
             string newOffers = $"{DB_Access.newOffersList.Count}";
             string updatedOffers = DB_Access.updatedList.Count > 0 ? $"{DB_Access.updatedList.Count}" : "not found";
@@ -117,6 +117,19 @@ namespace BazosBot
             lbUpdatedCount.Text = $"updated: {updatedOffers}";
             lbDeletedCount.Text = $"deleted: {deletedOffers}";
             btnGetBazos.Text = "get offers";
+            //report bugs:
+            if (DB_Access.catchedCommands.Count > 0)
+            {
+               MessageBox.Show($"Catched commands: {DB_Access.catchedCommands.Count}");
+               if (MessageBox.Show("Show all catched commands?", "show catched commands", MessageBoxButtons.YesNo) == DialogResult.Yes)
+               {
+                  foreach (string commandText in DB_Access.catchedCommands)
+                  {
+                     MessageBox.Show(commandText);
+                  }
+               }
+            }
+            DB_Access.catchedCommands.Clear();
          }
          //report waiting time:
          if (!Download.waiting && waitingSw.IsRunning)
@@ -240,12 +253,9 @@ namespace BazosBot
                   cmbSelectOffersType.SelectedIndex = 0;
                   ResetList(); //reset list of offers and result lisbox
                   DB_Access.notUpdateViewedAndLastChecked = cboxNotUpdateViewedAndLastChecked.Checked;
-
                   Thread thread = new Thread(() => Download.DownloadAllFromCategory(BazosOffers.actualCategoryURL, cboxDownOnlyLast.Checked));
                   //Download.DownloadAllFromCategory(tbSearchUrl.Text, cboxDownOnlyLast.Checked); //await download
                   thread.Start();
-
-                  // vedlejší:
                   if (!QuickFilter.DictActualQuickFilters.ContainsKey(BazosOffers.actualCategoryURL))
                   {
                      QuickFilter.DictActualQuickFilters.Add(BazosOffers.actualCategoryURL, new List<string>());
@@ -260,8 +270,6 @@ namespace BazosBot
                      cmbBotCategoryUrl.Items.Add(tbSearchUrl.Text);
                   }
                   ChangeCmbSelectQuickFilter(BazosOffers.actualCategoryURL);
-
-                  //hlavní:
                   switchtimer();
                }
                else //+then another method for aukro, etc. servers
@@ -693,26 +701,48 @@ namespace BazosBot
          int itemCount = 1;
          resultLbox.Items.Clear();
          List<QuickFilter> qfList = QuickFilter.QuickFilterList;
-         string[] tbLokalitaSplit = tbLokalita.Text.Contains(";") ? tbLokalita.Text.Split(";") : new string[] { tbLokalita.Text }; //more locations
+         string[] tbLokalitaSplit = tbLokalita.Text.Contains(";") ? tbLokalita.Text.Split(";") : new string[] { tbLokalita.Text }; //more locations "..."
          if (qfList.Count > 0) //quickfilter and lokalita
          {
+            QuickFilter.notFullPopisList.Clear();
+            bool popisFilter = qfList.Any(qf => !qf.popis.Equals(string.Empty)) || QuickFilter.BlacklistPopis.Count > 0;
             foreach (BazosOffers item in BazosOffers.ListBazosOffers)
             {
                int cena = 0;
                string nadpis = TextAdjust.RemoveDiacritics(item.nadpis);
-               if (qfList.Any(qf => nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase))) //nadpis is matched in quickfilter
+               string popis = TextAdjust.RemoveDiacritics(item.popis);
+               if (popisFilter && item.popis.Length > 3 && item.popis[^3..].Equals("..."))
                {
-                  QuickFilter quickfilter = qfList.FirstOrDefault(qf => nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase));
+                  QuickFilter.notFullPopisList.Add(item.url);
+               }
+               if (qfList.Any(qf => nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase) || qfList.Any(qf => popis.Contains(qf.popis, StringComparison.OrdinalIgnoreCase)))) //nadpis or popis is matched in quickfilter
+               {
+                  QuickFilter quickfilter = qfList.FirstOrDefault(qf => nadpis.Contains(qf.nadpis, StringComparison.OrdinalIgnoreCase) || popis.Contains(qf.popis, StringComparison.OrdinalIgnoreCase));
                   int.TryParse(item.cena, out cena);
-                  if ((!quickfilter.FullNadpisName || nadpis.Split(' ').Contains(quickfilter.nadpis)) &&
+                  if ((!quickfilter.fullName || nadpis.Split(' ').Contains(quickfilter.nadpis)) &&
                      (quickfilter.minCena == 0 || (cena >= 0 && cena >= quickfilter.minCena) || cbDisableQuickFilterPrice.Checked) &&
                      (quickfilter.maxCena == 0 || (cena >= 0 && cena <= quickfilter.maxCena) || cbDisableQuickFilterPrice.Checked) &&
                      !QuickFilter.Blacklist.Any(qfNadpis => TextAdjust.RemoveDiacritics(nadpis).Contains(qfNadpis, StringComparison.OrdinalIgnoreCase)) &&
+                     !QuickFilter.BlacklistPopis.Any(qfPopis => TextAdjust.RemoveDiacritics(popis).Contains(qfPopis, StringComparison.OrdinalIgnoreCase)) &&
                      (tbLokalita.Text == string.Empty || tbLokalitaSplit.Any(lokalita => item.lokace.Contains(lokalita, StringComparison.OrdinalIgnoreCase)))) //test if item is matched to max cena
                   {
                      AddItemToResultLbox(itemCount, item);
                      itemCount++; //itemPlus = true;
                   }
+
+                  if (QuickFilter.notFullPopisList.Count > 0 && MessageBox.Show($"Stáhnout plný popis nabídek pro ovìøení? - Poèet nabídek/stránek pro stažení plného popisu - {QuickFilter.notFullPopisList.Count}", "Stáhnout plný popis nabídek?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                  {
+
+
+
+                  }
+
+                  //-> check full popis - download full popis? - do quickfilteru -> když fullpopis je downloaded -
+                  //-> pøi downloadování new je popis stejný až do bodu "..." na konci popisu - not upload popis, ... ;
+                  //-> možnost download full popis pøi klasickém stahování - pouze pokud není uložený v db už stejný do bodu s "..."
+                  //-> pøípadnì možnost check all full popis pro update - ale to je advanced a navíc, ... ;
+
+
                }
             }
          }
@@ -1092,7 +1122,7 @@ namespace BazosBot
                lboxBotQuickFilter.Items.Add(quickFilterText);
                botChanged = true;
             }
-         NoQuickFilter:
+            NoQuickFilter:
             //add quickfilter text to db:
             if (AutoBot.tempBotList.Any(p => p.category == addCategory))
             {
@@ -1532,7 +1562,26 @@ namespace BazosBot
          activePanel = "main";
          resultLbox.HorizontalScrollbar = true;
          offerLbox.HorizontalScrollbar = true;
-         offerLbox.Size = new Size(244, 468);
+         cboxCheckNotFullPopis.Checked = true;
+         Settings.checkAllNotFullPopis = cboxCheckNotFullPopis.Checked;
+         offerLbox.Size = new Size(244, 469);
+
+         foreach (Control panel in Controls.OfType<Panel>().Where(p => Equals(p.Tag, "mainPanels")))
+         {
+            cmbSelectPanel.Items.Add(Settings.DictMainPanelsNameValue.FirstOrDefault(c => c.Value == panel.Name).Key); //by value
+            panel.Location = Settings.defaultPanelLocation;
+            panel.Width = Size.Width - panel.Location.X - 12;
+            panel.Height = Size.Height - panel.Location.Y - 42;
+         }
+
+
+         resultLbox.Width = (panelMain.Width - resultLbox.Location.X - 60) / 3 * 2;
+         resultLbox.Height = panelMain.Height - resultLbox.Location.Y - 40;
+         offerLbox.Location = new Point(resultLbox.Location.X + resultLbox.Width + 20, offerLbox.Location.Y);
+         offerLbox.Size = cmbSelectOffersType.Text == "updated" ? new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height - updatesPanel.Height - 20) : new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height);
+         updatesPanel.Location = cmbSelectOffersType.Text == "updated" ? new Point(offerLbox.Location.X, offerLbox.Location.Y + offerLbox.Height + 20) : updatesPanel.Location;
+
+
          PrepareComboboxes();
       }
 
@@ -1677,9 +1726,11 @@ namespace BazosBot
          }
          //ef
 
+
+         //main panel:
          resultLbox.Width = (panelMain.Width - resultLbox.Location.X - 60) / 3 * 2;
          resultLbox.Height = panelMain.Height - resultLbox.Location.Y - 40;
-         offerLbox.Location = new Point(resultLbox.Location.X + resultLbox.Width + 20, resultLbox.Location.Y);
+         offerLbox.Location = new Point(resultLbox.Location.X + resultLbox.Width + 20, offerLbox.Location.Y);
          offerLbox.Size = cmbSelectOffersType.Text == "updated" ? new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height - updatesPanel.Height - 20) : new Size((panelMain.Width - resultLbox.Location.X - 60) / 3, resultLbox.Height);
          updatesPanel.Location = cmbSelectOffersType.Text == "updated" ? new Point(offerLbox.Location.X, offerLbox.Location.Y + offerLbox.Height + 20) : updatesPanel.Location;
 
@@ -1702,8 +1753,12 @@ namespace BazosBot
          lbLokace.Location = new Point(cmbSelectBlacklistSet.Location.X + cmbSelectBlacklistSet.Width + 5, lbLokace.Location.Y);
          tbLokalita.Location = new Point(lbLokace.Location.X + lbLokace.Width + 6, tbLokalita.Location.Y);
 
-      }
+         //autobot panel:
+         lboxBotQuickFilter.Height = panelAutoBot.Height - lboxBotQuickFilter.Location.Y - 32;
+         lboxBotCategory.Height = panelAutoBot.Height - lboxBotCategory.Location.Y - 32;
 
+
+      }
 
    }
 }

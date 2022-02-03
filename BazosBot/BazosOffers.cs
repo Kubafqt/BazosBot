@@ -76,12 +76,10 @@ namespace BazosBot
                {
                   return true; //only new offers
                }
-               //continue;
             }
             if (line.Contains("class=popis")) //popis
             {
                DictNameValue["popis"] = GetOfferPopis(htmlSplit, line, lineNumber);
-               //continue;
             }
             if (line.Contains("class=\"inzeratycena\"")) //cena - kč, dohodou, nabídněte, v textu, ...
             {
@@ -96,7 +94,6 @@ namespace BazosBot
                   }
                   nabCena = string.Empty;
                }
-               //continue;
             }
             if (line.Contains("class=\"inzeratylok\"")) //lokace, psč
 
@@ -105,7 +102,6 @@ namespace BazosBot
                string[] subStrSplit = line.Substring(startIndex).Split("<");
                DictNameValue["lokace"] = subStrSplit[0];
                DictNameValue["psc"] = subStrSplit[1].Replace("br>", string.Empty);
-               //continue;
             }
             if (line.Contains("class=\"inzeratyview\"")) //viewed count
             {

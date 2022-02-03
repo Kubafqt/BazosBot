@@ -16,6 +16,7 @@ namespace BazosBot
       public static string[] proxyList = new string[] { "190.15.200.31:8080" };
       public static readonly string DBconnString = $"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={Path.GetFullPath(Path.Combine(Application.StartupPath, @"..\..\..\"))}BazosDb.mdf;Integrated Security = True; Connect Timeout = 30";
       public static bool selectBotAfterCreateOrEdit = true;
+      public static bool checkAllNotFullPopis = true;
 
       public static Dictionary<string, Size> FormSize = new Dictionary<string, Size>()
       {
